@@ -41,7 +41,8 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 const configured = () =>
   Boolean(process.env.ADMIN_PASSWORD) &&
-  process.env.ADMIN_PASSWORD.length >= 12 &&
+  // Minimum de 11 caractères pour le mot de passe choisi ; 16+ recommandé.
+  process.env.ADMIN_PASSWORD.length >= 11 &&
   Boolean(process.env.SESSION_SECRET) &&
   process.env.SESSION_SECRET.length >= 32 &&
   Boolean(process.env.PLUGIN_TOKEN) &&
@@ -348,7 +349,7 @@ export default async (req, context) => {
   try {
     if (!configured()) {
       return fail(
-        "configuration serveur incomplète : ADMIN_PASSWORD (12 caractères min.), SESSION_SECRET (32 min.) et PLUGIN_TOKEN (24 min.) sont requis",
+        "configuration serveur incomplète : ADMIN_PASSWORD (11 caractères min.), SESSION_SECRET (32 min.) et PLUGIN_TOKEN (24 min.) sont requis",
         500
       );
     }

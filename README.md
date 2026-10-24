@@ -52,18 +52,33 @@ npm run dev
 `npm run dev` lance `netlify dev` sur `http://localhost:8888` avec les fonctions et le stockage Blobs local. Créez un fichier `.env` (non versionné) ou utilisez les variables Netlify :
 
 ```dotenv
-ADMIN_PASSWORD=un-mot-de-passe-de-12-caracteres-minimum
+ADMIN_PASSWORD=un-mot-de-passe-de-11-caracteres-minimum
 SESSION_SECRET=une-chaine-aleatoire-de-32-caracteres-minimum
 PLUGIN_TOKEN=un-jeton-de-24-caracteres-minimum
 ```
 
-Sans ces variables, l’API répond `500 configuration serveur incomplète` : c’est volontaire.
+Sans ces variables, l’API répond `500 configuration serveur incomplète` : c’est volontaire. Le fichier `.env.example` sert de modèle.
+
+### Erreur « configuration serveur incomplète »
+
+Cette erreur signifie que l’une des trois variables est absente ou trop courte. Elle n’est **pas** causée par le mot de passe saisi dans le formulaire.
+
+- **En local** : copiez `.env.example` vers `.env`, remplacez les trois valeurs, puis redémarrez `npm run dev`.
+- **Sur Netlify** : ajoutez les variables dans **Site configuration → Environment variables**, puis relancez un déploiement. Un simple rechargement de la page ne suffit pas si les variables ont été ajoutées après le dernier déploiement.
+
+Pour générer des valeurs aléatoires :
+
+```bash
+node -e "const c=require('node:crypto');const r=n=>c.randomBytes(n).toString('base64url');console.log('ADMIN_PASSWORD='+r(12));console.log('SESSION_SECRET='+r(24));console.log('PLUGIN_TOKEN='+r(18))"
+```
+
+Conservez la valeur de `ADMIN_PASSWORD` : c’est le mot de passe à saisir dans le studio.
 
 ## Variables d’environnement
 
 | Variable | Minimum | Rôle |
 |---|---:|---|
-| `ADMIN_PASSWORD` | 12 caractères | Mot de passe du studio (comparaison à temps constant). |
+| `ADMIN_PASSWORD` | 11 caractères (16 recommandés) | Mot de passe du studio (comparaison à temps constant). |
 | `SESSION_SECRET` | 32 caractères | Signature HMAC des sessions (durée 2 h, rafraîchies par `POST /api/session`). |
 | `PLUGIN_TOKEN` | 24 caractères | Jeton du plugin pour `GET /api/plugin/content`. |
 
