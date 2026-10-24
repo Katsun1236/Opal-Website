@@ -1,0 +1,21 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "opal:tropical_fog"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 30.0,
+        "fog_end": 110.0,
+        "fog_color": "#a8e8f8",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 45.0,
+        "fog_color": "#12a4b8"
+      }
+    }
+  }
+}

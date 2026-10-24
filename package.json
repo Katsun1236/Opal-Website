@@ -1,0 +1,21 @@
+{
+  "name": "opal-studio",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Studio de contenu Opal Heaven — édition des items, crafts et textures pour le serveur PMMP.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npx --yes netlify-cli dev",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check:data": "node scripts/check-data.mjs",
+    "check": "node --check public/app.js && node --check netlify/functions/api.mjs && node --check scripts/generate-vanilla-catalogue.mjs && node scripts/check-data.mjs && node --test \"tests/*.test.mjs\"",
+    "generate:catalogue": "node scripts/generate-vanilla-catalogue.mjs",
+    "generate:textures": "node scripts/generate-vanilla-textures.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

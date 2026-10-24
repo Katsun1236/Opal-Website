@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_shadow_wolf",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/loup_ombres"
+            },
+            "geometry": {
+                "default": "geometry.mob_shadow_wolf"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

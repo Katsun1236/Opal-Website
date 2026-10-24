@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_basalt_gargoyle",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/gargouille_basalte"
+            },
+            "geometry": {
+                "default": "geometry.basalt_gargoyle"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

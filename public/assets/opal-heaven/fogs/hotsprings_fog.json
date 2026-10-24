@@ -1,0 +1,21 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "opal:hotsprings_fog"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 4.0,
+        "fog_end": 48.0,
+        "fog_color": "#8de3dc",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 22.0,
+        "fog_color": "#1ca1a1"
+      }
+    }
+  }
+}

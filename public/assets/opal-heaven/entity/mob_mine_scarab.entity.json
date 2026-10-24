@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_mine_scarab",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/scarabee_mines"
+            },
+            "geometry": {
+                "default": "geometry.mob_cobalt_scarab"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

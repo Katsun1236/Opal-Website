@@ -1,0 +1,2020 @@
+{
+    "icons":  [
+                  {
+                      "file":  "icons/amethyst_shard.png",
+                      "url":  "/assets/opal-heaven/icons/amethyst_shard.png"
+                  },
+                  {
+                      "file":  "icons/blood_token.png",
+                      "url":  "/assets/opal-heaven/icons/blood_token.png"
+                  },
+                  {
+                      "file":  "icons/bottes_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bottes_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/bottes_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bottes_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/bottes_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/bottes_rubis.png"
+                  },
+                  {
+                      "file":  "icons/bottes_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bottes_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/bouclier_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bouclier_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/bouclier_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bouclier_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/bouclier_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/bouclier_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/casque_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/casque_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/casque_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/casque_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/casque_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/casque_rubis.png"
+                  },
+                  {
+                      "file":  "icons/casque_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/casque_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/combat_ration.png",
+                      "url":  "/assets/opal-heaven/icons/combat_ration.png"
+                  },
+                  {
+                      "file":  "icons/dague_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/dague_rubis.png"
+                  },
+                  {
+                      "file":  "icons/diamond_shard.png",
+                      "url":  "/assets/opal-heaven/icons/diamond_shard.png"
+                  },
+                  {
+                      "file":  "icons/eclat_amethyste.png",
+                      "url":  "/assets/opal-heaven/icons/eclat_amethyste.png"
+                  },
+                  {
+                      "file":  "icons/epee_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/epee_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/epee_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/epee_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/epee_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/epee_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/fast_fertilizer.png",
+                      "url":  "/assets/opal-heaven/icons/fast_fertilizer.png"
+                  },
+                  {
+                      "file":  "icons/faux_opale.png",
+                      "url":  "/assets/opal-heaven/icons/faux_opale.png"
+                  },
+                  {
+                      "file":  "icons/gemme_opale.png",
+                      "url":  "/assets/opal-heaven/icons/gemme_opale.png"
+                  },
+                  {
+                      "file":  "icons/gemme_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/gemme_rubis.png"
+                  },
+                  {
+                      "file":  "icons/hache_abattage.png",
+                      "url":  "/assets/opal-heaven/icons/hache_abattage.png"
+                  },
+                  {
+                      "file":  "icons/hache_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/hache_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/hache_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/hache_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/hache_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/hache_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/hammer_opale.png",
+                      "url":  "/assets/opal-heaven/icons/hammer_opale.png"
+                  },
+                  {
+                      "file":  "icons/hammer_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/hammer_rubis.png"
+                  },
+                  {
+                      "file":  "icons/houe_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/houe_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/houe_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/houe_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/houe_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/houe_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/jambieres_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/jambieres_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/jambieres_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/jambieres_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/jambieres_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/jambieres_rubis.png"
+                  },
+                  {
+                      "file":  "icons/jambieres_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/jambieres_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/koth_key.png",
+                      "url":  "/assets/opal-heaven/icons/koth_key.png"
+                  },
+                  {
+                      "file":  "icons/lingot_argent.png",
+                      "url":  "/assets/opal-heaven/icons/lingot_argent.png"
+                  },
+                  {
+                      "file":  "icons/lingot_titane.png",
+                      "url":  "/assets/opal-heaven/icons/lingot_titane.png"
+                  },
+                  {
+                      "file":  "icons/lumberjack_axe.png",
+                      "url":  "/assets/opal-heaven/icons/lumberjack_axe.png"
+                  },
+                  {
+                      "file":  "icons/masse_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/masse_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/opal_nugget.png",
+                      "url":  "/assets/opal-heaven/icons/opal_nugget.png"
+                  },
+                  {
+                      "file":  "icons/pelle_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pelle_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/pelle_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pelle_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/pelle_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pelle_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/pioche_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pioche_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/pioche_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pioche_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/pioche_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/pioche_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/plastron_argent_icon.png",
+                      "url":  "/assets/opal-heaven/icons/plastron_argent_icon.png"
+                  },
+                  {
+                      "file":  "icons/plastron_opale_icon.png",
+                      "url":  "/assets/opal-heaven/icons/plastron_opale_icon.png"
+                  },
+                  {
+                      "file":  "icons/plastron_rubis.png",
+                      "url":  "/assets/opal-heaven/icons/plastron_rubis.png"
+                  },
+                  {
+                      "file":  "icons/plastron_titane_icon.png",
+                      "url":  "/assets/opal-heaven/icons/plastron_titane_icon.png"
+                  },
+                  {
+                      "file":  "icons/sap_essence.png",
+                      "url":  "/assets/opal-heaven/icons/sap_essence.png"
+                  },
+                  {
+                      "file":  "icons/seed_diamond.png",
+                      "url":  "/assets/opal-heaven/icons/seed_diamond.png"
+                  },
+                  {
+                      "file":  "icons/seed_gold.png",
+                      "url":  "/assets/opal-heaven/icons/seed_gold.png"
+                  },
+                  {
+                      "file":  "icons/seed_iron.png",
+                      "url":  "/assets/opal-heaven/icons/seed_iron.png"
+                  },
+                  {
+                      "file":  "icons/seed_opal.png",
+                      "url":  "/assets/opal-heaven/icons/seed_opal.png"
+                  },
+                  {
+                      "file":  "icons/sharpening_powder.png",
+                      "url":  "/assets/opal-heaven/icons/sharpening_powder.png"
+                  },
+                  {
+                      "file":  "icons/stick_breach.png",
+                      "url":  "/assets/opal-heaven/icons/stick_breach.png"
+                  },
+                  {
+                      "file":  "icons/stick_force.png",
+                      "url":  "/assets/opal-heaven/icons/stick_force.png"
+                  },
+                  {
+                      "file":  "icons/stick_heal.png",
+                      "url":  "/assets/opal-heaven/icons/stick_heal.png"
+                  },
+                  {
+                      "file":  "icons/stick_speed.png",
+                      "url":  "/assets/opal-heaven/icons/stick_speed.png"
+                  },
+                  {
+                      "file":  "icons/super_pelle.png",
+                      "url":  "/assets/opal-heaven/icons/super_pelle.png"
+                  },
+                  {
+                      "file":  "icons/telluric_shard.png",
+                      "url":  "/assets/opal-heaven/icons/telluric_shard.png"
+                  },
+                  {
+                      "file":  "icons/watering_can_diamond.png",
+                      "url":  "/assets/opal-heaven/icons/watering_can_diamond.png"
+                  },
+                  {
+                      "file":  "icons/watering_can_iron.png",
+                      "url":  "/assets/opal-heaven/icons/watering_can_iron.png"
+                  },
+                  {
+                      "file":  "icons/watering_can_opal.png",
+                      "url":  "/assets/opal-heaven/icons/watering_can_opal.png"
+                  }
+              ],
+    "models":  [
+                   {
+                       "file":  "models/blocks/amas_cristaux_rubis.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/amas_cristaux_rubis.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/bloc_argent.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/bloc_argent.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/bloc_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/bloc_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/bloc_rubis.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/bloc_rubis.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/briques_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/briques_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/deepslate_minerai_argent.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/deepslate_minerai_argent.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/deepslate_minerai_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/deepslate_minerai_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/deepslate_minerai_rubis.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/deepslate_minerai_rubis.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/lampe_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/lampe_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/minerai_argent.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/minerai_argent.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/minerai_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/minerai_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/blocks/minerai_rubis.geo.json",
+                       "url":  "/assets/opal-heaven/models/blocks/minerai_rubis.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/araignee_cristal.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/araignee_cristal.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/archer_tribu.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/archer_tribu.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/armure_basalte_magma.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/armure_basalte_magma.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/armure_obsidienne_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/armure_obsidienne_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/armure_opale_celeste.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/armure_opale_celeste.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/armure_titane_forge.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/armure_titane_forge.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/baton_astral.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/baton_astral.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/behemoth_tellurique.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/behemoth_tellurique.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/berserker_tribu.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/berserker_tribu.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/bottes_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/bottes_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/bottes_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/bottes_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/bottes_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/bottes_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/bottes_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/bottes_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/bouclier_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/bouclier_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/casque_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/casque_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/casque_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/casque_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/casque_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/casque_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/casque_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/casque_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/chaman_tribu.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/chaman_tribu.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/chauve_souris_cryptes.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/chauve_souris_cryptes.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/crabe_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/crabe_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/dague_braise.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/dague_braise.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/dague_ombre.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/dague_ombre.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/epee_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/epee_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/epee_lourde_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/epee_lourde_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/epee_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/epee_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/faux_oblivion.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/faux_oblivion.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/faux_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/faux_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/fouisseur_profondeurs.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/fouisseur_profondeurs.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/gargouille_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/gargouille_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/golem_de_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/golem_de_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/goule_marais.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/goule_marais.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/guerrier_tribu.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/guerrier_tribu.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/hache_bataille_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/hache_bataille_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/hache_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/hache_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/hache_eruptive.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/hache_eruptive.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/hache_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/hache_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/hydre_des_cavernes.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/hydre_des_cavernes.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/jambieres_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/jambieres_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/jambieres_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/jambieres_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/jambieres_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/jambieres_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/jambieres_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/jambieres_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/lame_volcanique.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/lame_volcanique.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/lezard_prismatique.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/lezard_prismatique.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/loup_ombres.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/loup_ombres.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/masse_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/masse_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/masse_forgeron_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/masse_forgeron_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_archer.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_archer.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_berserker.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_berserker.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_guerrier.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_guerrier.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_moustique.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_moustique.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_shaman.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_shaman.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/mob_petit_souffleur.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/mob_petit_souffleur.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/moustique_geant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/moustique_geant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pavois_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pavois_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pavois_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pavois_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pelle_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pelle_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pelle_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pelle_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pioche_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pioche_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pioche_magma.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pioche_magma.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pioche_mecanique_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pioche_mecanique_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/pioche_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/pioche_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/plastron_basalte.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/plastron_basalte.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/plastron_en_titane.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/plastron_en_titane.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/plastron_neant.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/plastron_neant.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/plastron_opale.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/plastron_opale.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/rampant_braises.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/rampant_braises.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/roi_dechu.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/roi_dechu.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/scarabee_mines.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/scarabee_mines.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/scorpion_magma.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/scorpion_magma.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/seigneur_vampire.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/seigneur_vampire.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/sentinelle_de_pierre.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/sentinelle_de_pierre.geo.json"
+                   },
+                   {
+                       "file":  "models/entity/spectre_cendres.geo.json",
+                       "url":  "/assets/opal-heaven/models/entity/spectre_cendres.geo.json"
+                   }
+               ],
+    "textures":  [
+                     {
+                         "file":  "textures/blocks/acceleration_composter.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/acceleration_composter.png"
+                     },
+                     {
+                         "file":  "textures/blocks/amas_cristaux_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/amas_cristaux_rubis.png"
+                     },
+                     {
+                         "file":  "textures/blocks/amethyst_cluster.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/amethyst_cluster.png"
+                     },
+                     {
+                         "file":  "textures/blocks/bloc_argent.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/bloc_argent.png"
+                     },
+                     {
+                         "file":  "textures/blocks/bloc_opale.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/bloc_opale.png"
+                     },
+                     {
+                         "file":  "textures/blocks/bloc_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/bloc_rubis.png"
+                     },
+                     {
+                         "file":  "textures/blocks/block_titanium.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/block_titanium.png"
+                     },
+                     {
+                         "file":  "textures/blocks/breach_tnt.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/breach_tnt.png"
+                     },
+                     {
+                         "file":  "textures/blocks/briques_opale.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/briques_opale.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_diamond_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_diamond_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_iron_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_iron_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_minerai_argent.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_minerai_argent.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_minerai_opale.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_minerai_opale.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_minerai_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_minerai_rubis.png"
+                     },
+                     {
+                         "file":  "textures/blocks/deepslate_redstone_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/deepslate_redstone_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/diamond_block.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/diamond_block.png"
+                     },
+                     {
+                         "file":  "textures/blocks/diamond_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/diamond_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/ender_disruptor.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/ender_disruptor.png"
+                     },
+                     {
+                         "file":  "textures/blocks/faction_heart.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/faction_heart.png"
+                     },
+                     {
+                         "file":  "textures/blocks/fast_smelter.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/fast_smelter.png"
+                     },
+                     {
+                         "file":  "textures/blocks/fortified_stone.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/fortified_stone.png"
+                     },
+                     {
+                         "file":  "textures/blocks/iron_block.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/iron_block.png"
+                     },
+                     {
+                         "file":  "textures/blocks/iron_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/iron_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/lampe_opale.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/lampe_opale.png"
+                     },
+                     {
+                         "file":  "textures/blocks/minerai_argent.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/minerai_argent.png"
+                     },
+                     {
+                         "file":  "textures/blocks/minerai_opale.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/minerai_opale.png"
+                     },
+                     {
+                         "file":  "textures/blocks/minerai_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/minerai_rubis.png"
+                     },
+                     {
+                         "file":  "textures/blocks/netherite_block.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/netherite_block.png"
+                     },
+                     {
+                         "file":  "textures/blocks/redstone_block.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/redstone_block.png"
+                     },
+                     {
+                         "file":  "textures/blocks/redstone_ore.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/redstone_ore.png"
+                     },
+                     {
+                         "file":  "textures/blocks/reinforced_door.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/reinforced_door.png"
+                     },
+                     {
+                         "file":  "textures/blocks/reinforced_glass.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/reinforced_glass.png"
+                     },
+                     {
+                         "file":  "textures/blocks/reinforced_obsidian.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/reinforced_obsidian.png"
+                     },
+                     {
+                         "file":  "textures/blocks/shock_plate.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/shock_plate.png"
+                     },
+                     {
+                         "file":  "textures/blocks/steel_spikes.png",
+                         "url":  "/assets/opal-heaven/textures/blocks/steel_spikes.png"
+                     },
+                     {
+                         "file":  "textures/entity/araignee_cristal.png",
+                         "url":  "/assets/opal-heaven/textures/entity/araignee_cristal.png"
+                     },
+                     {
+                         "file":  "textures/entity/archer_tribu.png",
+                         "url":  "/assets/opal-heaven/textures/entity/archer_tribu.png"
+                     },
+                     {
+                         "file":  "textures/entity/behemoth_tellurique.png",
+                         "url":  "/assets/opal-heaven/textures/entity/behemoth_tellurique.png"
+                     },
+                     {
+                         "file":  "textures/entity/berserker_tribu.png",
+                         "url":  "/assets/opal-heaven/textures/entity/berserker_tribu.png"
+                     },
+                     {
+                         "file":  "textures/entity/chaman_tribu.png",
+                         "url":  "/assets/opal-heaven/textures/entity/chaman_tribu.png"
+                     },
+                     {
+                         "file":  "textures/entity/chauve_souris_cryptes.png",
+                         "url":  "/assets/opal-heaven/textures/entity/chauve_souris_cryptes.png"
+                     },
+                     {
+                         "file":  "textures/entity/crabe_opale.png",
+                         "url":  "/assets/opal-heaven/textures/entity/crabe_opale.png"
+                     },
+                     {
+                         "file":  "textures/entity/fouisseur_profondeurs.png",
+                         "url":  "/assets/opal-heaven/textures/entity/fouisseur_profondeurs.png"
+                     },
+                     {
+                         "file":  "textures/entity/gargouille_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/entity/gargouille_basalte.png"
+                     },
+                     {
+                         "file":  "textures/entity/golem_de_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/entity/golem_de_basalte.png"
+                     },
+                     {
+                         "file":  "textures/entity/goule_marais.png",
+                         "url":  "/assets/opal-heaven/textures/entity/goule_marais.png"
+                     },
+                     {
+                         "file":  "textures/entity/guerrier_tribu.png",
+                         "url":  "/assets/opal-heaven/textures/entity/guerrier_tribu.png"
+                     },
+                     {
+                         "file":  "textures/entity/hydre_des_cavernes.png",
+                         "url":  "/assets/opal-heaven/textures/entity/hydre_des_cavernes.png"
+                     },
+                     {
+                         "file":  "textures/entity/lezard_prismatique.png",
+                         "url":  "/assets/opal-heaven/textures/entity/lezard_prismatique.png"
+                     },
+                     {
+                         "file":  "textures/entity/loup_ombres.png",
+                         "url":  "/assets/opal-heaven/textures/entity/loup_ombres.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_archer.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_archer.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_berserker.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_berserker.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_guerrier.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_guerrier.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_moustique.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_moustique.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_shaman.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_shaman.png"
+                     },
+                     {
+                         "file":  "textures/entity/mob_petit_souffleur.png",
+                         "url":  "/assets/opal-heaven/textures/entity/mob_petit_souffleur.png"
+                     },
+                     {
+                         "file":  "textures/entity/moustique_geant.png",
+                         "url":  "/assets/opal-heaven/textures/entity/moustique_geant.png"
+                     },
+                     {
+                         "file":  "textures/entity/rampant_braises.png",
+                         "url":  "/assets/opal-heaven/textures/entity/rampant_braises.png"
+                     },
+                     {
+                         "file":  "textures/entity/roi_dechu.png",
+                         "url":  "/assets/opal-heaven/textures/entity/roi_dechu.png"
+                     },
+                     {
+                         "file":  "textures/entity/scarabee_mines.png",
+                         "url":  "/assets/opal-heaven/textures/entity/scarabee_mines.png"
+                     },
+                     {
+                         "file":  "textures/entity/scorpion_magma.png",
+                         "url":  "/assets/opal-heaven/textures/entity/scorpion_magma.png"
+                     },
+                     {
+                         "file":  "textures/entity/seigneur_vampire.png",
+                         "url":  "/assets/opal-heaven/textures/entity/seigneur_vampire.png"
+                     },
+                     {
+                         "file":  "textures/entity/sentinelle_de_pierre.png",
+                         "url":  "/assets/opal-heaven/textures/entity/sentinelle_de_pierre.png"
+                     },
+                     {
+                         "file":  "textures/entity/spectre_cendres.png",
+                         "url":  "/assets/opal-heaven/textures/entity/spectre_cendres.png"
+                     },
+                     {
+                         "file":  "textures/item_texture.json",
+                         "url":  "/assets/opal-heaven/textures/item_texture.json"
+                     },
+                     {
+                         "file":  "textures/items/amas_cristaux_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/amas_cristaux_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/amethyst_shard.png",
+                         "url":  "/assets/opal-heaven/textures/items/amethyst_shard.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_combat.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_combat.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_economy.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_economy.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_faction.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_faction.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_jobs.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_jobs.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_portals.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_portals.png"
+                     },
+                     {
+                         "file":  "textures/items/banner_card_warzone.png",
+                         "url":  "/assets/opal-heaven/textures/items/banner_card_warzone.png"
+                     },
+                     {
+                         "file":  "textures/items/baton_astral.png",
+                         "url":  "/assets/opal-heaven/textures/items/baton_astral.png"
+                     },
+                     {
+                         "file":  "textures/items/bloc_argent.png",
+                         "url":  "/assets/opal-heaven/textures/items/bloc_argent.png"
+                     },
+                     {
+                         "file":  "textures/items/bloc_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/bloc_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/bloc_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/bloc_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/blood_token.png",
+                         "url":  "/assets/opal-heaven/textures/items/blood_token.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_basalt_golem.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_basalt_golem.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_cave_hydra.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_cave_hydra.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_fallen_monarch.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_fallen_monarch.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_stone_sentinel.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_stone_sentinel.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_telluric_behemoth.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_telluric_behemoth.png"
+                     },
+                     {
+                         "file":  "textures/items/boss_vampire_lord.png",
+                         "url":  "/assets/opal-heaven/textures/items/boss_vampire_lord.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_basalte.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_neant.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_neant.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/bottes_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bottes_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/bouclier_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bouclier_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/bouclier_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/bouclier_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/bouclier_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bouclier_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/bouclier_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/bouclier_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/briques_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/briques_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/card_ah.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_ah.png"
+                     },
+                     {
+                         "file":  "textures/items/card_bounty.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_bounty.png"
+                     },
+                     {
+                         "file":  "textures/items/card_creative.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_creative.png"
+                     },
+                     {
+                         "file":  "textures/items/card_dummy.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_dummy.png"
+                     },
+                     {
+                         "file":  "textures/items/card_faction.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_faction.png"
+                     },
+                     {
+                         "file":  "textures/items/card_jobs.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_jobs.png"
+                     },
+                     {
+                         "file":  "textures/items/card_portals.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_portals.png"
+                     },
+                     {
+                         "file":  "textures/items/card_profile.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_profile.png"
+                     },
+                     {
+                         "file":  "textures/items/card_quests.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_quests.png"
+                     },
+                     {
+                         "file":  "textures/items/card_settings.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_settings.png"
+                     },
+                     {
+                         "file":  "textures/items/card_shop.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_shop.png"
+                     },
+                     {
+                         "file":  "textures/items/card_warzone.png",
+                         "url":  "/assets/opal-heaven/textures/items/card_warzone.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_basalte.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_neant.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_neant.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/casque_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/casque_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/combat_dummy.png",
+                         "url":  "/assets/opal-heaven/textures/items/combat_dummy.png"
+                     },
+                     {
+                         "file":  "textures/items/combat_ration.png",
+                         "url":  "/assets/opal-heaven/textures/items/combat_ration.png"
+                     },
+                     {
+                         "file":  "textures/items/dague_braise.png",
+                         "url":  "/assets/opal-heaven/textures/items/dague_braise.png"
+                     },
+                     {
+                         "file":  "textures/items/dague_ombre.png",
+                         "url":  "/assets/opal-heaven/textures/items/dague_ombre.png"
+                     },
+                     {
+                         "file":  "textures/items/dague_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/dague_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/deepslate_minerai_argent.png",
+                         "url":  "/assets/opal-heaven/textures/items/deepslate_minerai_argent.png"
+                     },
+                     {
+                         "file":  "textures/items/deepslate_minerai_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/deepslate_minerai_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/deepslate_minerai_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/deepslate_minerai_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_axe.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_axe.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_boots.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_boots.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_chestplate.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_chestplate.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_helmet.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_helmet.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_hoe.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_hoe.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_leggings.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_leggings.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_pickaxe.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_pickaxe.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_shard.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_shard.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_shovel.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_shovel.png"
+                     },
+                     {
+                         "file":  "textures/items/diamond_sword.png",
+                         "url":  "/assets/opal-heaven/textures/items/diamond_sword.png"
+                     },
+                     {
+                         "file":  "textures/items/eclat_amethyste.png",
+                         "url":  "/assets/opal-heaven/textures/items/eclat_amethyste.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_basalt_golem.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_basalt_golem.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_cave_hydra.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_cave_hydra.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_fallen_monarch.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_fallen_monarch.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_stone_sentinel.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_stone_sentinel.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_telluric_behemoth.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_telluric_behemoth.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_boss_vampire_lord.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_boss_vampire_lord.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_combat_dummy.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_combat_dummy.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_ash_spectre.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_ash_spectre.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_basalt_gargoyle.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_basalt_gargoyle.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_crypt_bat.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_crypt_bat.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_crystal_spider.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_crystal_spider.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_deep_burrower.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_deep_burrower.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_ember_crawler.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_ember_crawler.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_giant_mosquito.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_giant_mosquito.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_magma_scorpion.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_magma_scorpion.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_mine_scarab.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_mine_scarab.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_opal_crab.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_opal_crab.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_archer.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_archer.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_berserker.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_berserker.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_guerrier.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_guerrier.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_moustique.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_moustique.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_shaman.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_shaman.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_petit_souffleur.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_petit_souffleur.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_prismatic_lizard.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_prismatic_lizard.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_shadow_wolf.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_shadow_wolf.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_swamp_ghoul.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_swamp_ghoul.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_tribal_archer.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_tribal_archer.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_tribal_berserker.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_tribal_berserker.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_tribal_shaman.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_tribal_shaman.png"
+                     },
+                     {
+                         "file":  "textures/items/egg_mob_tribal_warrior.png",
+                         "url":  "/assets/opal-heaven/textures/items/egg_mob_tribal_warrior.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_lourde_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_lourde_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/epee_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/epee_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/fast_fertilizer.png",
+                         "url":  "/assets/opal-heaven/textures/items/fast_fertilizer.png"
+                     },
+                     {
+                         "file":  "textures/items/faux_oblivion.png",
+                         "url":  "/assets/opal-heaven/textures/items/faux_oblivion.png"
+                     },
+                     {
+                         "file":  "textures/items/faux_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/faux_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/gemme_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/gemme_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/gemme_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/gemme_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/golden_boots.png",
+                         "url":  "/assets/opal-heaven/textures/items/golden_boots.png"
+                     },
+                     {
+                         "file":  "textures/items/golden_chestplate.png",
+                         "url":  "/assets/opal-heaven/textures/items/golden_chestplate.png"
+                     },
+                     {
+                         "file":  "textures/items/golden_helmet.png",
+                         "url":  "/assets/opal-heaven/textures/items/golden_helmet.png"
+                     },
+                     {
+                         "file":  "textures/items/golden_leggings.png",
+                         "url":  "/assets/opal-heaven/textures/items/golden_leggings.png"
+                     },
+                     {
+                         "file":  "textures/items/golden_sword.png",
+                         "url":  "/assets/opal-heaven/textures/items/golden_sword.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_abattage.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_abattage.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_bataille_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_bataille_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_eruptive.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_eruptive.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/hache_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/hache_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/hammer_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/hammer_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/hammer_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/hammer_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/houe_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/houe_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/houe_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/houe_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/houe_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/houe_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_axe.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_axe.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_boots.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_boots.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_chestplate.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_chestplate.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_helmet.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_helmet.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_ingot.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_ingot.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_leggings.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_leggings.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_pickaxe.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_pickaxe.png"
+                     },
+                     {
+                         "file":  "textures/items/iron_sword.png",
+                         "url":  "/assets/opal-heaven/textures/items/iron_sword.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_basalte.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_neant.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_neant.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/jambieres_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/jambieres_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/koth_key.png",
+                         "url":  "/assets/opal-heaven/textures/items/koth_key.png"
+                     },
+                     {
+                         "file":  "textures/items/lame_volcanique.png",
+                         "url":  "/assets/opal-heaven/textures/items/lame_volcanique.png"
+                     },
+                     {
+                         "file":  "textures/items/lampe_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/lampe_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/lingot_argent.png",
+                         "url":  "/assets/opal-heaven/textures/items/lingot_argent.png"
+                     },
+                     {
+                         "file":  "textures/items/lingot_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/lingot_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/lumberjack_axe.png",
+                         "url":  "/assets/opal-heaven/textures/items/lumberjack_axe.png"
+                     },
+                     {
+                         "file":  "textures/items/masse_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/masse_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/masse_forgeron_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/masse_forgeron_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/masse_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/masse_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/minerai_argent.png",
+                         "url":  "/assets/opal-heaven/textures/items/minerai_argent.png"
+                     },
+                     {
+                         "file":  "textures/items/minerai_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/minerai_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/minerai_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/minerai_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_ash_spectre.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_ash_spectre.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_basalt_gargoyle.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_basalt_gargoyle.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_crypt_bat.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_crypt_bat.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_crystal_spider.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_crystal_spider.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_deep_burrower.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_deep_burrower.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_ember_crawler.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_ember_crawler.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_giant_mosquito.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_giant_mosquito.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_magma_scorpion.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_magma_scorpion.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_mine_scarab.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_mine_scarab.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_opal_crab.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_opal_crab.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_archer.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_archer.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_berserker.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_berserker.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_guerrier.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_guerrier.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_moustique.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_moustique.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_shaman.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_shaman.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_petit_souffleur.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_petit_souffleur.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_prismatic_lizard.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_prismatic_lizard.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_shadow_wolf.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_shadow_wolf.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_swamp_ghoul.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_swamp_ghoul.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_tribal_archer.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_tribal_archer.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_tribal_berserker.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_tribal_berserker.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_tribal_shaman.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_tribal_shaman.png"
+                     },
+                     {
+                         "file":  "textures/items/mob_tribal_warrior.png",
+                         "url":  "/assets/opal-heaven/textures/items/mob_tribal_warrior.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_axe.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_axe.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_boots.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_boots.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_chestplate.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_chestplate.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_helmet.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_helmet.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_hoe.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_hoe.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_ingot.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_ingot.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_leggings.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_leggings.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_pickaxe.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_pickaxe.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_shovel.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_shovel.png"
+                     },
+                     {
+                         "file":  "textures/items/netherite_sword.png",
+                         "url":  "/assets/opal-heaven/textures/items/netherite_sword.png"
+                     },
+                     {
+                         "file":  "textures/items/opal_nugget.png",
+                         "url":  "/assets/opal-heaven/textures/items/opal_nugget.png"
+                     },
+                     {
+                         "file":  "textures/items/pavois_neant.png",
+                         "url":  "/assets/opal-heaven/textures/items/pavois_neant.png"
+                     },
+                     {
+                         "file":  "textures/items/pavois_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/pavois_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/pelle_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pelle_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/pelle_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/pelle_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/pelle_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/pelle_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/pelle_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pelle_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/pelle_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pelle_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_magma.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_magma.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_mecanique_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_mecanique_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/pioche_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/pioche_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_argent_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_argent_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_basalte.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_neant.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_neant.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_opale.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_opale.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_opale_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_opale_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_rubis.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_rubis.png"
+                     },
+                     {
+                         "file":  "textures/items/plastron_titane_icon.png",
+                         "url":  "/assets/opal-heaven/textures/items/plastron_titane_icon.png"
+                     },
+                     {
+                         "file":  "textures/items/redstone.png",
+                         "url":  "/assets/opal-heaven/textures/items/redstone.png"
+                     },
+                     {
+                         "file":  "textures/items/sap_essence.png",
+                         "url":  "/assets/opal-heaven/textures/items/sap_essence.png"
+                     },
+                     {
+                         "file":  "textures/items/seed_diamond.png",
+                         "url":  "/assets/opal-heaven/textures/items/seed_diamond.png"
+                     },
+                     {
+                         "file":  "textures/items/seed_gold.png",
+                         "url":  "/assets/opal-heaven/textures/items/seed_gold.png"
+                     },
+                     {
+                         "file":  "textures/items/seed_iron.png",
+                         "url":  "/assets/opal-heaven/textures/items/seed_iron.png"
+                     },
+                     {
+                         "file":  "textures/items/seed_opal.png",
+                         "url":  "/assets/opal-heaven/textures/items/seed_opal.png"
+                     },
+                     {
+                         "file":  "textures/items/sharpening_powder.png",
+                         "url":  "/assets/opal-heaven/textures/items/sharpening_powder.png"
+                     },
+                     {
+                         "file":  "textures/items/shield.png",
+                         "url":  "/assets/opal-heaven/textures/items/shield.png"
+                     },
+                     {
+                         "file":  "textures/items/stick.png",
+                         "url":  "/assets/opal-heaven/textures/items/stick.png"
+                     },
+                     {
+                         "file":  "textures/items/stick_breach.png",
+                         "url":  "/assets/opal-heaven/textures/items/stick_breach.png"
+                     },
+                     {
+                         "file":  "textures/items/stick_force.png",
+                         "url":  "/assets/opal-heaven/textures/items/stick_force.png"
+                     },
+                     {
+                         "file":  "textures/items/stick_heal.png",
+                         "url":  "/assets/opal-heaven/textures/items/stick_heal.png"
+                     },
+                     {
+                         "file":  "textures/items/stick_speed.png",
+                         "url":  "/assets/opal-heaven/textures/items/stick_speed.png"
+                     },
+                     {
+                         "file":  "textures/items/super_pelle.png",
+                         "url":  "/assets/opal-heaven/textures/items/super_pelle.png"
+                     },
+                     {
+                         "file":  "textures/items/telluric_shard.png",
+                         "url":  "/assets/opal-heaven/textures/items/telluric_shard.png"
+                     },
+                     {
+                         "file":  "textures/items/watering_can_diamond.png",
+                         "url":  "/assets/opal-heaven/textures/items/watering_can_diamond.png"
+                     },
+                     {
+                         "file":  "textures/items/watering_can_iron.png",
+                         "url":  "/assets/opal-heaven/textures/items/watering_can_iron.png"
+                     },
+                     {
+                         "file":  "textures/items/watering_can_opal.png",
+                         "url":  "/assets/opal-heaven/textures/items/watering_can_opal.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/armure_basalte_magma.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/armure_basalte_magma.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/armure_obsidienne_neant.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/armure_obsidienne_neant.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/armure_opale_celeste.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/armure_opale_celeste.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/armure_titane_forge.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/armure_titane_forge.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/bottes_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/bottes_basalte.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/bottes_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/bottes_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/bottes_neant.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/bottes_neant.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/bottes_opale.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/bottes_opale.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/casque_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/casque_basalte.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/casque_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/casque_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/casque_neant.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/casque_neant.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/casque_opale.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/casque_opale.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/diamond_1.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/diamond_1.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/diamond_2.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/diamond_2.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/gold_1.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/gold_1.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/gold_2.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/gold_2.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/iron_1.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/iron_1.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/iron_2.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/iron_2.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/jambieres_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/jambieres_basalte.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/jambieres_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/jambieres_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/jambieres_neant.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/jambieres_neant.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/jambieres_opale.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/jambieres_opale.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/netherite_1.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/netherite_1.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/netherite_2.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/netherite_2.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/plastron_basalte.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/plastron_basalte.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/plastron_en_titane.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/plastron_en_titane.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/plastron_neant.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/plastron_neant.png"
+                     },
+                     {
+                         "file":  "textures/models/armor/plastron_opale.png",
+                         "url":  "/assets/opal-heaven/textures/models/armor/plastron_opale.png"
+                     },
+                     {
+                         "file":  "textures/terrain_texture.json",
+                         "url":  "/assets/opal-heaven/textures/terrain_texture.json"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_combat.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_combat.png"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_economy.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_economy.png"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_faction.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_faction.png"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_jobs.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_jobs.png"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_portals.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_portals.png"
+                     },
+                     {
+                         "file":  "textures/ui/banner_card_warzone.png",
+                         "url":  "/assets/opal-heaven/textures/ui/banner_card_warzone.png"
+                     },
+                     {
+                         "file":  "textures/ui/button_opal_default.png",
+                         "url":  "/assets/opal-heaven/textures/ui/button_opal_default.png"
+                     },
+                     {
+                         "file":  "textures/ui/button_opal_hover.png",
+                         "url":  "/assets/opal-heaven/textures/ui/button_opal_hover.png"
+                     },
+                     {
+                         "file":  "textures/ui/button_opal_pressed.png",
+                         "url":  "/assets/opal-heaven/textures/ui/button_opal_pressed.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_ah.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_ah.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_bounty.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_bounty.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_creative.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_creative.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_dummy.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_dummy.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_faction.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_faction.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_jobs.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_jobs.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_portals.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_portals.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_profile.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_profile.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_quests.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_quests.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_settings.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_settings.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_shop.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_shop.png"
+                     },
+                     {
+                         "file":  "textures/ui/card_warzone.png",
+                         "url":  "/assets/opal-heaven/textures/ui/card_warzone.png"
+                     },
+                     {
+                         "file":  "textures/ui/frame_opal_dialog.png",
+                         "url":  "/assets/opal-heaven/textures/ui/frame_opal_dialog.png"
+                     },
+                     {
+                         "file":  "textures/ui/ui_banner_opal_heaven.png",
+                         "url":  "/assets/opal-heaven/textures/ui/ui_banner_opal_heaven.png"
+                     }
+                 ]
+}

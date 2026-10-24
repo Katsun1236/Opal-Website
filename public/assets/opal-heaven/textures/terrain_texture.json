@@ -1,0 +1,80 @@
+{
+  "resource_pack_name": "OpalPack",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "minerai_opale": {
+      "textures": "textures/blocks/minerai_opale"
+    },
+    "deepslate_minerai_opale": {
+      "textures": "textures/blocks/deepslate_minerai_opale"
+    },
+    "bloc_opale": {
+      "textures": "textures/blocks/bloc_opale"
+    },
+    "briques_opale": {
+      "textures": "textures/blocks/briques_opale"
+    },
+    "lampe_opale": {
+      "textures": "textures/blocks/lampe_opale"
+    },
+    "minerai_argent": {
+      "textures": "textures/blocks/minerai_argent"
+    },
+    "deepslate_minerai_argent": {
+      "textures": "textures/blocks/deepslate_minerai_argent"
+    },
+    "bloc_argent": {
+      "textures": "textures/blocks/bloc_argent"
+    },
+    "minerai_rubis": {
+      "textures": "textures/blocks/minerai_rubis"
+    },
+    "deepslate_minerai_rubis": {
+      "textures": "textures/blocks/deepslate_minerai_rubis"
+    },
+    "bloc_rubis": {
+      "textures": "textures/blocks/bloc_rubis"
+    },
+    "amas_cristaux_rubis": {
+      "textures": "textures/blocks/amas_cristaux_rubis"
+    },
+    "fortified_stone": {
+      "textures": "textures/blocks/fortified_stone"
+    },
+    "reinforced_obsidian": {
+      "textures": "textures/blocks/reinforced_obsidian"
+    },
+    "reinforced_glass": {
+      "textures": "textures/blocks/reinforced_glass"
+    },
+    "steel_spikes": {
+      "textures": "textures/blocks/steel_spikes"
+    },
+    "breach_tnt": {
+      "textures": "textures/blocks/breach_tnt"
+    },
+    "reinforced_door": {
+      "textures": "textures/blocks/reinforced_door"
+    },
+    "faction_heart": {
+      "textures": "textures/blocks/faction_heart"
+    },
+    "ender_disruptor": {
+      "textures": "textures/blocks/ender_disruptor"
+    },
+    "shock_plate": {
+      "textures": "textures/blocks/shock_plate"
+    },
+    "acceleration_composter": {
+      "textures": "textures/blocks/acceleration_composter"
+    },
+    "fast_smelter": {
+      "textures": "textures/blocks/fast_smelter"
+    },
+    "block_titanium": {
+      "textures": "textures/blocks/block_titanium"
+    }
+  }
+}

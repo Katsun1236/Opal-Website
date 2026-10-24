@@ -1,0 +1,951 @@
+{
+    "resource_pack_name": "OpalPack",
+    "texture_name": "atlas.items",
+    "texture_data": {
+        "minerai_opale": {
+            "textures": "textures/items/minerai_opale"
+        },
+        "deepslate_minerai_opale": {
+            "textures": "textures/items/deepslate_minerai_opale"
+        },
+        "bloc_opale": {
+            "textures": "textures/items/bloc_opale"
+        },
+        "briques_opale": {
+            "textures": "textures/items/briques_opale"
+        },
+        "lampe_opale": {
+            "textures": "textures/items/lampe_opale"
+        },
+        "minerai_argent": {
+            "textures": "textures/items/minerai_argent"
+        },
+        "deepslate_minerai_argent": {
+            "textures": "textures/items/deepslate_minerai_argent"
+        },
+        "bloc_argent": {
+            "textures": "textures/items/bloc_argent"
+        },
+        "minerai_rubis": {
+            "textures": "textures/items/minerai_rubis"
+        },
+        "deepslate_minerai_rubis": {
+            "textures": "textures/items/deepslate_minerai_rubis"
+        },
+        "bloc_rubis": {
+            "textures": "textures/items/bloc_rubis"
+        },
+        "amas_cristaux_rubis": {
+            "textures": "textures/items/amas_cristaux_rubis"
+        },
+        "boss_basalt_golem": {
+            "textures": "textures/items/boss_basalt_golem"
+        },
+        "boss_cave_hydra": {
+            "textures": "textures/items/boss_cave_hydra"
+        },
+        "boss_fallen_monarch": {
+            "textures": "textures/items/boss_fallen_monarch"
+        },
+        "boss_vampire_lord": {
+            "textures": "textures/items/boss_vampire_lord"
+        },
+        "boss_stone_sentinel": {
+            "textures": "textures/items/boss_stone_sentinel"
+        },
+        "boss_telluric_behemoth": {
+            "textures": "textures/items/boss_telluric_behemoth"
+        },
+        "mob_magma_scorpion": {
+            "textures": "textures/items/mob_magma_scorpion"
+        },
+        "mob_crystal_spider": {
+            "textures": "textures/items/mob_crystal_spider"
+        },
+        "mob_opal_crab": {
+            "textures": "textures/items/mob_opal_crab"
+        },
+        "mob_shadow_wolf": {
+            "textures": "textures/items/mob_shadow_wolf"
+        },
+        "mob_basalt_gargoyle": {
+            "textures": "textures/items/mob_basalt_gargoyle"
+        },
+        "mob_tribal_warrior": {
+            "textures": "textures/items/mob_tribal_warrior"
+        },
+        "mob_tribal_archer": {
+            "textures": "textures/items/mob_tribal_archer"
+        },
+        "mob_deep_burrower": {
+            "textures": "textures/items/mob_deep_burrower"
+        },
+        "mob_tribal_shaman": {
+            "textures": "textures/items/mob_tribal_shaman"
+        },
+        "mob_mine_scarab": {
+            "textures": "textures/items/mob_mine_scarab"
+        },
+        "mob_tribal_berserker": {
+            "textures": "textures/items/mob_tribal_berserker"
+        },
+        "mob_crypt_bat": {
+            "textures": "textures/items/mob_crypt_bat"
+        },
+        "mob_prismatic_lizard": {
+            "textures": "textures/items/mob_prismatic_lizard"
+        },
+        "mob_giant_mosquito": {
+            "textures": "textures/items/mob_giant_mosquito"
+        },
+        "mob_swamp_ghoul": {
+            "textures": "textures/items/mob_swamp_ghoul"
+        },
+        "mob_ash_spectre": {
+            "textures": "textures/items/mob_ash_spectre"
+        },
+        "mob_ember_crawler": {
+            "textures": "textures/items/mob_ember_crawler"
+        },
+        "mob_petit_guerrier": {
+            "textures": "textures/items/mob_petit_guerrier"
+        },
+        "mob_petit_archer": {
+            "textures": "textures/items/mob_petit_archer"
+        },
+        "mob_petit_shaman": {
+            "textures": "textures/items/mob_petit_shaman"
+        },
+        "mob_petit_berserker": {
+            "textures": "textures/items/mob_petit_berserker"
+        },
+        "mob_petit_souffleur": {
+            "textures": "textures/items/mob_petit_souffleur"
+        },
+        "mob_petit_moustique": {
+            "textures": "textures/items/mob_petit_moustique"
+        },
+        "casque_en_titane": {
+            "textures": "textures/items/casque_titane_icon"
+        },
+        "plastron_en_titane": {
+            "textures": "textures/items/plastron_titane_icon"
+        },
+        "jambieres_en_titane": {
+            "textures": "textures/items/jambieres_titane_icon"
+        },
+        "bottes_en_titane": {
+            "textures": "textures/items/bottes_titane_icon"
+        },
+        "epee_en_titane": {
+            "textures": "textures/items/epee_titane_icon"
+        },
+        "pioche_en_titane": {
+            "textures": "textures/items/pioche_titane_icon"
+        },
+        "hache_en_titane": {
+            "textures": "textures/items/hache_titane_icon"
+        },
+        "pelle_en_titane": {
+            "textures": "textures/items/pelle_titane_icon"
+        },
+        "masse_en_titane": {
+            "textures": "textures/items/masse_titane_icon"
+        },
+        "bouclier_en_titane": {
+            "textures": "textures/items/bouclier_titane_icon"
+        },
+        "epee_opale": {
+            "textures": "textures/items/epee_opale_icon"
+        },
+        "pioche_opale": {
+            "textures": "textures/items/pioche_opale_icon"
+        },
+        "hache_opale": {
+            "textures": "textures/items/hache_opale_icon"
+        },
+        "pelle_opale": {
+            "textures": "textures/items/pelle_opale_icon"
+        },
+        "faux_opale": {
+            "textures": "textures/items/faux_opale"
+        },
+        "pavois_opale": {
+            "textures": "textures/items/bouclier_opale_icon"
+        },
+        "casque_opale": {
+            "textures": "textures/items/casque_opale_icon"
+        },
+        "plastron_opale": {
+            "textures": "textures/items/plastron_opale_icon"
+        },
+        "jambieres_opale": {
+            "textures": "textures/items/jambieres_opale_icon"
+        },
+        "bottes_opale": {
+            "textures": "textures/items/bottes_opale_icon"
+        },
+        "casque_basalte": {
+            "textures": "textures/items/casque_basalte"
+        },
+        "plastron_basalte": {
+            "textures": "textures/items/plastron_basalte"
+        },
+        "jambieres_basalte": {
+            "textures": "textures/items/jambieres_basalte"
+        },
+        "bottes_basalte": {
+            "textures": "textures/items/bottes_basalte"
+        },
+        "casque_neant": {
+            "textures": "textures/items/casque_neant"
+        },
+        "plastron_neant": {
+            "textures": "textures/items/plastron_neant"
+        },
+        "jambieres_neant": {
+            "textures": "textures/items/jambieres_neant"
+        },
+        "bottes_neant": {
+            "textures": "textures/items/bottes_neant"
+        },
+        "lame_volcanique": {
+            "textures": "textures/items/lame_volcanique"
+        },
+        "pioche_magma": {
+            "textures": "textures/items/pioche_magma"
+        },
+        "hache_eruptive": {
+            "textures": "textures/items/hache_eruptive"
+        },
+        "dague_braise": {
+            "textures": "textures/items/dague_braise"
+        },
+        "faux_oblivion": {
+            "textures": "textures/items/faux_oblivion"
+        },
+        "dague_ombre": {
+            "textures": "textures/items/dague_ombre"
+        },
+        "baton_astral": {
+            "textures": "textures/items/baton_astral"
+        },
+        "pavois_neant": {
+            "textures": "textures/items/pavois_neant"
+        },
+        "epee_lourde_titane": {
+            "textures": "textures/items/epee_lourde_titane"
+        },
+        "pioche_mecanique_titane": {
+            "textures": "textures/items/pioche_mecanique_titane"
+        },
+        "hache_bataille_titane": {
+            "textures": "textures/items/hache_bataille_titane"
+        },
+        "masse_forgeron_titane": {
+            "textures": "textures/items/masse_forgeron_titane"
+        },
+        "opal_gem": {
+            "textures": "textures/items/gemme_opale"
+        },
+        "celestite_ingot": {
+            "textures": "textures/items/lingot_argent"
+        },
+        "onix_shard": {
+            "textures": "textures/items/gemme_rubis"
+        },
+        "casque_rubis": {
+            "textures": "textures/items/casque_rubis"
+        },
+        "plastron_rubis": {
+            "textures": "textures/items/plastron_rubis"
+        },
+        "jambieres_rubis": {
+            "textures": "textures/items/jambieres_rubis"
+        },
+        "bottes_rubis": {
+            "textures": "textures/items/bottes_rubis"
+        },
+        "dague_rubis": {
+            "textures": "textures/items/dague_rubis"
+        },
+        "hammer_rubis": {
+            "textures": "textures/items/hammer_rubis"
+        },
+        "hammer_opale": {
+            "textures": "textures/items/hammer_opale"
+        },
+        "super_pelle": {
+            "textures": "textures/items/super_pelle"
+        },
+        "hache_abattage": {
+            "textures": "textures/items/hache_abattage"
+        },
+        "lumberjack_axe": {
+            "textures": "textures/items/lumberjack_axe"
+        },
+        "stick_heal": {
+            "textures": "textures/items/stick_heal"
+        },
+        "stick_speed": {
+            "textures": "textures/items/stick_speed"
+        },
+        "stick_force": {
+            "textures": "textures/items/stick_force"
+        },
+        "stick_breach": {
+            "textures": "textures/items/stick_breach"
+        },
+        "watering_can_iron": {
+            "textures": "textures/items/watering_can_iron"
+        },
+        "watering_can_diamond": {
+            "textures": "textures/items/watering_can_diamond"
+        },
+        "watering_can_opal": {
+            "textures": "textures/items/watering_can_opal"
+        },
+        "seed_iron": {
+            "textures": "textures/items/seed_iron"
+        },
+        "seed_gold": {
+            "textures": "textures/items/seed_gold"
+        },
+        "seed_diamond": {
+            "textures": "textures/items/seed_diamond"
+        },
+        "seed_opal": {
+            "textures": "textures/items/seed_opal"
+        },
+        "diamond_shard": {
+            "textures": "textures/items/diamond_shard"
+        },
+        "opal_nugget": {
+            "textures": "textures/items/opal_nugget"
+        },
+        "fast_fertilizer": {
+            "textures": "textures/items/fast_fertilizer"
+        },
+        "koth_key": {
+            "textures": "textures/items/koth_key"
+        },
+        "combat_ration": {
+            "textures": "textures/items/combat_ration"
+        },
+        "sharpening_powder": {
+            "textures": "textures/items/sharpening_powder"
+        },
+        "blood_token": {
+            "textures": "textures/items/blood_token"
+        },
+        "telluric_shard": {
+            "textures": "textures/items/telluric_shard"
+        },
+        "sap_essence": {
+            "textures": "textures/items/sap_essence"
+        },
+        "lingot_titane": {
+            "textures": "textures/items/lingot_titane"
+        },
+        "lingot_argent": {
+            "textures": "textures/items/lingot_argent"
+        },
+        "gemme_rubis": {
+            "textures": "textures/items/gemme_rubis"
+        },
+        "gemme_opale": {
+            "textures": "textures/items/gemme_opale"
+        },
+        "bouclier_argent": {
+            "textures": "textures/items/bouclier_argent_icon"
+        },
+        "bouclier_titane": {
+            "textures": "textures/items/bouclier_titane_icon"
+        },
+        "bouclier_opale": {
+            "textures": "textures/items/bouclier_opale_icon"
+        },
+        "egg_boss_basalt_golem": {
+            "textures": "textures/items/egg_boss_basalt_golem"
+        },
+        "egg_boss_cave_hydra": {
+            "textures": "textures/items/egg_boss_cave_hydra"
+        },
+        "egg_boss_fallen_monarch": {
+            "textures": "textures/items/egg_boss_fallen_monarch"
+        },
+        "egg_boss_vampire_lord": {
+            "textures": "textures/items/egg_boss_vampire_lord"
+        },
+        "egg_boss_stone_sentinel": {
+            "textures": "textures/items/egg_boss_stone_sentinel"
+        },
+        "egg_boss_telluric_behemoth": {
+            "textures": "textures/items/egg_boss_telluric_behemoth"
+        },
+        "egg_mob_magma_scorpion": {
+            "textures": "textures/items/egg_mob_magma_scorpion"
+        },
+        "egg_mob_crystal_spider": {
+            "textures": "textures/items/egg_mob_crystal_spider"
+        },
+        "egg_mob_opal_crab": {
+            "textures": "textures/items/egg_mob_opal_crab"
+        },
+        "egg_mob_shadow_wolf": {
+            "textures": "textures/items/egg_mob_shadow_wolf"
+        },
+        "egg_mob_basalt_gargoyle": {
+            "textures": "textures/items/egg_mob_basalt_gargoyle"
+        },
+        "egg_mob_tribal_warrior": {
+            "textures": "textures/items/egg_mob_tribal_warrior"
+        },
+        "egg_mob_tribal_archer": {
+            "textures": "textures/items/egg_mob_tribal_archer"
+        },
+        "egg_mob_deep_burrower": {
+            "textures": "textures/items/egg_mob_deep_burrower"
+        },
+        "egg_mob_tribal_shaman": {
+            "textures": "textures/items/egg_mob_tribal_shaman"
+        },
+        "egg_mob_mine_scarab": {
+            "textures": "textures/items/egg_mob_mine_scarab"
+        },
+        "egg_mob_tribal_berserker": {
+            "textures": "textures/items/egg_mob_tribal_berserker"
+        },
+        "egg_mob_crypt_bat": {
+            "textures": "textures/items/egg_mob_crypt_bat"
+        },
+        "egg_mob_prismatic_lizard": {
+            "textures": "textures/items/egg_mob_prismatic_lizard"
+        },
+        "egg_mob_giant_mosquito": {
+            "textures": "textures/items/egg_mob_giant_mosquito"
+        },
+        "egg_mob_swamp_ghoul": {
+            "textures": "textures/items/egg_mob_swamp_ghoul"
+        },
+        "egg_mob_ash_spectre": {
+            "textures": "textures/items/egg_mob_ash_spectre"
+        },
+        "egg_mob_ember_crawler": {
+            "textures": "textures/items/egg_mob_ember_crawler"
+        },
+        "egg_mob_petit_archer": {
+            "textures": "textures/items/egg_mob_petit_archer"
+        },
+        "egg_mob_petit_berserker": {
+            "textures": "textures/items/egg_mob_petit_berserker"
+        },
+        "egg_mob_petit_guerrier": {
+            "textures": "textures/items/egg_mob_petit_guerrier"
+        },
+        "egg_mob_petit_moustique": {
+            "textures": "textures/items/egg_mob_petit_moustique"
+        },
+        "egg_mob_petit_shaman": {
+            "textures": "textures/items/egg_mob_petit_shaman"
+        },
+        "egg_mob_petit_souffleur": {
+            "textures": "textures/items/egg_mob_petit_souffleur"
+        },
+        "combat_dummy": {
+            "textures": "textures/items/combat_dummy"
+        },
+        "egg_combat_dummy": {
+            "textures": "textures/items/egg_combat_dummy"
+        },
+        "epee_opale_icon": {
+            "textures": "textures/items/epee_opale_icon"
+        },
+        "pioche_opale_icon": {
+            "textures": "textures/items/pioche_opale_icon"
+        },
+        "hache_opale_icon": {
+            "textures": "textures/items/hache_opale_icon"
+        },
+        "pelle_opale_icon": {
+            "textures": "textures/items/pelle_opale_icon"
+        },
+        "houe_opale": {
+            "textures": "textures/items/houe_opale_icon"
+        },
+        "houe_opale_icon": {
+            "textures": "textures/items/houe_opale_icon"
+        },
+        "casque_opale_icon": {
+            "textures": "textures/items/casque_opale_icon"
+        },
+        "plastron_opale_icon": {
+            "textures": "textures/items/plastron_opale_icon"
+        },
+        "jambieres_opale_icon": {
+            "textures": "textures/items/jambieres_opale_icon"
+        },
+        "bottes_opale_icon": {
+            "textures": "textures/items/bottes_opale_icon"
+        },
+        "bouclier_opale_icon": {
+            "textures": "textures/items/bouclier_opale_icon"
+        },
+        "epee_argent": {
+            "textures": "textures/items/epee_argent_icon"
+        },
+        "epee_argent_icon": {
+            "textures": "textures/items/epee_argent_icon"
+        },
+        "pioche_argent": {
+            "textures": "textures/items/pioche_argent_icon"
+        },
+        "pioche_argent_icon": {
+            "textures": "textures/items/pioche_argent_icon"
+        },
+        "hache_argent": {
+            "textures": "textures/items/hache_argent_icon"
+        },
+        "hache_argent_icon": {
+            "textures": "textures/items/hache_argent_icon"
+        },
+        "pelle_argent": {
+            "textures": "textures/items/pelle_argent_icon"
+        },
+        "pelle_argent_icon": {
+            "textures": "textures/items/pelle_argent_icon"
+        },
+        "houe_argent": {
+            "textures": "textures/items/houe_argent_icon"
+        },
+        "houe_argent_icon": {
+            "textures": "textures/items/houe_argent_icon"
+        },
+        "casque_argent": {
+            "textures": "textures/items/casque_argent_icon"
+        },
+        "casque_argent_icon": {
+            "textures": "textures/items/casque_argent_icon"
+        },
+        "plastron_argent": {
+            "textures": "textures/items/plastron_argent_icon"
+        },
+        "plastron_argent_icon": {
+            "textures": "textures/items/plastron_argent_icon"
+        },
+        "jambieres_argent": {
+            "textures": "textures/items/jambieres_argent_icon"
+        },
+        "jambieres_argent_icon": {
+            "textures": "textures/items/jambieres_argent_icon"
+        },
+        "bottes_argent": {
+            "textures": "textures/items/bottes_argent_icon"
+        },
+        "bottes_argent_icon": {
+            "textures": "textures/items/bottes_argent_icon"
+        },
+        "bouclier_argent_icon": {
+            "textures": "textures/items/bouclier_argent_icon"
+        },
+        "silver_ingot": {
+            "textures": "textures/items/lingot_argent"
+        },
+        "epee_titane": {
+            "textures": "textures/items/epee_titane_icon"
+        },
+        "epee_titane_icon": {
+            "textures": "textures/items/epee_titane_icon"
+        },
+        "pioche_titane": {
+            "textures": "textures/items/pioche_titane_icon"
+        },
+        "pioche_titane_icon": {
+            "textures": "textures/items/pioche_titane_icon"
+        },
+        "hache_titane": {
+            "textures": "textures/items/hache_titane_icon"
+        },
+        "hache_titane_icon": {
+            "textures": "textures/items/hache_titane_icon"
+        },
+        "pelle_titane": {
+            "textures": "textures/items/pelle_titane_icon"
+        },
+        "pelle_titane_icon": {
+            "textures": "textures/items/pelle_titane_icon"
+        },
+        "houe_titane": {
+            "textures": "textures/items/houe_titane_icon"
+        },
+        "houe_titane_icon": {
+            "textures": "textures/items/houe_titane_icon"
+        },
+        "masse_titane": {
+            "textures": "textures/items/masse_titane_icon"
+        },
+        "masse_titane_icon": {
+            "textures": "textures/items/masse_titane_icon"
+        },
+        "casque_titane": {
+            "textures": "textures/items/casque_titane_icon"
+        },
+        "casque_titane_icon": {
+            "textures": "textures/items/casque_titane_icon"
+        },
+        "plastron_titane": {
+            "textures": "textures/items/plastron_titane_icon"
+        },
+        "plastron_titane_icon": {
+            "textures": "textures/items/plastron_titane_icon"
+        },
+        "jambieres_titane": {
+            "textures": "textures/items/jambieres_titane_icon"
+        },
+        "jambieres_titane_icon": {
+            "textures": "textures/items/jambieres_titane_icon"
+        },
+        "bottes_titane": {
+            "textures": "textures/items/bottes_titane_icon"
+        },
+        "bottes_titane_icon": {
+            "textures": "textures/items/bottes_titane_icon"
+        },
+        "bouclier_titane_icon": {
+            "textures": "textures/items/bouclier_titane_icon"
+        },
+        "titanium_ingot": {
+            "textures": "textures/items/lingot_titane"
+        },
+        "ruby_gem": {
+            "textures": "textures/items/gemme_rubis"
+        },
+        "amethyst_shard": {
+            "textures": "textures/items/amethyst_shard"
+        },
+        "eclat_amethyste": {
+            "textures": "textures/items/eclat_amethyste"
+        },
+        "opal:epee_opale": {
+            "textures": "textures/items/epee_opale_icon"
+        },
+        "opal:pioche_opale": {
+            "textures": "textures/items/pioche_opale_icon"
+        },
+        "opal:hache_opale": {
+            "textures": "textures/items/hache_opale_icon"
+        },
+        "opal:pelle_opale": {
+            "textures": "textures/items/pelle_opale_icon"
+        },
+        "opal:houe_opale": {
+            "textures": "textures/items/houe_opale_icon"
+        },
+        "opal:casque_opale": {
+            "textures": "textures/items/casque_opale_icon"
+        },
+        "opal:plastron_opale": {
+            "textures": "textures/items/plastron_opale_icon"
+        },
+        "opal:jambieres_opale": {
+            "textures": "textures/items/jambieres_opale_icon"
+        },
+        "opal:bottes_opale": {
+            "textures": "textures/items/bottes_opale_icon"
+        },
+        "opal:bouclier_opale": {
+            "textures": "textures/items/bouclier_opale_icon"
+        },
+        "opal:pavois_opale": {
+            "textures": "textures/items/bouclier_opale_icon"
+        },
+        "opal:hammer_opale": {
+            "textures": "textures/items/hammer_opale"
+        },
+        "opal:faux_opale": {
+            "textures": "textures/items/faux_opale"
+        },
+        "opal:gemme_opale": {
+            "textures": "textures/items/gemme_opale"
+        },
+        "opal:opal_gem": {
+            "textures": "textures/items/gemme_opale"
+        },
+        "opal:opal_nugget": {
+            "textures": "textures/items/opal_nugget"
+        },
+        "opal:watering_can_opal": {
+            "textures": "textures/items/watering_can_opal"
+        },
+        "opal:seed_opal": {
+            "textures": "textures/items/seed_opal"
+        },
+        "opal:epee_argent": {
+            "textures": "textures/items/epee_argent_icon"
+        },
+        "opal:pioche_argent": {
+            "textures": "textures/items/pioche_argent_icon"
+        },
+        "opal:hache_argent": {
+            "textures": "textures/items/hache_argent_icon"
+        },
+        "opal:pelle_argent": {
+            "textures": "textures/items/pelle_argent_icon"
+        },
+        "opal:houe_argent": {
+            "textures": "textures/items/houe_argent_icon"
+        },
+        "opal:casque_argent": {
+            "textures": "textures/items/casque_argent_icon"
+        },
+        "opal:plastron_argent": {
+            "textures": "textures/items/plastron_argent_icon"
+        },
+        "opal:jambieres_argent": {
+            "textures": "textures/items/jambieres_argent_icon"
+        },
+        "opal:bottes_argent": {
+            "textures": "textures/items/bottes_argent_icon"
+        },
+        "opal:bouclier_argent": {
+            "textures": "textures/items/bouclier_argent_icon"
+        },
+        "opal:lingot_argent": {
+            "textures": "textures/items/lingot_argent"
+        },
+        "opal:silver_ingot": {
+            "textures": "textures/items/lingot_argent"
+        },
+        "opal:epee_en_titane": {
+            "textures": "textures/items/epee_titane_icon"
+        },
+        "opal:epee_titane": {
+            "textures": "textures/items/epee_titane_icon"
+        },
+        "opal:pioche_en_titane": {
+            "textures": "textures/items/pioche_titane_icon"
+        },
+        "opal:pioche_titane": {
+            "textures": "textures/items/pioche_titane_icon"
+        },
+        "opal:hache_en_titane": {
+            "textures": "textures/items/hache_titane_icon"
+        },
+        "opal:hache_titane": {
+            "textures": "textures/items/hache_titane_icon"
+        },
+        "opal:pelle_en_titane": {
+            "textures": "textures/items/pelle_titane_icon"
+        },
+        "opal:pelle_titane": {
+            "textures": "textures/items/pelle_titane_icon"
+        },
+        "opal:houe_titane": {
+            "textures": "textures/items/houe_titane_icon"
+        },
+        "opal:masse_en_titane": {
+            "textures": "textures/items/masse_titane_icon"
+        },
+        "opal:masse_titane": {
+            "textures": "textures/items/masse_titane_icon"
+        },
+        "opal:casque_en_titane": {
+            "textures": "textures/items/casque_titane_icon"
+        },
+        "opal:casque_titane": {
+            "textures": "textures/items/casque_titane_icon"
+        },
+        "opal:plastron_en_titane": {
+            "textures": "textures/items/plastron_titane_icon"
+        },
+        "opal:plastron_titane": {
+            "textures": "textures/items/plastron_titane_icon"
+        },
+        "opal:jambieres_en_titane": {
+            "textures": "textures/items/jambieres_titane_icon"
+        },
+        "opal:jambieres_titane": {
+            "textures": "textures/items/jambieres_titane_icon"
+        },
+        "opal:bottes_en_titane": {
+            "textures": "textures/items/bottes_titane_icon"
+        },
+        "opal:bottes_titane": {
+            "textures": "textures/items/bottes_titane_icon"
+        },
+        "opal:bouclier_en_titane": {
+            "textures": "textures/items/bouclier_titane_icon"
+        },
+        "opal:bouclier_titane": {
+            "textures": "textures/items/bouclier_titane_icon"
+        },
+        "opal:lingot_titane": {
+            "textures": "textures/items/lingot_titane"
+        },
+        "opal:titanium_ingot": {
+            "textures": "textures/items/lingot_titane"
+        },
+        "opal:casque_rubis": {
+            "textures": "textures/items/casque_rubis"
+        },
+        "opal:plastron_rubis": {
+            "textures": "textures/items/plastron_rubis"
+        },
+        "opal:jambieres_rubis": {
+            "textures": "textures/items/jambieres_rubis"
+        },
+        "opal:bottes_rubis": {
+            "textures": "textures/items/bottes_rubis"
+        },
+        "opal:dague_rubis": {
+            "textures": "textures/items/dague_rubis"
+        },
+        "opal:hammer_rubis": {
+            "textures": "textures/items/hammer_rubis"
+        },
+        "opal:gemme_rubis": {
+            "textures": "textures/items/gemme_rubis"
+        },
+        "opal:ruby_gem": {
+            "textures": "textures/items/gemme_rubis"
+        },
+        "pioche_rubis": {
+            "textures": "textures/items/hammer_rubis"
+        },
+        "opal:pioche_rubis": {
+            "textures": "textures/items/hammer_rubis"
+        },
+        "opal:super_pelle": {
+            "textures": "textures/items/super_pelle"
+        },
+        "opal:hache_abattage": {
+            "textures": "textures/items/hache_abattage"
+        },
+        "opal:lumberjack_axe": {
+            "textures": "textures/items/lumberjack_axe"
+        },
+        "opal:stick_heal": {
+            "textures": "textures/items/stick_heal"
+        },
+        "opal:stick_speed": {
+            "textures": "textures/items/stick_speed"
+        },
+        "opal:stick_force": {
+            "textures": "textures/items/stick_force"
+        },
+        "opal:stick_breach": {
+            "textures": "textures/items/stick_breach"
+        },
+        "opal:watering_can_iron": {
+            "textures": "textures/items/watering_can_iron"
+        },
+        "opal:watering_can_diamond": {
+            "textures": "textures/items/watering_can_diamond"
+        },
+        "opal:seed_iron": {
+            "textures": "textures/items/seed_iron"
+        },
+        "opal:seed_gold": {
+            "textures": "textures/items/seed_gold"
+        },
+        "opal:seed_diamond": {
+            "textures": "textures/items/seed_diamond"
+        },
+        "opal:fast_fertilizer": {
+            "textures": "textures/items/fast_fertilizer"
+        },
+        "opal:sap_essence": {
+            "textures": "textures/items/sap_essence"
+        },
+        "opal:combat_ration": {
+            "textures": "textures/items/combat_ration"
+        },
+        "opal:koth_key": {
+            "textures": "textures/items/koth_key"
+        },
+        "opal:blood_token": {
+            "textures": "textures/items/blood_token"
+        },
+        "opal:sharpening_powder": {
+            "textures": "textures/items/sharpening_powder"
+        },
+        "opal:diamond_shard": {
+            "textures": "textures/items/diamond_shard"
+        },
+        "opal:telluric_shard": {
+            "textures": "textures/items/telluric_shard"
+        },
+        "opal:amethyst_shard": {
+            "textures": "textures/items/amethyst_shard"
+        },
+        "opal:eclat_amethyste": {
+            "textures": "textures/items/eclat_amethyste"
+        },
+        "card_faction": {
+            "textures": "textures/ui/card_faction"
+        },
+        "card_jobs": {
+            "textures": "textures/ui/card_jobs"
+        },
+        "card_shop": {
+            "textures": "textures/ui/card_shop"
+        },
+        "card_ah": {
+            "textures": "textures/ui/card_ah"
+        },
+        "card_quests": {
+            "textures": "textures/ui/card_quests"
+        },
+        "card_bounty": {
+            "textures": "textures/ui/card_bounty"
+        },
+        "card_portals": {
+            "textures": "textures/ui/card_portals"
+        },
+        "card_warzone": {
+            "textures": "textures/ui/card_warzone"
+        },
+        "card_dummy": {
+            "textures": "textures/ui/card_dummy"
+        },
+        "card_settings": {
+            "textures": "textures/ui/card_settings"
+        },
+        "card_profile": {
+            "textures": "textures/ui/card_profile"
+        },
+        "card_creative": {
+            "textures": "textures/ui/card_creative"
+        },
+        "banner_card_faction": {
+            "textures": "textures/ui/banner_card_faction"
+        },
+        "banner_card_jobs": {
+            "textures": "textures/ui/banner_card_jobs"
+        },
+        "banner_card_warzone": {
+            "textures": "textures/ui/banner_card_warzone"
+        },
+        "banner_card_economy": {
+            "textures": "textures/ui/banner_card_economy"
+        },
+        "banner_card_portals": {
+            "textures": "textures/ui/banner_card_portals"
+        },
+        "banner_card_combat": {
+            "textures": "textures/ui/banner_card_combat"
+        },
+        "ui_banner_opal_heaven": {
+            "textures": "textures/ui/ui_banner_opal_heaven"
+        },
+        "frame_opal_dialog": {
+            "textures": "textures/ui/frame_opal_dialog"
+        },
+        "button_opal_default": {
+            "textures": "textures/ui/button_opal_default"
+        },
+        "button_opal_hover": {
+            "textures": "textures/ui/button_opal_hover"
+        }
+    }
+}

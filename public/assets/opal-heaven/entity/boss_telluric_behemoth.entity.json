@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:boss_telluric_behemoth",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/behemoth_tellurique"
+            },
+            "geometry": {
+                "default": "geometry.telluric_behemoth"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

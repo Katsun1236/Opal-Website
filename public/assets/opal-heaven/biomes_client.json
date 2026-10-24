@@ -1,0 +1,71 @@
+{
+  "biomes": {
+    "opal:bayou": {
+      "fog_identifier": "opal:swamp_fog",
+      "water_surface_color": "#3b5a32"
+    },
+    "opal:marais": {
+      "fog_identifier": "opal:swamp_fog",
+      "water_surface_color": "#4a5a3a"
+    },
+    "opal:mangrove": {
+      "fog_identifier": "opal:swamp_fog",
+      "water_surface_color": "#3a5333"
+    },
+    "opal:volcan": {
+      "fog_identifier": "opal:volcano_fog",
+      "water_surface_color": "#3f1a1a"
+    },
+    "opal:plaine_de_basalte": {
+      "fog_identifier": "opal:volcano_fog",
+      "water_surface_color": "#2c2828"
+    },
+    "opal:foret_de_cerisiers": {
+      "fog_identifier": "opal:cherry_fog",
+      "water_surface_color": "#5b8ba8"
+    },
+    "opal:montagnes_enneigees": {
+      "fog_identifier": "opal:mountain_fog",
+      "water_surface_color": "#3d73a8"
+    },
+    "opal:fjords": {
+      "fog_identifier": "opal:mountain_fog",
+      "water_surface_color": "#2d6396"
+    },
+    "opal:hauts_plateaux": {
+      "fog_identifier": "opal:mountain_fog",
+      "water_surface_color": "#3b6d94"
+    },
+    "opal:foret_d_automne": {
+      "fog_identifier": "opal:autumn_fog",
+      "water_surface_color": "#3b6b55"
+    },
+    "opal:foret_sombre": {
+      "fog_identifier": "opal:dark_forest_fog",
+      "water_surface_color": "#1e3a24"
+    },
+    "opal:sources_chaudes": {
+      "fog_identifier": "opal:hotsprings_fog",
+      "water_surface_color": "#1cb5b5"
+    },
+    "opal:atoll": {
+      "fog_identifier": "opal:tropical_fog",
+      "water_surface_color": "#1fc7d4"
+    },
+    "opal:collines_marines": {
+      "fog_identifier": "opal:tropical_fog",
+      "water_surface_color": "#1caec4"
+    },
+    "opal:gouffre": {
+      "fog_identifier": "opal:dark_forest_fog",
+      "water_surface_color": "#108882"
+    },
+    "opal:canyon": {
+      "water_surface_color": "#945c3b"
+    },
+    "opal:foret_de_sequoias": {
+      "fog_identifier": "opal:autumn_fog",
+      "water_surface_color": "#2d5238"
+    }
+  }
+}

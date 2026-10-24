@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_prismatic_lizard",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/lezard_prismatique"
+            },
+            "geometry": {
+                "default": "geometry.mob_prismatic_lizard"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

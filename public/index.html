@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1020">
+<meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
+<title>Opal Heaven — Studio de contenu</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<a class="skip-link" href="#app">Aller au contenu</a>
+<noscript><p class="noscript">Ce studio nécessite JavaScript pour fonctionner.</p></noscript>
+
+<section id="login" class="card narrow">
+  <h1>Opal Heaven · Studio</h1>
+  <form id="login-form">
+    <label for="password">Mot de passe administrateur
+      <input type="password" id="password" name="password" autocomplete="current-password" required maxlength="256">
+    </label>
+    <button type="submit">Connexion</button>
+    <p id="login-error" class="error" role="alert"></p>
+  </form>
+</section>
+
+<main id="app" hidden>
+  <div id="fatal" class="fatal" role="alertdialog" aria-labelledby="fatal-title" hidden>
+    <h2 id="fatal-title">Chargement impossible</h2>
+    <p id="fatal-message"></p>
+    <div class="row">
+      <button type="button" id="fatal-retry">Réessayer</button>
+      <button type="button" id="fatal-logout" class="ghost">Se déconnecter</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>Opal Heaven · Studio</h1>
+    <div class="actions">
+      <span id="status" aria-live="polite">Synchronisé</span>
+      <button id="save" type="button">Enregistrer</button>
+      <button id="logout" type="button" class="ghost">Déconnexion</button>
+    </div>
+  </header>
+
+  <div id="draft-banner" class="draft-banner" role="status" hidden>
+    <span id="draft-text"></span>
+    <div class="row">
+      <button type="button" id="draft-restore">Restaurer le brouillon</button>
+      <button type="button" id="draft-discard" class="ghost">Ignorer</button>
+    </div>
+  </div>
+
+  <nav role="tablist" aria-label="Sections du studio">
+    <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="true" data-tab="library" class="active" tabindex="0">Contenu existant</button>
+    <button type="button" role="tab" id="nav-entries" aria-controls="tab-entries" aria-selected="false" data-tab="entries" tabindex="-1">Contenus</button>
+    <button type="button" role="tab" id="nav-recipes" aria-controls="tab-recipes" aria-selected="false" data-tab="recipes" tabindex="-1">Crafts</button>
+    <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" tabindex="-1">Données</button>
+  </nav>
+
+  <section id="tab-entries" class="tab" role="tabpanel" aria-labelledby="nav-entries" tabindex="0" hidden>
+    <div class="split">
+      <div class="card">
+        <label class="sr-only" for="entry-filter">Filtrer les contenus</label>
+        <input id="entry-filter" placeholder="Filtrer…" maxlength="40">
+        <label class="sort-control" for="entry-sort">Trier par
+          <select id="entry-sort">
+            <option value="name">Nom (A–Z)</option>
+            <option value="name-desc">Nom (Z–A)</option>
+            <option value="id">Identifiant</option>
+            <option value="kind">Type</option>
+          </select>
+        </label>
+        <ul id="entry-list" class="list"></ul>
+      </div>
+      <form id="entry-form" class="card">
+        <h2 id="entry-title">Nouveau contenu</h2>
+        <label for="entry-kind">Type
+          <select id="entry-kind">
+            <option value="item">Item</option>
+            <option value="block">Bloc</option>
+            <option value="armor">Armure</option>
+            <option value="weapon">Arme</option>
+            <option value="tool">Outil</option>
+          </select>
+        </label>
+        <label for="entry-id">Identifiant (a-z, 0-9, _)
+          <input id="entry-id" maxlength="40" required pattern="[a-z0-9_]{2,40}">
+        </label>
+        <label for="entry-name">Nom affiché
+          <input id="entry-name" maxlength="80" required>
+        </label>
+        <div id="entry-preview" class="entry-preview" aria-live="polite"></div>
+        <div class="row row-tight">
+          <button type="button" id="entry-change-texture" class="ghost btn-sm">🎨 Modifier la texture</button>
+          <span id="entry-texture-status" class="muted text-sm"></span>
+        </div>
+        <label for="entry-base">Item vanilla de base
+          <input id="entry-base" list="ingredients-vanilla" maxlength="64" required placeholder="ex. diamant">
+        </label>
+        <label for="entry-lore">Description (une ligne par ligne, 10 max, 100 caractères par ligne)
+          <textarea id="entry-lore" rows="4" maxlength="1200"></textarea>
+        </label>
+        <p id="lore-counter" class="field-hint"></p>
+        <div class="row">
+          <label for="entry-tier">Tier
+            <input id="entry-tier" maxlength="20">
+          </label>
+          <label id="durability-label" for="entry-durability">Durabilité
+            <input id="entry-durability" type="number" min="0" max="100000" step="1" value="0">
+          </label>
+          <label id="charges-label" for="entry-charges">Charges
+            <input id="entry-charges" type="number" min="0" max="1000" step="1" value="0">
+          </label>
+        </div>
+        <div class="row">
+          <button type="submit">Valider</button>
+          <button type="button" id="entry-reset" class="ghost">Nouveau</button>
+          <button type="button" id="entry-delete" class="danger" hidden>Supprimer</button>
+        </div>
+        <p id="entry-error" class="error" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-recipes" class="tab" role="tabpanel" aria-labelledby="nav-recipes" tabindex="0" hidden>
+    <div class="split">
+      <div class="card">
+        <label class="sr-only" for="recipe-filter">Filtrer les crafts</label>
+        <input id="recipe-filter" placeholder="Filtrer…" maxlength="40">
+        <label class="sort-control" for="recipe-category">Catégorie
+          <select id="recipe-category">
+            <option value="all">Tous les crafts</option>
+            <option value="custom">Crafts personnalisés</option>
+            <option value="vanilla-overrides">Crafts vanilla modifiés</option>
+            <option value="vanilla">Crafts vanilla d’origine</option>
+          </select>
+        </label>
+        <label class="sort-control" for="recipe-sort">Trier par
+          <select id="recipe-sort">
+            <option value="name">Résultat (A–Z)</option>
+            <option value="name-desc">Résultat (Z–A)</option>
+            <option value="id">Identifiant</option>
+            <option value="type">Type de craft</option>
+          </select>
+        </label>
+        <ul id="recipe-list" class="list"></ul>
+        <p id="recipe-status" class="muted" aria-live="polite"></p>
+      </div>
+      <form id="recipe-form" class="card">
+        <h2 id="recipe-title">Nouveau craft</h2>
+        <div id="recipe-banner" class="banner-override" hidden>
+          <span id="recipe-banner-text"></span>
+          <button type="button" id="recipe-revert" class="ghost btn-sm">Rétablir la recette vanilla d’origine</button>
+        </div>
+        <div class="row">
+          <label for="recipe-type">Type
+            <select id="recipe-type">
+              <option value="shaped">Avec forme (3x3)</option>
+              <option value="shapeless">Sans forme</option>
+              <option value="furnace">Four</option>
+            </select>
+          </label>
+          <label for="recipe-id">Identifiant
+            <input id="recipe-id" maxlength="40" required pattern="[a-z0-9_]{2,40}">
+          </label>
+        </div>
+        <div id="grid" class="grid" role="group" aria-label="Grille de craft"></div>
+        <div class="row">
+          <label for="recipe-result">Résultat
+            <input id="recipe-result" list="ingredients" maxlength="80" required>
+          </label>
+          <label for="recipe-count">Quantité
+            <input id="recipe-count" type="number" min="1" max="64" step="1" value="1">
+          </label>
+        </div>
+        <div class="row">
+          <button type="submit">Valider</button>
+          <button type="button" id="recipe-reset" class="ghost">Nouveau</button>
+          <button type="button" id="recipe-delete" class="danger" hidden>Supprimer</button>
+        </div>
+        <p id="recipe-error" class="error" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-library" class="tab" role="tabpanel" aria-labelledby="nav-library" tabindex="0">
+    <div class="card">
+      <h2>Contenu existant</h2>
+      <p class="muted">Parcourez les items, blocs et recettes vanilla ou Opal Heaven. Les crafts non supportés par l’éditeur restent consultables mais ne sont ni modifiables ni désactivables.</p>
+      <div class="library-controls">
+        <label class="sr-only" for="library-filter">Rechercher</label>
+        <input id="library-filter" placeholder="Rechercher un nom ou un fichier…" maxlength="80">
+        <label class="sr-only" for="library-type">Catalogue à afficher</label>
+        <select id="library-type">
+          <option value="custom-items">Mes contenus personnalisés</option>
+          <option value="vanilla-items">Items vanilla (PMMP 5)</option>
+          <option value="vanilla-blocks">Blocs vanilla (PMMP 5)</option>
+          <option value="vanilla-recipes">Crafts vanilla (PMMP 5)</option>
+          <option value="opal-items">Items Opal Heaven</option>
+          <option value="opal-blocks">Blocs Opal Heaven</option>
+          <option value="icons">Icônes Opal Heaven</option>
+          <option value="models">Modèles 3D Opal Heaven</option>
+          <option value="textures">Textures Opal Heaven</option>
+        </select>
+        <label class="sr-only" for="library-sort">Trier le catalogue</label>
+        <select id="library-sort">
+          <option value="name">Nom (A–Z)</option>
+          <option value="name-desc">Nom (Z–A)</option>
+          <option value="id">Identifiant</option>
+          <option value="category">Catégorie / type</option>
+        </select>
+      </div>
+      <p id="library-status" class="muted" aria-live="polite"></p>
+      <div class="library-layout">
+        <div id="library-list" class="library-grid"></div>
+        <aside id="library-detail" class="card library-detail" aria-live="polite">
+          <p class="muted">Sélectionnez un item ou un bloc pour afficher ses détails.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-data" class="tab" role="tabpanel" aria-labelledby="nav-data" tabindex="0" hidden>
+    <div class="data-stack">
+      <div class="card">
+        <h2>Export / import</h2>
+        <div class="row">
+          <button type="button" id="export">Exporter custom_content.json</button>
+          <label class="file" for="import">Ajouter depuis un fichier JSON
+            <input type="file" id="import" accept="application/json,.json">
+          </label>
+        </div>
+        <p class="field-hint">L’import est validé avec exactement les mêmes règles que le serveur avant d’être appliqué.</p>
+        <p id="data-error" class="error" role="alert"></p>
+        <p id="data-status" class="success" aria-live="polite"></p>
+      </div>
+
+      <div class="card">
+        <h2>Historique des versions</h2>
+        <p class="muted">Chaque enregistrement conserve une sauvegarde des 15 dernières versions. La restauration crée une nouvelle version (rien n’est supprimé).</p>
+        <div class="row">
+          <button type="button" id="history-refresh" class="ghost">Rafraîchir</button>
+        </div>
+        <ul id="history-list" class="list history-list"></ul>
+        <p id="history-status" class="muted" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="texture-dialog" class="card modal-dialog">
+  <form id="texture-dialog-form" method="dialog">
+    <div class="modal-header">
+      <h2 id="texture-dialog-title">Modifier la texture</h2>
+      <button type="button" id="texture-dialog-close" class="ghost close-btn" aria-label="Fermer">✕</button>
+    </div>
+    <p id="texture-dialog-subtitle" class="muted"></p>
+
+    <div class="texture-preview-box">
+      <div id="texture-dialog-preview" class="preview-img-container"></div>
+      <div class="texture-preview-info">
+        <p id="texture-dialog-status" class="muted"></p>
+        <button type="button" id="texture-dialog-reset" class="danger ghost btn-sm">Réinitialiser la texture d’origine</button>
+      </div>
+    </div>
+
+    <div class="texture-sources">
+      <label for="texture-dialog-file"><b>1. Importer un fichier image (PNG, JPG, WebP — 2 Mo max)</b>
+        <input type="file" id="texture-dialog-file" accept="image/png,image/jpeg,image/webp">
+      </label>
+
+      <label for="texture-dialog-select"><b>2. Ou choisir une texture existante du pack</b>
+        <select id="texture-dialog-select">
+          <option value="">-- Choisir une texture du pack Opal Heaven --</option>
+        </select>
+      </label>
+
+      <label for="texture-dialog-url"><b>3. Ou entrer une URL directe d’image</b>
+        <input type="text" id="texture-dialog-url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://cdn.jsdelivr.net/… ou /assets/…">
+      </label>
+      <p class="field-hint">Hôtes autorisés par la CSP : <code>cdn.jsdelivr.net</code>, <code>raw.githubusercontent.com</code>, chemins <code>/assets/…</code> ou images importées.</p>
+    </div>
+
+    <div class="row modal-actions">
+      <button type="submit" id="texture-dialog-save">Appliquer la texture</button>
+      <button type="button" id="texture-dialog-cancel" class="ghost">Annuler</button>
+    </div>
+    <p id="texture-dialog-error" class="error" role="alert"></p>
+  </form>
+</dialog>
+
+<dialog id="confirm-dialog" class="card modal-dialog">
+  <form method="dialog">
+    <h2 id="confirm-title">Confirmation</h2>
+    <p id="confirm-message"></p>
+    <div class="row modal-actions">
+      <button type="submit" value="cancel" id="confirm-cancel" class="ghost">Annuler</button>
+      <button type="submit" value="confirm" id="confirm-ok">Confirmer</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<datalist id="ingredients-vanilla"></datalist>
+<datalist id="ingredients"></datalist>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:boss_cave_hydra",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/hydre_des_cavernes"
+            },
+            "geometry": {
+                "default": "geometry.boss_abyssal_hydra"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

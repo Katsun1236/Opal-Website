@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_deep_burrower",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/fouisseur_profondeurs"
+            },
+            "geometry": {
+                "default": "geometry.mob_deep_burrower"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

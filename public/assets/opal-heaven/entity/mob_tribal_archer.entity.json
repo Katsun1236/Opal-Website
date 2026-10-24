@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_tribal_archer",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/archer_tribu"
+            },
+            "geometry": {
+                "default": "geometry.mob_petit_archer"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

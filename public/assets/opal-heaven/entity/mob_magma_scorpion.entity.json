@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_magma_scorpion",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/scorpion_magma"
+            },
+            "geometry": {
+                "default": "geometry.mob_magma_scorpion"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

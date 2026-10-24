@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_crystal_spider",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/araignee_cristal"
+            },
+            "geometry": {
+                "default": "geometry.mob_crystal_spider"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

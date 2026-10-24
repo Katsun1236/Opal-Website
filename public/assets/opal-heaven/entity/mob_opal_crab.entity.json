@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_opal_crab",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/crabe_opale"
+            },
+            "geometry": {
+                "default": "geometry.mob_opal_crab"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

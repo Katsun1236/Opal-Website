@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_tribal_shaman",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/chaman_tribu"
+            },
+            "geometry": {
+                "default": "geometry.mob_petit_shaman"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:mob_ember_crawler",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/rampant_braises"
+            },
+            "geometry": {
+                "default": "geometry.mob_cinder_crawler"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

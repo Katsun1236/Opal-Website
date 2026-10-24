@@ -1,0 +1,21 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "opal:cherry_fog"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 16.0,
+        "fog_end": 75.0,
+        "fog_color": "#d8a5b8",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 20.0,
+        "fog_color": "#477899"
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "opal:boss_basalt_golem",
+            "materials": {
+                "default": "entity_alphatest"
+            },
+            "textures": {
+                "default": "textures/entity/golem_de_basalte"
+            },
+            "geometry": {
+                "default": "geometry.boss_basalt_golem"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

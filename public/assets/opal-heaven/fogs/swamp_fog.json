@@ -1,0 +1,21 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "opal:swamp_fog"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 6.0,
+        "fog_end": 42.0,
+        "fog_color": "#2a3b20",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 14.0,
+        "fog_color": "#1e2e14"
+      }
+    }
+  }
+}

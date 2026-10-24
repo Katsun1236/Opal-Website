@@ -1,0 +1,21 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "opal:autumn_fog"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 18.0,
+        "fog_end": 70.0,
+        "fog_color": "#c98f52",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 18.0,
+        "fog_color": "#336149"
+      }
+    }
+  }
+}
