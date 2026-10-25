@@ -527,9 +527,10 @@ const TAB_TITLES = {
 };
 
 const renderActiveTab = () => {
-  if (!state.ready) return;
   if (state.ui.tab === "dashboard") renderDashboardTab();
-  else if (state.ui.tab === "library") renderLibrary();
+  if (state.ui.tab === "logs") renderLogsTab();
+  if (!state.ready) return;
+  if (state.ui.tab === "library") renderLibrary();
   else if (state.ui.tab === "entries") renderEntries();
   else if (state.ui.tab === "recipes") renderRecipes();
   else if (state.ui.tab === "config-daily") renderDailyTab();
@@ -4450,23 +4451,15 @@ const switchAnalyticsSubtab = (subtab) => {
 };
 
 const renderDashboardTab = () => {
+  if (!state.data) state.data = {};
   if (!state.data.configs) state.data.configs = defaultConfigs();
 
-  const currentSubtab = state.ui.analyticsSubtab || "overview";
-
-  if (currentSubtab === "overview") {
-    renderOverviewSubtab();
-  } else if (currentSubtab === "economy") {
-    renderEconomySubtab();
-  } else if (currentSubtab === "mining") {
-    renderMiningSubtab();
-  } else if (currentSubtab === "players") {
-    renderPlayersSubtab();
-  } else if (currentSubtab === "jobs-pvp") {
-    renderJobsPvPSubtab();
-  } else if (currentSubtab === "multiworld") {
-    renderMultiworldSubtab();
-  }
+  renderOverviewSubtab();
+  renderEconomySubtab();
+  renderMiningSubtab();
+  renderPlayersSubtab();
+  renderJobsPvPSubtab();
+  renderMultiworldSubtab();
 };
 
 /* --- 1. Sous-onglet Vue d'Ensemble ----------------------------------- */
@@ -7164,10 +7157,11 @@ on("#dashboard-refresh-btn", "click", () => {
   toast("Métriques et graphiques actualisés !", "success");
 });
 
-document.querySelectorAll(".analytics-subtab").forEach((btn) => {
-  btn.addEventListener("click", () => {
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".analytics-subtab");
+  if (btn) {
     switchAnalyticsSubtab(btn.dataset.subtab || "overview");
-  });
+  }
 });
 
 document.querySelectorAll(".btn-timeframe").forEach((btn) => {
