@@ -347,17 +347,35 @@ const routeRequest = async (req, url, context, store) => {
     return json(body, 200, { etag, "cache-control": "no-cache" });
   }
 
+  if (route === "/server-ping" && req.method === "GET") {
+    const host = (url.searchParams.get("host") || "opalheaven.mcbe.fr").trim();
+    const port = Number(url.searchParams.get("port")) || 19153;
+    try {
+      const pingRes = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`, {
+        headers: { "User-Agent": "OpalStudio/1.0" },
+      });
+      if (!pingRes.ok) throw new Error("mcsrvstat status " + pingRes.status);
+      const data = await pingRes.json();
+      return json(data, 200, { "cache-control": "public, max-age=15" });
+    } catch (err) {
+      return json({ online: false, error: err.message }, 200, { "cache-control": "no-cache" });
+    }
+  }
+
   if (route === "/plugin/telemetry" && req.method === "POST") {
     if (!validPluginToken(req)) return fail("non autorisé", 401);
     const body = parseJson(await readBody(req));
     const telemetry = {
       receivedAt: new Date().toISOString(),
-      server: String(body.server || "PocketMine-MP"),
+      server: String(body.server || "Axolotl-PM"),
       online: Boolean(body.online ?? true),
       players: body.players && typeof body.players === "object" ? body.players : { online: 0, max: 0, list: [] },
       tps: Number.isFinite(body.tps) ? Math.max(0, Math.min(20, Number(body.tps))) : null,
       memoryMb: Number.isFinite(body.memoryMb) ? Number(body.memoryMb) : null,
+      worlds: Array.isArray(body.worlds) ? body.worlds : [],
       economy: body.economy && typeof body.economy === "object" ? body.economy : null,
+      mining: body.mining && typeof body.mining === "object" ? body.mining : null,
+      pvp: body.pvp && typeof body.pvp === "object" ? body.pvp : null,
       logs: Array.isArray(body.logs) ? body.logs.slice(0, 50) : [],
     };
     try {

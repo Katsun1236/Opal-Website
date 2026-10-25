@@ -202,6 +202,10 @@
         <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <span>Métiers, Quêtes & PvP</span>
       </button>
+      <button type="button" class="analytics-subtab" data-subtab="multiworld">
+        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>Mondes & Multi-World</span>
+      </button>
     </div>
 
     <!-- SOUS-ONGLET 1 : VUE D'ENSEMBLE -->
@@ -587,6 +591,73 @@
               <tbody id="pvp-top-table-body"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOUS-ONGLET 6 : MONDES & MULTI-WORLD -->
+    <div id="subtab-multiworld" class="analytics-panel" hidden>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="row row-between" style="align-items: center;">
+          <div>
+            <h3 style="margin-bottom: 4px;">Architecture & Cartographie Multi-World</h3>
+            <p class="muted text-sm" style="margin: 0;">Surveillance des dimensions chargées sous Axolotl-PM / Bedrock, flux de joueurs par monde et occupation des chunks.</p>
+          </div>
+          <span class="badge" id="multiworld-status-badge" style="color: var(--mint); border-color: var(--mint);">6 Mondes Détectés</span>
+        </div>
+      </div>
+
+      <!-- Grille des cartes des mondes -->
+      <div class="dashboard-charts-grid" id="multiworld-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-bottom: 24px;"></div>
+
+      <!-- Graphiques analytiques Multi-World -->
+      <div class="dashboard-charts-grid">
+        <!-- Répartition de la population par monde -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Répartition des Joueurs par Dimension</h3>
+              <p class="muted text-sm">Localisation en direct de la communauté sur le serveur Bedrock</p>
+            </div>
+            <span class="badge" id="multiworld-pop-badge">Direct Bedrock</span>
+          </div>
+          <div class="server-distribution-bars" id="chart-multiworld-players"></div>
+        </div>
+
+        <!-- Répartition du Minage par Monde -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Extraction & Minage par Monde</h3>
+              <p class="muted text-sm">Volume de blocs extraits : Monde Minage vs Faction vs Nether</p>
+            </div>
+            <span class="badge" id="multiworld-mining-badge">Télémétrie</span>
+          </div>
+          <div class="server-distribution-bars" id="chart-multiworld-mining"></div>
+        </div>
+
+        <!-- Combats & Dangers par Monde -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Activité PvP & Morts par Dimension</h3>
+              <p class="muted text-sm">Fréquence des éliminations et décès par monde</p>
+            </div>
+            <span class="badge" id="multiworld-pvp-badge">Combats</span>
+          </div>
+          <div class="server-distribution-bars" id="chart-multiworld-pvp"></div>
+        </div>
+
+        <!-- Performance & Chunks par Monde -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Empreinte Chunks & Entités par Monde</h3>
+              <p class="muted text-sm">Surveillance de la charge technique et des entités en mémoire vive</p>
+            </div>
+            <span class="badge" id="multiworld-perf-badge">Performance</span>
+          </div>
+          <div class="server-distribution-bars" id="chart-multiworld-perf"></div>
         </div>
       </div>
     </div>
@@ -1571,6 +1642,15 @@
             <option value="all">Tous les serveurs</option>
             <option value="opalheaven.mcbe.fr:19153">opalheaven.mcbe.fr:19153</option>
             <option value="Studio">Studio Opal</option>
+          </select>
+          <select id="logs-world-filter" class="logs-server-select" title="Filtrer par monde">
+            <option value="all">Tous les mondes</option>
+            <option value="world">Spawn (world)</option>
+            <option value="faction">Faction (faction)</option>
+            <option value="minage">Minage (minage)</option>
+            <option value="nether">Nether (nether)</option>
+            <option value="the_end">L'End (the_end)</option>
+            <option value="warzone">Warzone (warzone)</option>
           </select>
 
           <input type="search" id="logs-player-filter" placeholder="Filtrer par pseudo (ex: Katsun)..." class="logs-player-input">

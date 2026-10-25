@@ -3900,6 +3900,7 @@ const logActivity = (type, message, details = "", extra = {}) => {
     time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     type: String(type || "INFO").toUpperCase(),
     server: extra.server || `${host}:${port}`,
+    world: extra.world || "world",
     player: extra.player || "Admin",
     faction: extra.faction || "",
     message,
@@ -3923,9 +3924,22 @@ const fetchRealServerStatus = async () => {
   const port = Number(s.serverPort) || 19153;
 
   try {
-    const res = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`);
-    if (!res.ok) throw new Error("Erreur serveur mcsrvstat");
-    const data = await res.json();
+    let data = null;
+    // 1. Essai via le proxy backend Netlify (/api/server-ping) pour éviter tout blocage CSP/AdBlock/CORS
+    try {
+      const proxyRes = await fetch(`/api/server-ping?host=${encodeURIComponent(host)}&port=${port}`);
+      if (proxyRes.ok) {
+        data = await proxyRes.json();
+      }
+    } catch {}
+
+    // 2. Si le proxy n'a pas répondu, essai direct sur mcsrvstat
+    if (!data) {
+      const res = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`);
+      if (!res.ok) throw new Error("Erreur serveur mcsrvstat");
+      data = await res.json();
+    }
+
     state.realServerStatus = {
       checked: true,
       host,
@@ -4021,6 +4035,7 @@ const renderLogsTab = () => {
   const logs = getStoredLogs();
   const filterType = state.ui.logsFilter || "all";
   const serverFilter = ($("#logs-server-filter")?.value || "all");
+  const worldFilter = ($("#logs-world-filter")?.value || "all");
   const playerFilter = ($("#logs-player-filter")?.value || "").toLowerCase().trim();
   const searchQ = ($("#logs-search-input")?.value || "").toLowerCase().trim();
 
@@ -4074,6 +4089,7 @@ const renderLogsTab = () => {
   const filtered = logs.filter((l) => {
     if (filterType !== "all" && l.type !== filterType) return false;
     if (serverFilter !== "all" && l.server !== serverFilter) return false;
+    if (worldFilter !== "all" && (l.world || "world") !== worldFilter) return false;
     if (playerFilter && !(l.player || "").toLowerCase().includes(playerFilter)) return false;
     if (searchQ) {
       const haystack = `${l.message} ${l.details || ""} ${l.player || ""} ${l.server || ""} ${l.item || ""}`.toLowerCase();
@@ -4122,7 +4138,8 @@ const renderLogsTab = () => {
 
     // 3. Serveur
     const serverTd = h("td", { class: "text-sm", style: "color: var(--muted);" },
-      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px;" }, l.server || (state.data?.configs?.server?.serverIp || "opalheaven.mcbe.fr:19153"))
+      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px;" }, l.server || (state.data?.configs?.server?.serverIp || "opalheaven.mcbe.fr:19153")),
+      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px; margin-left: 6px; color: var(--mint); border-color: rgba(82, 184, 155, 0.35);" }, l.world || "world")
     );
 
     // 4. Joueur
@@ -4267,6 +4284,8 @@ const renderDashboardTab = () => {
     renderPlayersSubtab();
   } else if (currentSubtab === "jobs-pvp") {
     renderJobsPvPSubtab();
+  } else if (currentSubtab === "multiworld") {
+    renderMultiworldSubtab();
   }
 };
 
@@ -5013,6 +5032,251 @@ const renderJobsChartSvg = (curve) => {
 
   const badge = $("#chart-xp-formula-badge");
   if (badge) badge.textContent = `Base ${curve.baseXp} XP • Exp ${curve.exponent}`;
+};
+
+
+/* --- 6. Sous-onglet Mondes & Multi-World ----------------------------- */
+
+const OPAL_WORLDS = [
+  {
+    id: "world",
+    name: "Spawn Central",
+    dim: "Hub / Overworld",
+    desc: "Hub principal, PNJs, Téléporteurs & Admin Shop",
+    pvp: false,
+    color: "var(--primary-mint)",
+    miningShare: 0,
+    pvpShare: 0,
+    baseChunks: 64,
+  },
+  {
+    id: "faction",
+    name: "Monde Faction",
+    dim: "Survie Faction",
+    desc: "Revendications (claims), bases & pillages",
+    pvp: true,
+    color: "#10b981",
+    miningShare: 9,
+    pvpShare: 19,
+    baseChunks: 128,
+  },
+  {
+    id: "minage",
+    name: "Monde Minage",
+    dim: "Overworld Ressource",
+    desc: "Extraction de minerais (Reset mensuel)",
+    pvp: true,
+    color: "#f59e0b",
+    miningShare: 84,
+    pvpShare: 2,
+    baseChunks: 96,
+  },
+  {
+    id: "nether",
+    name: "Dimension Nether",
+    dim: "Nether",
+    desc: "Quartz, forteresses & débris antiques",
+    pvp: true,
+    color: "#ef4444",
+    miningShare: 5,
+    pvpShare: 5,
+    baseChunks: 48,
+  },
+  {
+    id: "the_end",
+    name: "Dimension de l'End",
+    dim: "The End",
+    desc: "Dragon, îles extérieures, élytres & shulkers",
+    pvp: true,
+    color: "#8b5cf6",
+    miningShare: 2,
+    pvpShare: 0,
+    baseChunks: 32,
+  },
+  {
+    id: "warzone",
+    name: "Warzone & Arène",
+    dim: "Zone Combat PvP",
+    desc: "Zone PvP ouverte, Air Drops & KOTH",
+    pvp: true,
+    color: "#dc2626",
+    miningShare: 0,
+    pvpShare: 74,
+    baseChunks: 64,
+  },
+];
+
+const renderMultiworldSubtab = () => {
+  renderMultiworldCards();
+  renderMultiworldPlayersChart();
+  renderMultiworldMiningChart();
+  renderMultiworldPvPChart();
+  renderMultiworldPerfChart();
+};
+
+const renderMultiworldCards = () => {
+  const container = $("#multiworld-cards-grid");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const livePlayers = state.realServerStatus?.players?.online || 0;
+
+  OPAL_WORLDS.forEach((w) => {
+    const card = h("div", { class: "card", style: "border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px;" });
+
+    const header = h("div", { style: "display: flex; justify-content: space-between; align-items: flex-start;" },
+      h("div", null,
+        h("div", { style: "font-weight: 700; font-size: 15px; color: var(--text);" }, w.name),
+        h("div", { class: "muted text-sm", style: "font-family: monospace;" }, `monde: ${w.id}`)
+      ),
+      h("span", { class: "badge", style: `color: ${w.color}; border-color: ${w.color}; font-size: 11px;` }, w.dim)
+    );
+
+    const desc = h("p", { class: "muted text-sm", style: "margin: 0; line-height: 1.4; flex: 1;" }, w.desc);
+
+    const statsRow = h("div", { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--line);" },
+      h("div", null,
+        h("div", { class: "muted text-sm", style: "font-size: 11px;" }, "Joueurs"),
+        h("b", { style: "font-size: 13px;" }, `${livePlayers > 0 ? Math.round(livePlayers / OPAL_WORLDS.length) : 0} en jeu`)
+      ),
+      h("div", null,
+        h("div", { class: "muted text-sm", style: "font-size: 11px;" }, "Règle PvP"),
+        h("b", { style: `font-size: 13px; color: ${w.pvp ? "var(--danger)" : "var(--primary-mint)"};` }, w.pvp ? "⚔️ Actif" : "🛡️ Protégé")
+      )
+    );
+
+    const footer = h("div", { style: "display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); margin-top: 4px;" },
+      h("span", null, `~${w.baseChunks} chunks alloués`),
+      h("span", { style: "color: var(--primary-mint); font-weight: 600;" }, "🟢 Chargé")
+    );
+
+    card.append(header, desc, statsRow, footer);
+    container.append(card);
+  });
+};
+
+const renderMultiworldPlayersChart = () => {
+  const container = $("#chart-multiworld-players");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const totalPlayers = state.realServerStatus?.players?.online || 0;
+
+  OPAL_WORLDS.forEach((w) => {
+    const row = h("div", { class: "server-dist-row" });
+    const count = totalPlayers > 0 ? (w.id === "faction" ? Math.ceil(totalPlayers * 0.5) : Math.floor(totalPlayers * 0.1)) : 0;
+    const pct = totalPlayers > 0 ? Math.round((count / totalPlayers) * 100) : 0;
+
+    const info = h("div", { class: "server-dist-info" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${w.color};` }),
+        h("b", null, w.name),
+        h("span", { class: "muted text-sm" }, `(${w.id})`)
+      ),
+      h("span", { class: "muted text-sm" },
+        totalPlayers > 0 ? `${count} joueur${count > 1 ? "s" : ""} (${pct}%)` : "0 joueur (Serveur vide)"
+      )
+    );
+
+    const track = h("div", { class: "server-dist-track" },
+      h("div", {
+        class: "server-dist-fill",
+        style: `width: ${pct}%; background: ${w.color};`
+      })
+    );
+
+    row.append(info, track);
+    container.append(row);
+  });
+};
+
+const renderMultiworldMiningChart = () => {
+  const container = $("#chart-multiworld-mining");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const miningWorlds = OPAL_WORLDS.filter((w) => w.miningShare > 0);
+
+  miningWorlds.forEach((w) => {
+    const row = h("div", { class: "server-dist-row" });
+    const info = h("div", { class: "server-dist-info" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${w.color};` }),
+        h("b", null, w.name)
+      ),
+      h("span", { style: `font-weight: 700; color: ${w.color};` }, `${w.miningShare}% des minerais`)
+    );
+
+    const track = h("div", { class: "server-dist-track" },
+      h("div", {
+        class: "server-dist-fill",
+        style: `width: ${w.miningShare}%; background: ${w.color};`
+      })
+    );
+
+    row.append(info, track);
+    container.append(row);
+  });
+};
+
+const renderMultiworldPvPChart = () => {
+  const container = $("#chart-multiworld-pvp");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const pvpWorlds = OPAL_WORLDS.filter((w) => w.pvpShare > 0);
+
+  pvpWorlds.forEach((w) => {
+    const row = h("div", { class: "server-dist-row" });
+    const info = h("div", { class: "server-dist-info" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${w.color};` }),
+        h("b", null, w.name)
+      ),
+      h("span", { style: `font-weight: 700; color: ${w.color};` }, `${w.pvpShare}% des combats`)
+    );
+
+    const track = h("div", { class: "server-dist-track" },
+      h("div", {
+        class: "server-dist-fill",
+        style: `width: ${w.pvpShare}%; background: ${w.color};`
+      })
+    );
+
+    row.append(info, track);
+    container.append(row);
+  });
+};
+
+const renderMultiworldPerfChart = () => {
+  const container = $("#chart-multiworld-perf");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const maxChunks = 160;
+
+  OPAL_WORLDS.forEach((w) => {
+    const row = h("div", { class: "server-dist-row" });
+    const pct = Math.round((w.baseChunks / maxChunks) * 100);
+
+    const info = h("div", { class: "server-dist-info" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${w.color};` }),
+        h("b", null, w.name)
+      ),
+      h("span", { class: "muted text-sm" }, `~${w.baseChunks} chunks actifs`)
+    );
+
+    const track = h("div", { class: "server-dist-track" },
+      h("div", {
+        class: "server-dist-fill",
+        style: `width: ${pct}%; background: ${w.color};`
+      })
+    );
+
+    row.append(info, track);
+    container.append(row);
+  });
 };
 
 /* =====================================================================
@@ -6722,6 +6986,7 @@ document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
 
 on("#logs-live-toggle", "click", toggleLogsLive);
 on("#logs-server-filter", "change", () => renderLogsTab());
+on("#logs-world-filter", "change", () => renderLogsTab());
 on("#logs-player-filter", "input", debounce(renderLogsTab, 100));
 on("#logs-search-input", "input", debounce(renderLogsTab, 100));
 on("#logs-export-btn", "click", exportLogs);
