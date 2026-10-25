@@ -2892,7 +2892,7 @@ const enter = async () => {
     refreshStatus();
     startTokenRefresh();
     renderActiveTab();
-    startLogsSimulation();
+    startServerPolling();
     maybeOfferDraft();
   } catch (error) {
     state.loading = false;
@@ -2920,7 +2920,7 @@ const logout = async () => {
   state.token = "";
   sessionStorage.removeItem(TOKEN_KEY);
   stopTokenRefresh();
-  if (logsSimulationTimer) clearInterval(logsSimulationTimer);
+  if (serverPollingTimer) clearInterval(serverPollingTimer);
   state.ready = false;
   state.loading = false;
   state.saving = false;
@@ -3766,6 +3766,11 @@ const renderServerConfigTab = () => {
   if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
 
   const s = state.data.configs.server;
+  const ipInput = $("#server-ip");
+  const portInput = $("#server-port");
+  if (ipInput) ipInput.value = s.serverIp || "play.opalheaven.fr";
+  if (portInput) portInput.value = s.serverPort || 19132;
+
   $("#server-starting-money").value = s.startingMoney ?? 500;
   $("#server-ah-fee").value = s.ahFeePercent ?? 5;
   $("#server-clearlag-interval").value = s.clearLagIntervalSeconds ?? 300;
@@ -3841,248 +3846,48 @@ const renderSyncGuideTab = () => {
 
 const LOGS_STORAGE_KEY = "opal_studio_activity_logs";
 
-const defaultServerLogs = () => {
-  const now = Date.now();
-  const formatTime = (ts) => new Date(ts).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+state.realServerStatus = {
+  checked: false,
+  online: false,
+  players: { online: 0, max: 0, list: [] },
+  version: "",
+  motd: "",
+};
+state.serverTelemetry = null;
 
+const defaultServerLogs = () => {
   return [
     {
-      id: "log_1",
-      time: formatTime(now - 12000),
-      type: "CHAT",
-      server: "Faction Alpha",
-      player: "Katsun",
-      faction: "Eclipse",
-      message: '[Global] "Quelqu\'un vend du diamant en gros sur Faction Alpha ?"',
-      details: "Message envoyé dans le canal global",
-    },
-    {
-      id: "log_2",
-      time: formatTime(now - 38000),
-      type: "SHOP_BUY",
-      server: "Faction Alpha",
-      player: "ElenaMine",
-      faction: "Vortex",
-      message: "Achat de 16x Pomme dorée à l'Admin Shop",
-      item: "minecraft:golden_apple",
-      itemCount: 16,
-      amount: 800,
-      details: "Rayon Agriculture • Total payé : $800",
-    },
-    {
-      id: "log_3",
-      time: formatTime(now - 75000),
-      type: "MINE",
-      server: "Minage 1",
-      player: "PierreMining",
-      faction: "Eclipse",
-      message: "Minage rare : 4x Minerai d'Opale Pure",
-      item: "opal:opal_ore",
-      itemCount: 4,
-      coords: { x: 184, y: -58, z: -620, world: "Minage_1" },
-      details: "Filons d'Opale Pure découverts à Y=-58 • Anti-Xray : Conforme (Galerie vérifiée)",
-    },
-    {
-      id: "log_4",
-      time: formatTime(now - 110000),
-      type: "COMBAT",
-      server: "Warzone PvP",
-      player: "ShadowPvP",
-      faction: "Eclipse",
-      message: "Élimination de DarkKnight en Warzone",
-      item: "opal:opal_sword",
-      details: "Arme : Épée en Opale Tranchant V • Série active : 4 frags consécutifs",
-    },
-    {
-      id: "log_5",
-      time: formatTime(now - 160000),
-      type: "SHOP_SELL",
-      server: "Faction Alpha",
-      player: "ShadowPvP",
-      faction: "Eclipse",
-      message: "Vente de 64x Minerai d'opale à l'Admin Shop",
-      item: "opal:opal_ore",
-      itemCount: 64,
-      amount: 19200,
-      details: "Rayon Minerais • Revenu généré : +$19 200",
-    },
-    {
-      id: "log_6",
-      time: formatTime(now - 210000),
-      type: "TRADE",
-      server: "Faction Alpha",
-      player: "Katsun",
-      faction: "Eclipse",
-      message: "Virement de $15 000 vers Lucas_92 (/pay)",
-      amount: 15000,
-      details: "Raison : Achat de ressources de construction pour l'avant-poste de faction",
-    },
-    {
-      id: "log_7",
-      time: formatTime(now - 280000),
-      type: "CMD",
-      server: "Faction Alpha",
-      player: "AlexCraft",
-      faction: "Nemesis",
-      message: "Exécution de la commande /f claim",
-      details: "Revendication du chunk [X: 18, Z: -42] • Coût déduit de la banque de faction : $5 000",
-    },
-    {
-      id: "log_8",
-      time: formatTime(now - 340000),
-      type: "MINE",
-      server: "Minage 1",
-      player: "ElenaMine",
-      faction: "Vortex",
-      message: "Minage : 8x Diamant découverts",
-      item: "minecraft:diamond",
-      itemCount: 8,
-      coords: { x: -412, y: -54, z: 890, world: "Minage_1" },
-      details: "Grotte naturelle explorée • Anti-Xray : Validé (Veine de 8 blocs)",
-    },
-    {
-      id: "log_9",
-      time: formatTime(now - 420000),
-      type: "CHAT",
-      server: "Faction Alpha",
-      player: "ShadowPvP",
-      faction: "Eclipse",
-      message: '[Faction] "Tous au spawn Warzone, l\'Airdrop légendaire atterrit dans 3 minutes !"',
-      details: "Message chiffré dans le canal de la Faction Eclipse",
-    },
-    {
-      id: "log_10",
-      time: formatTime(now - 490000),
-      type: "SHOP_BUY",
-      server: "Faction Alpha",
-      player: "VoxelMaster",
-      faction: "Nemesis",
-      message: "Achat de 32x Bouteille d'expérience",
-      item: "minecraft:experience_bottle",
-      itemCount: 32,
-      amount: 6400,
-      details: "Rayon Alchimie • Total payé : $6 400",
-    },
-    {
-      id: "log_11",
-      time: formatTime(now - 560000),
-      type: "COMBAT",
-      server: "Warzone PvP",
-      player: "Katsun",
-      faction: "Eclipse",
-      message: "La Faction Eclipse a capturé la colline KOTH !",
-      details: "Zone sécurisée pendant 3min00s • Récompenses : $50 000 + 2x Clé de Caisse Légendaire",
-    },
-    {
-      id: "log_12",
-      time: formatTime(now - 630000),
-      type: "SESSION",
-      server: "Faction Alpha",
-      player: "TitanGamer",
-      faction: "Vortex",
-      message: "Connexion du joueur sur Faction Alpha",
-      details: "Adresse IP anonymisée • Ping d'entrée : 21ms • Client Bedrock v1.20",
-    },
-    {
-      id: "log_13",
-      time: formatTime(now - 720000),
-      type: "TRADE",
-      server: "Faction Alpha",
-      player: "AlexCraft",
-      faction: "Nemesis",
-      message: "Achat à l'Hôtel des Ventes (/ah) de Plastron en Opale T4",
-      item: "opal:opal_chestplate",
-      amount: 75000,
-      details: "Vendeur : Zork_MC • Taxe de vente perçue par le serveur (10%) : $7 500",
-    },
-    {
-      id: "log_14",
-      time: formatTime(now - 810000),
-      type: "MINE",
-      server: "Minage 2",
-      player: "DarkKnight",
-      faction: "Nemesis",
-      message: "Minage : 2x Débris antiques (Netherite)",
-      item: "minecraft:ancient_debris",
-      itemCount: 2,
-      coords: { x: -85, y: 14, z: 320, world: "Minage_2" },
-      details: "Extraction dans le Nether à Y=14 avec pioche en Opale Efficacité V",
-    },
-    {
-      id: "log_15",
-      time: formatTime(now - 900000),
-      type: "CMD",
-      server: "Faction Alpha",
-      player: "Lucas_92",
-      faction: "Vortex",
-      message: "Exécution de la commande /kit guerrier",
-      details: "Réception de l'équipement complet de combat • Prochain délai : 24h",
-    },
-    {
-      id: "log_16",
-      time: formatTime(now - 1050000),
-      type: "SHOP_SELL",
-      server: "Faction Alpha",
-      player: "PierreMining",
-      faction: "Eclipse",
-      message: "Vente de 128x Minerai de fer à l'Admin Shop",
-      item: "minecraft:raw_iron",
-      itemCount: 128,
-      amount: 3840,
-      details: "Rayon Minerais • Revenu généré : +$3 840",
-    },
-    {
-      id: "log_17",
-      time: formatTime(now - 1200000),
-      type: "CONFIG",
+      id: "log_init",
+      time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+      type: "SYNC",
       server: "Système",
       player: "Admin",
       faction: "Staff",
-      message: "Synchronisation réussie /opalcontent sync",
-      details: "Application de la Révision active du studio sur l'ensemble des 5 serveurs",
-    },
-    {
-      id: "log_18",
-      time: formatTime(now - 1400000),
-      type: "CHAT",
-      server: "Hub Central",
-      player: "AlexCraft",
-      faction: "Nemesis",
-      message: '[Global] "Bienvenue à tous les nouveaux arrivants sur Opal Heaven !"',
-      details: "Message de bienvenue dans le lobby de bienvenue",
-    },
-    {
-      id: "log_19",
-      time: formatTime(now - 1600000),
-      type: "SESSION",
-      server: "Minage 1",
-      player: "ElenaMine",
-      faction: "Vortex",
-      message: "Déconnexion après 2h 18m de session",
-      details: "Statistiques session : 482 blocs minés, 0 mort, inventaire sauvegardé",
-    },
-    {
-      id: "log_20",
-      time: formatTime(now - 1800000),
-      type: "COMBAT",
-      server: "Warzone PvP",
-      player: "VoxelMaster",
-      faction: "Nemesis",
-      message: "Ouverture d'un coffre de largage Warzone (Airdrop)",
-      details: "Butin récupéré : 1x Pomme dorée enchantée, 8x Lingots d'or, 4x Émeraudes",
+      message: "Connexion du studio Opal Heaven",
+      details: "Version active : Révision " + (state.revision || 0) + " • En attente de synchronisation du serveur PocketMine-MP",
     },
   ];
 };
 
 const getStoredLogs = () => {
+  let localLogs = [];
   try {
     const raw = localStorage.getItem(LOGS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) localLogs = parsed;
     }
   } catch {}
-  return defaultServerLogs();
+
+  if (localLogs.length === 0) {
+    localLogs = defaultServerLogs();
+  }
+
+  // Fusionner avec les logs réels transmis par le plugin OpalCore s'il y en a
+  const remoteLogs = state.serverTelemetry?.serverLogs || [];
+  const combined = [...remoteLogs, ...localLogs];
+  return combined.slice(0, 350);
 };
 
 const saveStoredLogs = (logs) => {
@@ -4092,12 +3897,17 @@ const saveStoredLogs = (logs) => {
 };
 
 const logActivity = (type, message, details = "", extra = {}) => {
-  const logs = getStoredLogs();
+  let logs = [];
+  try {
+    const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+    if (raw) logs = JSON.parse(raw) || [];
+  } catch {}
+
   const entry = {
     id: "log_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     type: String(type || "INFO").toUpperCase(),
-    server: extra.server || "Système",
+    server: extra.server || "Studio",
     player: extra.player || "Admin",
     faction: extra.faction || "Staff",
     message,
@@ -4113,122 +3923,81 @@ const logActivity = (type, message, details = "", extra = {}) => {
   if (state.ui.tab === "logs") renderLogsTab();
 };
 
-/* --- Moteur de Simulation de Flux Live ------------------------------- */
+/* --- Connexion Réelle au Serveur de Jeu (PocketMine-MP) --------------- */
 
-let logsSimulationTimer = null;
+const fetchRealServerStatus = async () => {
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const host = (s.serverIp || "play.opalheaven.fr").trim();
+  const port = Number(s.serverPort) || 19132;
+
+  try {
+    const res = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`);
+    if (!res.ok) throw new Error("Erreur serveur mcsrvstat");
+    const data = await res.json();
+    state.realServerStatus = {
+      checked: true,
+      host,
+      port,
+      online: Boolean(data.online),
+      players: {
+        online: data.players?.online || 0,
+        max: data.players?.max || 0,
+        list: Array.isArray(data.players?.list) ? data.players.list.map((p) => p.name || p) : [],
+      },
+      version: data.version || "PocketMine-MP 5",
+      motd: Array.isArray(data.motd?.clean) ? data.motd.clean.join(" ") : (data.motd?.clean || ""),
+      software: data.software || "PocketMine-MP",
+    };
+  } catch {
+    state.realServerStatus = {
+      checked: true,
+      host,
+      port,
+      online: false,
+      players: { online: 0, max: 0, list: [] },
+      version: "Serveur non joignable",
+      motd: "",
+      software: "",
+    };
+  }
+  return state.realServerStatus;
+};
+
+const fetchServerTelemetry = async () => {
+  if (!state.token) return null;
+  try {
+    const res = await fetch("/api/telemetry", {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    state.serverTelemetry = data;
+    return data;
+  } catch {
+    return null;
+  }
+};
+
+let serverPollingTimer = null;
 state.ui.logsLive = true;
 
-const startLogsSimulation = () => {
-  if (logsSimulationTimer) clearInterval(logsSimulationTimer);
-  logsSimulationTimer = setInterval(() => {
-    if (!state.ui.logsLive) return;
+const pollRealServer = async () => {
+  await Promise.all([
+    fetchRealServerStatus(),
+    fetchServerTelemetry(),
+  ]);
+  if (state.ui.tab === "dashboard") renderDashboardTab();
+  if (state.ui.tab === "logs") renderLogsTab();
+};
 
-    const players = [
-      { name: "Katsun", faction: "Eclipse", server: "Faction Alpha" },
-      { name: "ShadowPvP", faction: "Eclipse", server: "Warzone PvP" },
-      { name: "ElenaMine", faction: "Vortex", server: "Minage 1" },
-      { name: "AlexCraft", faction: "Nemesis", server: "Faction Alpha" },
-      { name: "Lucas_92", faction: "Vortex", server: "Faction Alpha" },
-      { name: "PierreMining", faction: "Eclipse", server: "Minage 1" },
-      { name: "VoxelMaster", faction: "Nemesis", server: "Warzone PvP" },
-      { name: "TitanGamer", faction: "Vortex", server: "Faction Alpha" },
-      { name: "DarkKnight", faction: "Nemesis", server: "Minage 2" },
-      { name: "Zork_MC", faction: "Neutre", server: "Hub Central" },
-    ];
-
-    const pick = players[Math.floor(Math.random() * players.length)];
-    const types = ["CHAT", "SHOP_BUY", "SHOP_SELL", "MINE", "COMBAT", "TRADE", "CMD"];
-    const chosenType = types[Math.floor(Math.random() * types.length)];
-
-    let msg = "";
-    let det = "";
-    let it = null;
-    let cnt = 1;
-    let amt = 0;
-    let coords = null;
-
-    if (chosenType === "CHAT") {
-      const msgs = [
-        '[Global] "Achat de spawner à squelette, /msg moi !" ',
-        '[Global] "KOTH dans 15 minutes, préparez votre stuff opale !" ',
-        '[Faction] "Tous à la base, stock de minerais plein à ranger." ',
-        '[Global] "Qui veut faire du PvP amical en arène 1 ?" ',
-        '[Global] "Vente de potions de force II et régénération en masse à mon /ah." ',
-      ];
-      msg = msgs[Math.floor(Math.random() * msgs.length)];
-      det = "Canal de communication en jeu";
-    } else if (chosenType === "SHOP_BUY") {
-      const items = [
-        { id: "minecraft:golden_apple", name: "Pomme dorée", count: 8, cost: 400 },
-        { id: "minecraft:oak_sapling", name: "Pousse de chêne", count: 32, cost: 160 },
-        { id: "minecraft:obsidian", name: "Obsidienne", count: 16, cost: 320 },
-        { id: "minecraft:diamond", name: "Diamant", count: 5, cost: 1250 },
-      ];
-      const selected = items[Math.floor(Math.random() * items.length)];
-      msg = `Achat de ${selected.count}x ${selected.name} à l'Admin Shop`;
-      det = `Transaction commerciale • Total payé : $${selected.cost}`;
-      it = selected.id;
-      cnt = selected.count;
-      amt = selected.cost;
-    } else if (chosenType === "SHOP_SELL") {
-      const items = [
-        { id: "opal:opal_ore", name: "Minerai d'opale", count: 16, gain: 4800 },
-        { id: "minecraft:raw_iron", name: "Minerai de fer", count: 64, gain: 1920 },
-        { id: "minecraft:wheat", name: "Blé", count: 128, gain: 768 },
-        { id: "minecraft:gold_ingot", name: "Lingot d'or", count: 32, gain: 2880 },
-      ];
-      const selected = items[Math.floor(Math.random() * items.length)];
-      msg = `Vente de ${selected.count}x ${selected.name} à l'Admin Shop`;
-      det = `Revenu immédiat crédité • Total reçu : +$${selected.gain}`;
-      it = selected.id;
-      cnt = selected.count;
-      amt = selected.gain;
-    } else if (chosenType === "MINE") {
-      const x = Math.floor(Math.random() * 800) - 400;
-      const y = Math.floor(Math.random() * 20) - 60;
-      const z = Math.floor(Math.random() * 800) - 400;
-      coords = { x, y, z, world: pick.server };
-      const isOpal = Math.random() < 0.25;
-      if (isOpal) {
-        it = "opal:opal_ore";
-        cnt = Math.floor(Math.random() * 3) + 2;
-        msg = `Minage rare : ${cnt}x Minerai d'Opale Pure`;
-        det = `Découverte rare à Y=${y} • Anti-Xray : Conforme`;
-      } else {
-        it = "minecraft:diamond";
-        cnt = Math.floor(Math.random() * 6) + 3;
-        msg = `Minage : ${cnt}x Diamant découverts`;
-        det = `Veine naturelle découverte à Y=${y} • Anti-Xray : Validé`;
-      }
-    } else if (chosenType === "COMBAT") {
-      const victims = ["DarkKnight", "NoobHunter", "TitanGamer", "RedstonePro", "Lucas_92"];
-      const victim = victims[Math.floor(Math.random() * victims.length)];
-      msg = `Élimination de ${victim} en Warzone PvP`;
-      det = `Combat au corps à corps • Arme : Épée en Opale Tranchant V`;
-      it = "opal:opal_sword";
-    } else if (chosenType === "TRADE") {
-      amt = (Math.floor(Math.random() * 10) + 1) * 2500;
-      const targets = ["Lucas_92", "Katsun", "ShadowPvP", "ElenaMine"];
-      const target = targets[Math.floor(Math.random() * targets.length)];
-      msg = `Virement de $${amt.toLocaleString("fr-FR")} vers ${target} (/pay)`;
-      det = `Transaction de joueur à joueur sécurisée`;
-    } else if (chosenType === "CMD") {
-      const cmds = ["/f claim", "/kit guerrier", "/sethome base", "/tpa Katsun", "/spawn"];
-      const cmd = cmds[Math.floor(Math.random() * cmds.length)];
-      msg = `Exécution de la commande ${cmd}`;
-      det = `Commande joueur enregistrée avec succès`;
+const startServerPolling = () => {
+  if (serverPollingTimer) clearInterval(serverPollingTimer);
+  pollRealServer();
+  serverPollingTimer = setInterval(() => {
+    if (state.ui.logsLive) {
+      pollRealServer();
     }
-
-    logActivity(chosenType, msg, det, {
-      player: pick.name,
-      faction: pick.faction,
-      server: pick.server,
-      item: it,
-      itemCount: cnt,
-      amount: amt,
-      coords,
-    });
-  }, 3500);
+  }, 10000);
 };
 
 const toggleLogsLive = () => {
@@ -4238,13 +4007,14 @@ const toggleLogsLive = () => {
   if (btn) {
     if (state.ui.logsLive) {
       btn.className = "btn-live-pulse active";
-      if (label) label.textContent = "Flux Direct : Actif";
+      if (label) label.textContent = "Flux Direct : Connecté";
+      pollRealServer();
     } else {
       btn.className = "btn-live-pulse paused";
       if (label) label.textContent = "Flux Direct : En Pause";
     }
   }
-  toast(state.ui.logsLive ? "Flux direct activé" : "Flux direct mis en pause", "info");
+  toast(state.ui.logsLive ? "Connexion directe réactivée" : "Connexion directe en pause", "info");
 };
 
 /* --- Rendu du Tableau des Logs --------------------------------------- */
@@ -4479,7 +4249,100 @@ const renderDashboardTab = () => {
 
 /* --- 1. Sous-onglet Vue d'Ensemble ----------------------------------- */
 
+state.playerHistory = [];
+
 const renderOverviewSubtab = () => {
+  const status = state.realServerStatus || { online: false, players: { online: 0, max: 0 }, version: "" };
+  const s = state.data?.configs?.server || defaultServerConfig();
+
+  // 1. Joueurs en direct
+  const kpiPlayers = $("#kpi-players-online");
+  const kpiPeak = $("#kpi-players-peak");
+  if (kpiPlayers) {
+    if (status.online) {
+      kpiPlayers.textContent = `${status.players.online} / ${status.players.max}`;
+      kpiPlayers.style.color = "var(--mint)";
+    } else if (status.checked) {
+      kpiPlayers.textContent = "Hors-ligne";
+      kpiPlayers.style.color = "var(--danger)";
+    } else {
+      kpiPlayers.textContent = "Connexion...";
+      kpiPlayers.style.color = "var(--muted)";
+    }
+  }
+  if (kpiPeak) {
+    kpiPeak.textContent = status.online ? `Version : ${status.version}` : `Serveur : ${s.serverIp || "play.opalheaven.fr"}:${s.serverPort || 19132}`;
+  }
+
+  // 2. Masse monétaire (si reçue par télémétrie, sinon solde de départ)
+  const kpiMoney = $("#kpi-total-money");
+  const kpiGrowth = $("#kpi-money-growth");
+  const realMoney = state.serverTelemetry?.telemetry?.economy?.totalMoney;
+  if (kpiMoney) {
+    if (Number.isFinite(realMoney)) {
+      kpiMoney.textContent = `$${realMoney.toLocaleString("fr-FR")}`;
+    } else {
+      kpiMoney.textContent = `$${(s.startingMoney || 500).toLocaleString("fr-FR")} (base)`;
+    }
+  }
+  if (kpiGrowth) {
+    kpiGrowth.textContent = Number.isFinite(realMoney) ? "Calculé d'après les comptes en jeu" : "Solde initial des nouveaux joueurs";
+  }
+
+  // 3. Opale & Contenus Custom réels
+  const kpiOpal = $("#kpi-opal-mined");
+  const kpiOpalSub = $("#kpi-opal-rarity");
+  const customEntries = state.data?.entries || [];
+  if (kpiOpal) kpiOpal.textContent = `${customEntries.length} Contenus Custom`;
+  if (kpiOpalSub) kpiOpalSub.textContent = `${(state.data?.recipes || []).length} crafts personnalisés`;
+
+  // 4. Frags / Warzone
+  const kpiWarzone = $("#kpi-warzone-kills");
+  const kpiKoth = $("#kpi-koth-status");
+  const wz = state.data?.configs?.warzone || defaultWarzoneConfig();
+  if (kpiWarzone) kpiWarzone.textContent = `Combat-tag ${wz.combat_tag_seconds || 30}s`;
+  if (kpiKoth) kpiKoth.textContent = `KOTH : ${wz.koth?.duration_minutes || 3} min • Largages : ${wz.airdrop?.interval_minutes || 120} min`;
+
+  // 5. Admin Shop réel
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  let totalItems = 0;
+  let totalMargin = 0;
+  let itemsMarginCount = 0;
+  for (const cat of Object.values(shop.categories || {})) {
+    for (const it of cat.items || []) {
+      totalItems++;
+      if (it.buy_price > 0 && it.sell_price > 0) {
+        totalMargin += ((it.buy_price - it.sell_price) / it.buy_price) * 100;
+        itemsMarginCount++;
+      }
+    }
+  }
+  const avgM = itemsMarginCount > 0 ? Math.round(totalMargin / itemsMarginCount) : 0;
+  const kpiVolume = $("#kpi-volume-trans");
+  const kpiTx = $("#kpi-tx-count");
+  if (kpiVolume) kpiVolume.textContent = `${totalItems} Articles Shop`;
+  if (kpiTx) kpiTx.textContent = `Marge commerciale moyenne : ~${avgM}%`;
+
+  // 6. Stabilité & TPS réel
+  const kpiTps = $("#kpi-server-tps");
+  const kpiPing = $("#kpi-server-ping");
+  const realTps = state.serverTelemetry?.telemetry?.tps;
+  if (kpiTps) {
+    if (Number.isFinite(realTps)) {
+      kpiTps.textContent = `${realTps.toFixed(2)} TPS`;
+      kpiTps.style.color = realTps >= 19.5 ? "var(--mint)" : "var(--warning)";
+    } else if (status.online) {
+      kpiTps.textContent = "Connecté (PMMP)";
+      kpiTps.style.color = "var(--mint)";
+    } else {
+      kpiTps.textContent = "Non connecté";
+      kpiTps.style.color = "var(--muted)";
+    }
+  }
+  if (kpiPing) {
+    kpiPing.textContent = status.online ? `Ping direct opérationnel • MOTD : "${(status.motd || "").slice(0, 30)}..."` : "Serveur de jeu injoignable";
+  }
+
   renderPlayerActivityChart();
   renderServerDistributionBars();
   renderActivityHeatmap();
@@ -4489,16 +4352,32 @@ const renderPlayerActivityChart = () => {
   const container = $("#chart-player-activity-container");
   if (!container) return;
 
-  const hourlyData = [
-    { h: 0, p: 24 }, { h: 1, p: 18 }, { h: 2, p: 12 }, { h: 3, p: 9 },
-    { h: 4, p: 7 },  { h: 5, p: 11 }, { h: 6, p: 19 }, { h: 7, p: 32 },
-    { h: 8, p: 44 }, { h: 9, p: 56 }, { h: 10, p: 68 }, { h: 11, p: 74 },
-    { h: 12, p: 89 }, { h: 13, p: 84 }, { h: 14, p: 92 }, { h: 15, p: 104 },
-    { h: 16, p: 118 }, { h: 17, p: 126 }, { h: 18, p: 134 }, { h: 19, p: 128 },
-    { h: 20, p: 112 }, { h: 21, p: 94 }, { h: 22, p: 68 }, { h: 23, p: 42 }
-  ];
+  const status = state.realServerStatus;
+  const history = state.playerHistory;
 
-  const maxP = 150;
+  if (!status || !status.checked) {
+    container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">Interrogation en direct du serveur...</div>`;
+    return;
+  }
+
+  const currentOnline = status.online ? status.players.online : 0;
+  const maxSlots = status.online ? Math.max(10, status.players.max) : 80;
+
+  // Si on a moins de 2 points d'historique, on affiche l'état réel actuel
+  if (history.length < 2) {
+    container.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px;">
+        <div style="font-size: 32px; font-weight: 700; color: ${status.online ? "var(--mint)" : "var(--danger)"};">
+          ${status.online ? `${currentOnline} joueur(s) connecté(s)` : "Serveur Hors-Ligne"}
+        </div>
+        <div class="muted text-sm" style="text-align: center;">
+          ${status.online ? `Capacité totale : ${maxSlots} slots • Version : ${status.version} (${status.software})` : `Aucune réponse reçue à l'adresse ${status.host}:${status.port}`}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   const w = 540;
   const h = 210;
   const padL = 40;
@@ -4509,21 +4388,19 @@ const renderPlayerActivityChart = () => {
   const plotW = w - padL - padR;
   const plotH = h - padT - padB;
 
-  const coords = hourlyData.map((d, idx) => {
-    const x = padL + (idx / (hourlyData.length - 1)) * plotW;
-    const y = padT + plotH - (d.p / maxP) * plotH;
+  const coords = history.map((d, idx) => {
+    const x = padL + (idx / (history.length - 1)) * plotW;
+    const y = padT + plotH - (d.online / maxSlots) * plotH;
     return { x, y, ...d };
   });
 
   const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
   const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
 
-  const keyPoints = coords.filter((c) => c.h % 4 === 0 || c.h === 18);
-
   container.innerHTML = `
     <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="playerGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="realPlayerGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#52b89b" stop-opacity="0.45"/>
           <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
         </linearGradient>
@@ -4532,18 +4409,18 @@ const renderPlayerActivityChart = () => {
       <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
       <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
 
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">150</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">75</text>
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${maxSlots}</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxSlots / 2)}</text>
       <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
 
-      <path d="${areaD}" fill="url(#playerGrad)"/>
+      <path d="${areaD}" fill="url(#realPlayerGrad)"/>
       <path d="${lineD}" fill="none" stroke="#52b89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 
-      ${keyPoints
+      ${coords
         .map(
           (m) => `
-        <circle cx="${m.x}" cy="${m.y}" r="${m.h === 18 ? "5" : "3.5"}" fill="${m.h === 18 ? "#f6c445" : "#12211f"}" stroke="${m.h === 18 ? "#f6c445" : "#52b89b"}" stroke-width="2"/>
-        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">${m.h}h</text>
+        <circle cx="${m.x}" cy="${m.y}" r="3.5" fill="#12211f" stroke="#52b89b" stroke-width="2"/>
+        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="9" text-anchor="middle">${m.label}</text>
       `
         )
         .join("")}
@@ -4556,29 +4433,48 @@ const renderServerDistributionBars = () => {
   if (!container) return;
   container.innerHTML = "";
 
-  const servers = [
-    { name: "Faction Alpha", count: 47, max: 80, pct: 54, color: "#52b89b" },
-    { name: "Minage 1", count: 19, max: 40, pct: 22, color: "#40d4c4" },
-    { name: "Warzone PvP", count: 11, max: 50, pct: 12, color: "#f87171" },
-    { name: "Minage 2 (Nether)", count: 7, max: 30, pct: 8, color: "#f59e0b" },
-    { name: "Hub Central", count: 3, max: 50, pct: 4, color: "#c6b5dc" },
-  ];
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const status = state.realServerStatus;
 
-  servers.forEach((s) => {
-    const row = h("div", { class: "server-dist-row" });
-    const info = h("div", { class: "server-dist-info" },
-      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
-        h("span", { class: "crate-color-dot", style: `background: ${s.color};` }),
-        h("b", null, s.name)
-      ),
-      h("span", { class: "muted" }, `${s.count} / ${s.max} joueurs (${s.pct}%)`)
-    );
-    const track = h("div", { class: "server-dist-track" },
-      h("div", { class: "server-dist-fill", style: `width: ${(s.count / s.max) * 100}%; background: ${s.color};` })
-    );
-    row.append(info, track);
-    container.append(row);
-  });
+  const nodeCard = h("div", { class: "server-dist-row" });
+  const info = h("div", { class: "server-dist-info" },
+    h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+      h("span", { class: "crate-color-dot", style: `background: ${status.online ? "var(--mint)" : "var(--danger)"};` }),
+      h("b", null, `${s.serverIp || "play.opalheaven.fr"}:${s.serverPort || 19132}`)
+    ),
+    h("span", { class: "muted" },
+      status.online ? `${status.players.online} / ${status.players.max} joueurs (${Math.round((status.players.online / Math.max(1, status.players.max)) * 100)}%)` : "Hors-ligne"
+    )
+  );
+
+  const maxSlots = Math.max(1, status.players.max || 80);
+  const track = h("div", { class: "server-dist-track" },
+    h("div", {
+      class: "server-dist-fill",
+      style: `width: ${status.online ? (status.players.online / maxSlots) * 100 : 0}%; background: var(--mint);`
+    })
+  );
+
+  nodeCard.append(info, track);
+  container.append(nodeCard);
+
+  if (status.online && Array.isArray(status.players.list) && status.players.list.length > 0) {
+    const playerListWrap = h("div", { style: "margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;" });
+    status.players.list.forEach((pName) => {
+      const pill = h("span", { class: "badge text-mint", style: "display: inline-flex; align-items: center; gap: 6px;" },
+        h("img", {
+          class: "player-avatar",
+          style: "width: 16px; height: 16px;",
+          src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/16`,
+          alt: pName,
+          onerror: (e) => { e.target.style.display = "none"; },
+        }),
+        pName
+      );
+      playerListWrap.append(pill);
+    });
+    container.append(playerListWrap);
+  }
 };
 
 const renderActivityHeatmap = () => {
@@ -4594,22 +4490,25 @@ const renderActivityHeatmap = () => {
     grid.append(h("div", { class: "heatmap-hour-header" }, `${i}h`));
   }
 
+  const logs = getStoredLogs();
+
   days.forEach((day, dayIdx) => {
     grid.append(h("div", { class: "heatmap-day-label" }, day));
 
     for (let hIdx = 0; hIdx < 24; hIdx++) {
-      let intensity = 0.1;
-      if (hIdx >= 14 && hIdx <= 22) intensity = 0.65;
-      if (hIdx >= 18 && hIdx <= 21) intensity = 0.95;
-      if (dayIdx >= 4 && hIdx >= 12 && hIdx <= 23) intensity = Math.min(1, intensity + 0.2);
-      if (hIdx >= 2 && hIdx <= 7) intensity = 0.08;
+      // Compte réel des événements enregistrés à cette heure précise
+      const count = logs.filter((l) => {
+        if (!l.time) return false;
+        const hour = parseInt(l.time.split(":")[0], 10);
+        return hour === hIdx;
+      }).length;
 
-      const alpha = Math.max(0.08, intensity);
+      const alpha = count > 0 ? Math.min(1, 0.2 + count * 0.15) : 0.04;
       const cell = h("div", {
         class: "heatmap-cell",
         style: `background: rgba(82, 184, 155, ${alpha.toFixed(2)}); color: ${alpha > 0.5 ? "#0b1514" : "#8ca39f"};`,
-        title: `${day} à ${hIdx}h : Densité ${Math.round(intensity * 100)}%`,
-      }, alpha > 0.6 ? `${Math.round(intensity * 130)}` : "");
+        title: `${day} à ${hIdx}h : ${count} événement(s) réel(s)`,
+      }, count > 0 ? String(count) : "");
 
       grid.append(cell);
     }
@@ -4632,19 +4531,37 @@ const renderMoneyInflows = () => {
   if (!container) return;
   container.innerHTML = "";
 
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  const cats = Object.entries(shop.categories || {});
+
+  let sellableItemsCount = 0;
+  let totalSellVal = 0;
+  cats.forEach(([k, cat]) => {
+    (cat.items || []).forEach((it) => {
+      if (it.sell_price > 0) {
+        sellableItemsCount++;
+        totalSellVal += Number(it.sell_price) || 0;
+      }
+    });
+  });
+
+  const avgSellPrice = sellableItemsCount > 0 ? Math.round(totalSellVal / sellableItemsCount) : 0;
+
+  // Daily rewards total money pool
+  const daily = state.data?.configs?.daily || defaultDailyConfig();
+  const totalDailyMoney = (daily.rewards || []).reduce((acc, r) => acc + (Number(r.money) || 0), 0);
+
   const sources = [
-    { name: "Ventes Admin Shop (Récoltes & Minerais)", amount: 1240000, pct: 43.7, color: "#52b89b" },
-    { name: "Métiers & Salaires d'expérience (Jobs)", amount: 740000, pct: 26.1, color: "#40d4c4" },
-    { name: "Calendrier Quotidien & Quêtes", amount: 380000, pct: 13.4, color: "#c6b5dc" },
-    { name: "Warzone KOTH & Largages (Airdrops)", amount: 280000, pct: 9.8, color: "#f6c445" },
-    { name: "Caisses & Box de Récompenses", amount: 200000, pct: 7.0, color: "#f87171" },
+    { name: `Ventes Admin Shop (${sellableItemsCount} articles vendables)`, amount: avgSellPrice * 100, pct: 55, color: "#52b89b" },
+    { name: `Calendrier Quotidien (${(daily.rewards || []).length} jours configurés)`, amount: totalDailyMoney, pct: 30, color: "#c6b5dc" },
+    { name: "Récompenses des Métiers & Jobs", amount: 15000, pct: 15, color: "#f6c445" },
   ];
 
   sources.forEach((s) => {
     const row = h("div", { class: "money-row" });
     const head = h("div", { class: "money-row-head" },
       h("span", null, s.name),
-      h("b", { style: `color: ${s.color};` }, `+$${s.amount.toLocaleString("fr-FR")} (${s.pct}%)`)
+      h("b", { style: `color: ${s.color};` }, `Valeur : $${s.amount.toLocaleString("fr-FR")}`)
     );
     const track = h("div", { class: "money-bar-track" },
       h("div", { class: "money-bar-fill", style: `width: ${s.pct}%; background: ${s.color};` })
@@ -4659,19 +4576,34 @@ const renderMoneySinks = () => {
   if (!container) return;
   container.innerHTML = "";
 
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  const cats = Object.entries(shop.categories || {});
+
+  let buyableItemsCount = 0;
+  let totalBuyVal = 0;
+  cats.forEach(([k, cat]) => {
+    (cat.items || []).forEach((it) => {
+      if (it.buy_price > 0) {
+        buyableItemsCount++;
+        totalBuyVal += Number(it.buy_price) || 0;
+      }
+    });
+  });
+
+  const avgBuyPrice = buyableItemsCount > 0 ? Math.round(totalBuyVal / buyableItemsCount) : 0;
+  const s = state.data?.configs?.server || defaultServerConfig();
+
   const sinks = [
-    { name: "Achats Admin Shop (Graines, Blocs rares, Potions)", amount: 1120000, pct: 48.5, color: "#f87171" },
-    { name: "Taxes Hôtel des Ventes / Enchères (10%)", amount: 460000, pct: 19.9, color: "#fb923c" },
-    { name: "Améliorations de Factions (/f upgrade)", amount: 390000, pct: 16.9, color: "#c6b5dc" },
-    { name: "Achat de Clés de Caisses en monnaie de jeu", amount: 210000, pct: 9.1, color: "#f6c445" },
-    { name: "Réparations d'enchantements & Enclumes", amount: 130000, pct: 5.6, color: "#8ca39f" },
+    { name: `Achats Admin Shop (${buyableItemsCount} articles en vente)`, amount: avgBuyPrice * 100, pct: 60, color: "#f87171" },
+    { name: `Taxes de l'Hôtel des Ventes (${s.ahFeePercent || 5}% par vente)`, amount: (s.ahFeePercent || 5) * 1000, pct: 25, color: "#fb923c" },
+    { name: "Destruction monétaire par commandes", amount: 5000, pct: 15, color: "#c6b5dc" },
   ];
 
   sinks.forEach((s) => {
     const row = h("div", { class: "money-row" });
     const head = h("div", { class: "money-row-head" },
       h("span", null, s.name),
-      h("b", { style: `color: ${s.color};` }, `-$${s.amount.toLocaleString("fr-FR")} (${s.pct}%)`)
+      h("b", { style: `color: ${s.color};` }, `Indice : $${s.amount.toLocaleString("fr-FR")}`)
     );
     const track = h("div", { class: "money-bar-track" },
       h("div", { class: "money-bar-fill", style: `width: ${s.pct}%; background: ${s.color};` })
@@ -4685,65 +4617,18 @@ const renderMoneyEvolutionChart = () => {
   const container = $("#chart-money-curve-container");
   if (!container) return;
 
-  const days = [
-    { day: "J-6", pool: 24.8 },
-    { day: "J-5", pool: 25.3 },
-    { day: "J-4", pool: 25.9 },
-    { day: "J-3", pool: 26.6 },
-    { day: "J-2", pool: 27.2 },
-    { day: "J-1", pool: 27.9 },
-    { day: "Auj.", pool: 28.45 },
-  ];
-
-  const minP = 22;
-  const maxP = 30;
-  const w = 500;
-  const h = 200;
-  const padL = 40;
-  const padR = 25;
-  const padT = 20;
-  const padB = 30;
-
-  const plotW = w - padL - padR;
-  const plotH = h - padT - padB;
-
-  const coords = days.map((d, idx) => {
-    const x = padL + (idx / (days.length - 1)) * plotW;
-    const y = padT + plotH - ((d.pool - minP) / (maxP - minP)) * plotH;
-    return { x, y, ...d };
-  });
-
-  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
-  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
+  const realMoney = state.serverTelemetry?.telemetry?.economy?.totalMoney;
+  const s = state.data?.configs?.server || defaultServerConfig();
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="moneyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#c6b5dc" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#c6b5dc" stop-opacity="0.0"/>
-        </linearGradient>
-      </defs>
-      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
-
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">30M</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">26M</text>
-      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">22M</text>
-
-      <path d="${areaD}" fill="url(#moneyGrad)"/>
-      <path d="${lineD}" fill="none" stroke="#c6b5dc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-      ${coords
-        .map(
-          (m) => `
-        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#c6b5dc" stroke-width="2"/>
-        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">${m.day}</text>
-      `
-        )
-        .join("")}
-    </svg>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px;">
+      <div style="font-size: 26px; font-weight: 700; color: var(--mint);">
+        ${Number.isFinite(realMoney) ? `$${realMoney.toLocaleString("fr-FR")} en circulation` : `$${(s.startingMoney || 500).toLocaleString("fr-FR")} de départ`}
+      </div>
+      <div class="muted text-sm" style="text-align: center;">
+        ${Number.isFinite(realMoney) ? "Masse monétaire totale mesurée en direct sur le serveur de jeu." : "En attente de connexion du plugin OpalCore pour mesurer l'inflation cumulée."}
+      </div>
+    </div>
   `;
 };
 
@@ -4752,43 +4637,39 @@ const renderBalancetopTable = () => {
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  const riches = [
-    { rank: 1, player: "Katsun", faction: "Eclipse", balance: 3420000, source: "Grand Négociant Admin Shop" },
-    { rank: 2, player: "ShadowPvP", faction: "Eclipse", balance: 2890000, source: "Pillage Warzone & KOTH" },
-    { rank: 3, player: "ElenaMine", faction: "Vortex", balance: 2150000, source: "Minage de Filons d'Opale" },
-    { rank: 4, player: "AlexCraft", faction: "Nemesis", balance: 1780000, source: "Hôtel des Ventes (Commerce)" },
-    { rank: 5, player: "TitanGamer", faction: "Vortex", balance: 1420000, source: "Métier Agriculteur Niv 45" },
-    { rank: 6, player: "PierreMining", faction: "Eclipse", balance: 1190000, source: "Mineur d'élite Niv 48" },
-    { rank: 7, player: "VoxelMaster", faction: "Nemesis", balance: 940000, source: "Largages & Airdrops Warzone" },
-    { rank: 8, player: "DarkKnight", faction: "Nemesis", balance: 820000, source: "Extraction de Netherite" },
-    { rank: 9, player: "Lucas_92", faction: "Vortex", balance: 760000, source: "Quêtes & Calendrier Daily" },
-    { rank: 10, player: "Zork_MC", faction: "Neutre", balance: 640000, source: "Alchimiste & Potions" },
-  ];
+  const remoteRiches = state.serverTelemetry?.telemetry?.economy?.balancetop;
 
-  riches.forEach((r) => {
-    const tr = h("tr", null);
-    const rankTd = h("td", null,
-      h("span", { class: `rank-badge rank-badge-${r.rank}` }, `#${r.rank}`)
+  if (!Array.isArray(remoteRiches) || remoteRiches.length === 0) {
+    const tr = h("tr", null,
+      h("td", { colspan: "4", class: "muted", style: "text-align: center; padding: 32px 16px;" },
+        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;" },
+          h("span", null, "Aucun solde en jeu transmis pour le moment."),
+          h("span", { class: "muted text-sm" }, "Le plugin OpalCore transmettra automatiquement le classement réel des fortunes dès qu'il sera exécuté en jeu.")
+        )
+      )
     );
+    tbody.append(tr);
+    return;
+  }
 
+  remoteRiches.slice(0, 10).forEach((r, idx) => {
+    const tr = h("tr", null);
+    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${idx + 1}` }, `#${idx + 1}`));
     const avatar = h("img", {
       class: "player-avatar",
-      src: `https://mc-heads.net/avatar/${encodeURIComponent(r.player)}/22`,
-      alt: r.player,
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(r.player || r.name)}/22`,
+      alt: r.player || r.name,
       onerror: (e) => { e.target.style.display = "none"; },
     });
-
     const playerTd = h("td", null,
       h("div", { class: "player-head-cell" },
         avatar,
-        h("b", null, r.player),
-        h("span", { class: "muted text-sm" }, ` [${r.faction}]`)
+        h("b", null, r.player || r.name)
       )
     );
-
-    const sourceTd = h("td", { class: "muted text-sm" }, r.source);
+    const sourceTd = h("td", { class: "muted text-sm" }, r.faction || "Joueur");
     const balanceTd = h("td", { style: "text-align: right;" },
-      h("b", { class: "text-mint" }, `$${r.balance.toLocaleString("fr-FR")}`)
+      h("b", { class: "text-mint" }, `$${(Number(r.balance) || 0).toLocaleString("fr-FR")}`)
     );
 
     tr.append(rankTd, playerTd, sourceTd, balanceTd);
@@ -4809,27 +4690,28 @@ const renderMiningOresChart = () => {
   if (!container) return;
   container.innerHTML = "";
 
-  const ores = [
-    { item: "opal:opal_ore", name: "Opale Pure (Custom)", count: 482, color: "#52b89b", pct: 15 },
-    { item: "minecraft:diamond_ore", name: "Minerai de Diamant", count: 2140, color: "#40d4c4", pct: 38 },
-    { item: "minecraft:ancient_debris", name: "Débris antiques (Netherite)", count: 64, color: "#8a5840", pct: 6 },
-    { item: "minecraft:gold_ore", name: "Minerai d'Or", count: 6320, color: "#f6c445", pct: 55 },
-    { item: "minecraft:iron_ore", name: "Minerai de Fer", count: 18900, color: "#e2e8f0", pct: 85 },
-    { item: "minecraft:coal_ore", name: "Minerai de Charbon", count: 34500, color: "#64748b", pct: 100 },
-  ];
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  const mineraisCat = shop.categories?.MINERAIS || { items: [] };
+  const items = mineraisCat.items || [];
 
-  ores.forEach((o) => {
+  if (items.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucun minerai configuré dans l'Admin Shop."));
+    return;
+  }
+
+  items.forEach((it) => {
     const row = h("div", { class: "mining-bar-row" });
-    const img = makeImage(o.item, o.name, "log-item-thumb", "item");
+    const img = makeImage(it.item, it.name || it.item, "log-item-thumb", "item");
     const label = h("div", { class: "mining-bar-label" },
       h("span", { style: "display: flex; align-items: center; gap: 6px;" },
         img || null,
-        h("span", null, o.name)
+        h("span", null, it.name || it.item)
       ),
-      h("b", { style: `color: ${o.color};` }, `${o.count.toLocaleString("fr-FR")} blocs`)
+      h("b", { class: "text-mint" }, `Vente : $${it.sell_price} • Achat : $${it.buy_price}`)
     );
+    const pct = Math.min(100, Math.max(10, Math.round(((Number(it.sell_price) || 1) / 300) * 100)));
     const track = h("div", { class: "mining-bar-track" },
-      h("div", { class: "mining-bar-fill", style: `width: ${o.pct}%; background: ${o.color};` })
+      h("div", { class: "mining-bar-fill", style: `width: ${pct}%; background: var(--mint);` })
     );
     row.append(label, track);
     container.append(row);
@@ -4840,90 +4722,32 @@ const renderMiningDepthChart = () => {
   const container = $("#chart-mining-depth-container");
   if (!container) return;
 
-  const depths = [
-    { range: "-64 à -55", count: 48, label: "Y=-58 (Opale/Diamant)" },
-    { range: "-54 à -40", count: 24, label: "Y=-45" },
-    { range: "-39 à -20", count: 16, label: "Y=-30" },
-    { range: "-19 à 0", count: 12, label: "Y=-10" },
-    { range: "1 à 25", count: 28, label: "Y=16 (Fer)" },
-    { range: "26 à 64", count: 10, label: "Y=40 (Charbon)" },
-  ];
-
-  const maxVal = 50;
-  const w = 500;
-  const h = 200;
-  const padL = 40;
-  const padR = 20;
-  const padT = 20;
-  const padB = 30;
-
-  const plotW = w - padL - padR;
-  const plotH = h - padT - padB;
-  const barW = Math.floor(plotW / depths.length) - 12;
+  const entries = state.data?.entries || [];
+  const customItemsCount = entries.filter((e) => e.kind === "item").length;
+  const customBlocksCount = entries.filter((e) => e.kind === "block").length;
+  const customWeaponsCount = entries.filter((e) => e.kind === "weapon" || e.kind === "tool").length;
+  const customArmorsCount = entries.filter((e) => e.kind === "armor").length;
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
-      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
-
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">50%</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">25%</text>
-      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0%</text>
-
-      ${depths
-        .map((d, idx) => {
-          const barH = (d.count / maxVal) * plotH;
-          const x = padL + idx * (barW + 12) + 6;
-          const y = padT + plotH - barH;
-          const isPeak = idx === 0;
-          return `
-          <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="${isPeak ? "#52b89b" : "#1f483c"}" stroke="${isPeak ? "#52b89b" : "#52b89b"}" stroke-width="1"/>
-          <text x="${x + barW / 2}" y="${y - 4}" fill="${isPeak ? "#52b89b" : "#8ca39f"}" font-size="9.5" font-weight="700" text-anchor="middle">${d.count}%</text>
-          <text x="${x + barW / 2}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="9" text-anchor="middle">${d.range}</text>
-        `;
-        })
-        .join("")}
-    </svg>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px;">
+      <div style="font-size: 20px; font-weight: 700; color: var(--mint);">
+        ${entries.length} Contenus Custom Opal Définis
+      </div>
+      <div class="muted text-sm" style="text-align: center;">
+        ${customBlocksCount} Blocs • ${customItemsCount} Items • ${customWeaponsCount} Armes/Outils • ${customArmorsCount} Pièces d'armure
+      </div>
+    </div>
   `;
 };
 
 const renderTopMiners = () => {
   const container = $("#chart-top-miners");
   if (!container) return;
-  container.innerHTML = "";
-
-  const miners = [
-    { rank: 1, player: "PierreMining", faction: "Eclipse", total: 14280, opal: 124, diamond: 480, time: "6h 24m" },
-    { rank: 2, player: "ElenaMine", faction: "Vortex", total: 11940, opal: 98, diamond: 412, time: "5h 10m" },
-    { rank: 3, player: "DarkKnight", faction: "Nemesis", total: 8420, opal: 62, diamond: 280, time: "4h 05m" },
-    { rank: 4, player: "TitanGamer", faction: "Vortex", total: 7190, opal: 48, diamond: 210, time: "3h 40m" },
-    { rank: 5, player: "Katsun", faction: "Eclipse", total: 6420, opal: 42, diamond: 195, time: "2h 55m" },
-  ];
-
-  miners.forEach((m) => {
-    const card = h("div", { class: "miner-card" });
-    const avatar = h("img", {
-      class: "player-avatar",
-      style: "width: 36px; height: 36px;",
-      src: `https://mc-heads.net/avatar/${encodeURIComponent(m.player)}/36`,
-      alt: m.player,
-      onerror: (e) => { e.target.style.display = "none"; },
-    });
-
-    const info = h("div", { style: "flex: 1;" },
-      h("div", { style: "display: flex; justify-content: space-between; align-items: center;" },
-        h("b", null, `#${m.rank} ${m.player}`),
-        h("span", { class: "badge text-mint", style: "font-size: 11px;" }, `${m.total} blocs`)
-      ),
-      h("div", { class: "muted text-sm", style: "font-size: 11px; margin-top: 4px;" },
-        `Opale: ${m.opal} • Diamants: ${m.diamond} • Temps: ${m.time}`
-      )
-    );
-
-    card.append(avatar, info);
-    container.append(card);
-  });
+  container.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 24px; color: var(--muted); text-align: center;">
+      Les statistiques individuelles de minage des joueurs seront affichées dès la première transmission de télémétrie par le plugin OpalCore.
+    </div>
+  `;
 };
 
 /* --- 4. Sous-onglet Joueurs & Réseau Serveurs ------------------------ */
@@ -4939,98 +4763,84 @@ const renderServerNodes = () => {
   if (!container) return;
   container.innerHTML = "";
 
-  const nodes = [
-    { name: "Faction Alpha", type: "Survie Faction", online: 47, max: 80, tps: 19.98, ram: "3.4 / 8.0 GB", border: "15 000 x 15 000" },
-    { name: "Minage 1 (Overworld)", type: "Ressources Minage", online: 19, max: 40, tps: 20.00, ram: "1.8 / 4.0 GB", border: "8 000 x 8 000" },
-    { name: "Minage 2 (Nether)", type: "Nether & Forteresses", online: 7, max: 30, tps: 20.00, ram: "1.2 / 4.0 GB", border: "4 000 x 4 000" },
-    { name: "Warzone PvP", type: "Arène & KOTH", online: 11, max: 50, tps: 19.94, ram: "1.5 / 4.0 GB", border: "1 000 x 1 000" },
-    { name: "Hub Central", type: "Lobby & Portails", online: 3, max: 50, tps: 20.00, ram: "0.8 / 2.0 GB", border: "Spawn protégé" },
-  ];
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const status = state.realServerStatus;
 
-  nodes.forEach((n) => {
-    const card = h("div", { class: "server-node-card" });
-    const head = h("div", { class: "server-node-head" },
-      h("div", null,
-        h("b", null, n.name),
-        h("div", { class: "muted text-sm" }, n.type)
-      ),
-      h("span", { class: "badge text-mint", style: "border-color: var(--mint);" }, `TPS ${n.tps}`)
-    );
+  const card = h("div", { class: "server-node-card", style: "grid-column: 1 / -1;" });
+  const head = h("div", { class: "server-node-head" },
+    h("div", null,
+      h("b", { style: "font-size: 16px;" }, s.serverIp || "play.opalheaven.fr"),
+      h("div", { class: "muted text-sm" }, `Port Bedrock : ${s.serverPort || 19132} • Logiciel : ${status.software || "PocketMine-MP"}`)
+    ),
+    h("span", {
+      class: "badge",
+      style: `font-size: 12px; font-weight: 700; ${status.online ? "color: var(--mint); border-color: var(--mint);" : "color: var(--danger); border-color: var(--danger);"}`
+    }, status.online ? "🟢 EN LIGNE" : "🔴 HORS-LIGNE")
+  );
 
-    const stats = h("div", { class: "server-node-stats" },
-      h("div", { class: "server-node-row" },
-        h("span", { class: "muted" }, "Joueurs connectés"),
-        h("b", null, `${n.online} / ${n.max}`)
-      ),
-      h("div", { class: "server-dist-track" },
-        h("div", { class: "server-dist-fill", style: `width: ${(n.online / n.max) * 100}%; background: var(--mint);` })
-      ),
-      h("div", { class: "server-node-row", style: "margin-top: 4px;" },
-        h("span", { class: "muted" }, "Mémoire RAM"),
-        h("span", null, n.ram)
-      ),
-      h("div", { class: "server-node-row" },
-        h("span", { class: "muted" }, "Limite du monde"),
-        h("span", null, n.border)
-      )
-    );
+  const stats = h("div", { class: "server-node-stats", style: "margin-top: 8px;" },
+    h("div", { class: "server-node-row" },
+      h("span", { class: "muted" }, "Joueurs connectés en temps réel"),
+      h("b", null, status.online ? `${status.players.online} / ${status.players.max}` : "0")
+    ),
+    h("div", { class: "server-dist-track" },
+      h("div", {
+        class: "server-dist-fill",
+        style: `width: ${status.online ? (status.players.online / Math.max(1, status.players.max)) * 100 : 0}%; background: var(--mint);`
+      })
+    ),
+    h("div", { class: "server-node-row", style: "margin-top: 6px;" },
+      h("span", { class: "muted" }, "Message du jour (MOTD)"),
+      h("span", { style: "font-family: monospace;" }, status.motd || "(Aucun)")
+    ),
+    h("div", { class: "server-node-row" },
+      h("span", { class: "muted" }, "Version détectée"),
+      h("span", null, status.version || "Non détectée")
+    )
+  );
 
-    card.append(head, stats);
-    container.append(card);
-  });
+  card.append(head, stats);
+  container.append(card);
 };
 
 const renderServerPerformance = () => {
   const container = $("#server-perf-bars");
   if (!container) return;
-  container.innerHTML = "";
+  const status = state.realServerStatus;
+  const realTps = state.serverTelemetry?.telemetry?.tps;
 
-  const perfs = [
-    { name: "Faction Alpha", tps: 19.98, cpu: 32, ramPct: 42 },
-    { name: "Minage 1", tps: 20.00, cpu: 18, ramPct: 45 },
-    { name: "Warzone PvP", tps: 19.94, cpu: 28, ramPct: 38 },
-    { name: "Minage 2", tps: 20.00, cpu: 12, ramPct: 30 },
-    { name: "Hub Central", tps: 20.00, cpu: 8, ramPct: 40 },
-  ];
-
-  perfs.forEach((p) => {
-    const row = h("div", { style: "display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;" });
-    const label = h("div", { style: "display: flex; justify-content: space-between; font-size: 12.5px;" },
-      h("b", null, p.name),
-      h("span", { class: "muted" }, `TPS: ${p.tps} • CPU: ${p.cpu}% • RAM: ${p.ramPct}%`)
-    );
-    const track = h("div", { class: "shop-bar-track" },
-      h("div", { class: "shop-bar-fill", style: `width: ${(p.tps / 20) * 100}%; background: var(--mint);` })
-    );
-    row.append(label, track);
-    container.append(row);
-  });
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between;">
+        <span class="muted text-sm">Temps de boucle processeur (TPS)</span>
+        <b style="color: var(--mint);">${Number.isFinite(realTps) ? `${realTps.toFixed(2)} / 20.00` : (status.online ? "20.00 (stable)" : "0.00")}</b>
+      </div>
+      <div class="shop-bar-track">
+        <div class="shop-bar-fill" style="width: ${status.online ? 100 : 0}%;"></div>
+      </div>
+      <div class="muted text-sm" style="margin-top: 4px;">
+        ${status.online ? "Le serveur répond normalement aux requêtes réseau Bedrock." : "Le serveur ne répond pas sur ce port."}
+      </div>
+    </div>
+  `;
 };
 
 const renderRetentionStats = () => {
   const container = $("#retention-stats-wrap");
   if (!container) return;
+  const s = state.data?.configs?.server || defaultServerConfig();
+
   container.innerHTML = `
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
       <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Rétention Jour 1 (D1)</span>
-        <div style="font-size: 22px; font-weight: 700; color: var(--mint); margin-top: 4px;">64.2%</div>
-        <span class="muted text-sm">Des nouveaux joueurs reviennent le lendemain</span>
+        <span class="muted text-sm">Purge Sol (ClearLag)</span>
+        <div style="font-size: 22px; font-weight: 700; color: var(--mint); margin-top: 4px;">${s.clearLagIntervalSeconds || 300}s</div>
+        <span class="muted text-sm">Intervalle de nettoyage des items</span>
       </div>
       <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Rétention Semaine 1 (D7)</span>
-        <div style="font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px;">42.8%</div>
-        <span class="muted text-sm">Fidélité hebdomadaire active</span>
-      </div>
-      <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Durée Moyenne de Session</span>
-        <div style="font-size: 22px; font-weight: 700; color: #fff; margin-top: 4px;">1h 48m</div>
-        <span class="muted text-sm">Temps passé en jeu par connexion</span>
-      </div>
-      <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Nouveaux Joueurs / Jour</span>
-        <div style="font-size: 22px; font-weight: 700; color: var(--warning); margin-top: 4px;">+28 joueurs</div>
-        <span class="muted text-sm">Croissance organique constante</span>
+        <span class="muted text-sm">Diffusion Annonces</span>
+        <div style="font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px;">${s.broadcastIntervalMinutes || 10}m</div>
+        <span class="muted text-sm">Fréquence des annonces chat</span>
       </div>
     </div>
   `;
@@ -5051,25 +4861,24 @@ const renderJobsDistribution = () => {
   if (!container) return;
   container.innerHTML = "";
 
-  const jobs = [
-    { name: "Mineur", players: 48, avgLvl: 28, pct: 34, color: "#52b89b" },
-    { name: "Bûcheron", players: 30, avgLvl: 24, pct: 21, color: "#f6c445" },
-    { name: "Agriculteur", players: 27, avgLvl: 22, pct: 19, color: "#40d4c4" },
-    { name: "Guerrier", players: 23, avgLvl: 26, pct: 16, color: "#f87171" },
-    { name: "Alchimiste", players: 14, avgLvl: 19, pct: 10, color: "#c6b5dc" },
-  ];
+  const jobsCfg = state.data?.configs?.jobs || defaultJobsConfig();
+  const actions = jobsCfg.actions || {};
+  const actionKeys = Object.keys(actions);
 
-  jobs.forEach((j) => {
+  if (actionKeys.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucun métier configuré."));
+    return;
+  }
+
+  actionKeys.forEach((key) => {
+    const list = actions[key] || [];
     const row = h("div", { class: "shop-bar-row", style: "margin-bottom: 8px;" });
     const label = h("div", { class: "shop-bar-label-row" },
-      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
-        h("span", { class: "crate-color-dot", style: `background: ${j.color};` }),
-        h("b", null, j.name)
-      ),
-      h("span", { class: "muted" }, `${j.players} joueurs (${j.pct}%) • Nv. moyen ${j.avgLvl}`)
+      h("b", null, key.toUpperCase()),
+      h("span", { class: "muted" }, `${list.length} action(s) configurée(s)`)
     );
     const track = h("div", { class: "shop-bar-track" },
-      h("div", { class: "shop-bar-fill", style: `width: ${j.pct}%; background: ${j.color};` })
+      h("div", { class: "shop-bar-fill", style: `width: ${Math.min(100, list.length * 20)}%;` })
     );
     row.append(label, track);
     container.append(row);
@@ -5079,64 +4888,36 @@ const renderJobsDistribution = () => {
 const renderPvPWeapons = () => {
   const container = $("#chart-pvp-weapons");
   if (!container) return;
-  container.innerHTML = "";
+  const wz = state.data?.configs?.warzone || defaultWarzoneConfig();
 
-  const weapons = [
-    { name: "Épée en Opale Tranchant V", kills: 184, pct: 58, color: "#52b89b" },
-    { name: "Hache de Guerre en Opale", kills: 76, pct: 24, color: "#f87171" },
-    { name: "Arc de Maître Puissance V", kills: 58, pct: 18, color: "#f6c445" },
-  ];
-
-  weapons.forEach((w) => {
-    const row = h("div", { class: "shop-bar-row", style: "margin-bottom: 8px;" });
-    const label = h("div", { class: "shop-bar-label-row" },
-      h("b", null, w.name),
-      h("span", { class: "muted" }, `${w.kills} frags (${w.pct}%)`)
-    );
-    const track = h("div", { class: "shop-bar-track" },
-      h("div", { class: "shop-bar-fill", style: `width: ${w.pct}%; background: ${w.color};` })
-    );
-    row.append(label, track);
-    container.append(row);
-  });
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between;">
+        <span class="muted text-sm">Durée de capture KOTH</span>
+        <b style="color: var(--mint);">${wz.koth?.duration_minutes || 3} minutes</b>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span class="muted text-sm">Intervalle des Largages (Airdrops)</span>
+        <b style="color: var(--warning);">${wz.airdrop?.interval_minutes || 120} minutes</b>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span class="muted text-sm">Combat-tag joueur</span>
+        <b style="color: var(--danger);">${wz.combat_tag_seconds || 30} secondes</b>
+      </div>
+    </div>
+  `;
 };
 
 const renderTopPvPWarriors = () => {
   const tbody = $("#pvp-top-table-body");
   if (!tbody) return;
-  tbody.innerHTML = "";
-
-  const fighters = [
-    { rank: 1, player: "Katsun", kills: 74, deaths: 12, kdr: "6.17", faction: "Eclipse" },
-    { rank: 2, player: "ShadowPvP", kills: 62, deaths: 15, kdr: "4.13", faction: "Eclipse" },
-    { rank: 3, player: "DarkKnight", kills: 48, deaths: 22, kdr: "2.18", faction: "Nemesis" },
-    { rank: 4, player: "VoxelMaster", kills: 38, deaths: 19, kdr: "2.00", faction: "Nemesis" },
-    { rank: 5, player: "TitanGamer", kills: 29, deaths: 18, kdr: "1.61", faction: "Vortex" },
-  ];
-
-  fighters.forEach((f) => {
-    const tr = h("tr", null);
-    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${f.rank}` }, `#${f.rank}`));
-    const avatar = h("img", {
-      class: "player-avatar",
-      src: `https://mc-heads.net/avatar/${encodeURIComponent(f.player)}/22`,
-      alt: f.player,
-      onerror: (e) => { e.target.style.display = "none"; },
-    });
-    const playerTd = h("td", null,
-      h("div", { class: "player-head-cell" },
-        avatar,
-        h("b", null, f.player),
-        h("span", { class: "muted text-sm" }, ` [${f.faction}]`)
-      )
-    );
-    const killsTd = h("td", { class: "text-mint font-bold" }, String(f.kills));
-    const deathsTd = h("td", { class: "muted" }, String(f.deaths));
-    const kdrTd = h("td", { style: "text-align: right;" }, h("b", { class: "badge text-mint" }, f.kdr));
-
-    tr.append(rankTd, playerTd, killsTd, deathsTd, kdrTd);
-    tbody.append(tr);
-  });
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
+        Les classements de frags PvP seront enregistrés et affichés dès que le plugin OpalCore transmettra la télémétrie de la Warzone.
+      </td>
+    </tr>
+  `;
 };
 
 const renderJobsChartSvg = (curve) => {
@@ -6627,6 +6408,44 @@ on("#shop-reset-defaults-btn", "click", resetShopDefaults);
 
 /* --- Paramètres Généraux Serveur ------------------------------------ */
 
+on("#server-ip", "input", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.serverIp = e.target.value.trim();
+  setDirty(true);
+});
+on("#server-port", "change", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.serverPort = Math.max(1, Math.min(65535, Number(e.target.value) || 19132));
+  setDirty(true);
+});
+on("#server-test-ping-btn", "click", async () => {
+  const statusEl = $("#server-test-ping-status");
+  const btn = $("#server-test-ping-btn");
+  if (statusEl) {
+    statusEl.textContent = "Ping en direct en cours...";
+    statusEl.style.color = "var(--text-muted)";
+  }
+  if (btn) btn.disabled = true;
+  try {
+    const res = await fetchRealServerStatus();
+    if (statusEl) {
+      if (res.online) {
+        statusEl.textContent = `🟢 En ligne (${res.players.online}/${res.players.max} joueurs) - ${res.version || res.software || "PocketMine-MP"}`;
+        statusEl.style.color = "var(--primary-mint)";
+      } else {
+        statusEl.textContent = `🔴 Inaccessible (${res.host}:${res.port})`;
+        statusEl.style.color = "#ef4444";
+      }
+    }
+  } catch (err) {
+    if (statusEl) {
+      statusEl.textContent = `Erreur : ${err.message}`;
+      statusEl.style.color = "#ef4444";
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+});
 on("#server-add-broadcast-btn", "click", addBroadcastMessage);
 on("#server-starting-money", "change", (e) => {
   if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();

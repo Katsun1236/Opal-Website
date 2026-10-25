@@ -1090,6 +1090,24 @@
     </div>
 
     <div class="server-config-grid">
+      <!-- Connexion Serveur Minecraft -->
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Connexion au Serveur de Jeu Minecraft (PocketMine-MP / Bedrock)</h3>
+        <p class="muted text-sm">Renseignez l'adresse IP et le port de votre serveur hébergé (ex: WinHeberge) pour relier en direct les statistiques de connexion, la télémétrie des joueurs et l'état du serveur.</p>
+        <div class="row">
+          <label for="server-ip" style="flex: 2;">Adresse IP / Nom d'hôte du serveur
+            <input type="text" id="server-ip" placeholder="ex: play.opalheaven.fr ou 51.77.x.x">
+          </label>
+          <label for="server-port" style="flex: 1;">Port Bedrock (défaut : 19132)
+            <input type="number" id="server-port" min="1" max="65535" value="19132">
+          </label>
+        </div>
+        <div class="row row-tight" style="margin-top: 10px;">
+          <button type="button" id="server-test-ping-btn" class="ghost btn-sm">Tester la connexion en direct</button>
+          <span id="server-test-ping-status" class="muted text-sm"></span>
+        </div>
+      </div>
+
       <!-- Économie -->
       <div class="card">
         <h3>Économie & Marché</h3>

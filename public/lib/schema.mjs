@@ -456,6 +456,8 @@ export const defaultAdminShopConfig = () => ({
 });
 
 export const defaultServerConfig = () => ({
+  serverIp: "play.opalheaven.fr",
+  serverPort: 19132,
   startingMoney: 500,
   ahFeePercent: 5,
   clearLagIntervalSeconds: 300,
@@ -735,6 +737,8 @@ export const normalizeConfigs = (raw, { strict = true } = {}) => {
   // 4. Server General
   if (raw.server && typeof raw.server === "object") {
     out.server = {
+      serverIp: typeof raw.server.serverIp === "string" ? raw.server.serverIp.slice(0, 100) : "play.opalheaven.fr",
+      serverPort: Math.max(1, Math.min(65535, Number(raw.server.serverPort) || 19132)),
       startingMoney: Math.max(0, Math.min(1000000, Number(raw.server.startingMoney) || 500)),
       ahFeePercent: Math.max(0, Math.min(50, Number(raw.server.ahFeePercent) || 5)),
       clearLagIntervalSeconds: Math.max(60, Math.min(3600, Number(raw.server.clearLagIntervalSeconds) || 300)),

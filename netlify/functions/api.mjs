@@ -347,6 +347,50 @@ const routeRequest = async (req, url, context, store) => {
     return json(body, 200, { etag, "cache-control": "no-cache" });
   }
 
+  if (route === "/plugin/telemetry" && req.method === "POST") {
+    if (!validPluginToken(req)) return fail("non autorisé", 401);
+    const body = parseJson(await readBody(req));
+    const telemetry = {
+      receivedAt: new Date().toISOString(),
+      server: String(body.server || "PocketMine-MP"),
+      online: Boolean(body.online ?? true),
+      players: body.players && typeof body.players === "object" ? body.players : { online: 0, max: 0, list: [] },
+      tps: Number.isFinite(body.tps) ? Math.max(0, Math.min(20, Number(body.tps))) : null,
+      memoryMb: Number.isFinite(body.memoryMb) ? Number(body.memoryMb) : null,
+      economy: body.economy && typeof body.economy === "object" ? body.economy : null,
+      logs: Array.isArray(body.logs) ? body.logs.slice(0, 50) : [],
+    };
+    try {
+      await store.setJSON("telemetry", telemetry);
+      if (telemetry.logs.length > 0) {
+        let existingLogs = [];
+        try {
+          existingLogs = (await store.get("server_logs", { type: "json" })) || [];
+        } catch {}
+        const merged = [...telemetry.logs, ...existingLogs].slice(0, 300);
+        await store.setJSON("server_logs", merged);
+      }
+    } catch (e) {
+      console.error("Écriture télémétrie impossible", e);
+    }
+    return reply({ ok: true, timestamp: Date.now() });
+  }
+
+  if (route === "/telemetry" && req.method === "GET") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    let telemetry = null;
+    let serverLogs = [];
+    try {
+      telemetry = await store.get("telemetry", { type: "json" });
+      serverLogs = (await store.get("server_logs", { type: "json" })) || [];
+    } catch {}
+    return reply({
+      connected: Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 300000)),
+      telemetry: telemetry || null,
+      serverLogs,
+    });
+  }
+
   return fail("introuvable", 404);
 };
 
