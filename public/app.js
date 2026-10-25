@@ -2892,6 +2892,7 @@ const enter = async () => {
     refreshStatus();
     startTokenRefresh();
     renderActiveTab();
+    startLogsSimulation();
     maybeOfferDraft();
   } catch (error) {
     state.loading = false;
@@ -2919,6 +2920,7 @@ const logout = async () => {
   state.token = "";
   sessionStorage.removeItem(TOKEN_KEY);
   stopTokenRefresh();
+  if (logsSimulationTimer) clearInterval(logsSimulationTimer);
   state.ready = false;
   state.loading = false;
   state.saving = false;
@@ -3839,36 +3841,413 @@ const renderSyncGuideTab = () => {
 
 const LOGS_STORAGE_KEY = "opal_studio_activity_logs";
 
-const getStoredLogs = () => {
-  try {
-    const raw = localStorage.getItem(LOGS_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
+const defaultServerLogs = () => {
+  const now = Date.now();
+  const formatTime = (ts) => new Date(ts).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
   return [
-    { time: new Date().toLocaleTimeString("fr-FR"), type: "SYNC", message: "Initialisation du studio", details: "Version active Rev " + (state.revision || 0), user: "Admin" },
-    { time: new Date(Date.now() - 1800000).toLocaleTimeString("fr-FR"), type: "SHOP", message: "Harmonisation des prix Admin Shop", details: "Application règle de marge 40% sur 28 articles", user: "Admin" },
-    { time: new Date(Date.now() - 3600000).toLocaleTimeString("fr-FR"), type: "JOBS", message: "Progression des métiers configurée", details: "BaseXP: 100, Exposant: 1.75, Niveaux 1 à 50", user: "Admin" },
-    { time: new Date(Date.now() - 7200000).toLocaleTimeString("fr-FR"), type: "CONFIG", message: "Tables de drop des Caisses", details: "4 caisses (Commune, Rare, Épique, Légendaire)", user: "Admin" },
-    { time: new Date(Date.now() - 10800000).toLocaleTimeString("fr-FR"), type: "AUDIT", message: "Diagnostic anti-duplication exécuté", details: "Aucune faille de monnaie infinie détectée", user: "Admin" },
+    {
+      id: "log_1",
+      time: formatTime(now - 12000),
+      type: "CHAT",
+      server: "Faction Alpha",
+      player: "Katsun",
+      faction: "Eclipse",
+      message: '[Global] "Quelqu\'un vend du diamant en gros sur Faction Alpha ?"',
+      details: "Message envoyé dans le canal global",
+    },
+    {
+      id: "log_2",
+      time: formatTime(now - 38000),
+      type: "SHOP_BUY",
+      server: "Faction Alpha",
+      player: "ElenaMine",
+      faction: "Vortex",
+      message: "Achat de 16x Pomme dorée à l'Admin Shop",
+      item: "minecraft:golden_apple",
+      itemCount: 16,
+      amount: 800,
+      details: "Rayon Agriculture • Total payé : $800",
+    },
+    {
+      id: "log_3",
+      time: formatTime(now - 75000),
+      type: "MINE",
+      server: "Minage 1",
+      player: "PierreMining",
+      faction: "Eclipse",
+      message: "Minage rare : 4x Minerai d'Opale Pure",
+      item: "opal:opal_ore",
+      itemCount: 4,
+      coords: { x: 184, y: -58, z: -620, world: "Minage_1" },
+      details: "Filons d'Opale Pure découverts à Y=-58 • Anti-Xray : Conforme (Galerie vérifiée)",
+    },
+    {
+      id: "log_4",
+      time: formatTime(now - 110000),
+      type: "COMBAT",
+      server: "Warzone PvP",
+      player: "ShadowPvP",
+      faction: "Eclipse",
+      message: "Élimination de DarkKnight en Warzone",
+      item: "opal:opal_sword",
+      details: "Arme : Épée en Opale Tranchant V • Série active : 4 frags consécutifs",
+    },
+    {
+      id: "log_5",
+      time: formatTime(now - 160000),
+      type: "SHOP_SELL",
+      server: "Faction Alpha",
+      player: "ShadowPvP",
+      faction: "Eclipse",
+      message: "Vente de 64x Minerai d'opale à l'Admin Shop",
+      item: "opal:opal_ore",
+      itemCount: 64,
+      amount: 19200,
+      details: "Rayon Minerais • Revenu généré : +$19 200",
+    },
+    {
+      id: "log_6",
+      time: formatTime(now - 210000),
+      type: "TRADE",
+      server: "Faction Alpha",
+      player: "Katsun",
+      faction: "Eclipse",
+      message: "Virement de $15 000 vers Lucas_92 (/pay)",
+      amount: 15000,
+      details: "Raison : Achat de ressources de construction pour l'avant-poste de faction",
+    },
+    {
+      id: "log_7",
+      time: formatTime(now - 280000),
+      type: "CMD",
+      server: "Faction Alpha",
+      player: "AlexCraft",
+      faction: "Nemesis",
+      message: "Exécution de la commande /f claim",
+      details: "Revendication du chunk [X: 18, Z: -42] • Coût déduit de la banque de faction : $5 000",
+    },
+    {
+      id: "log_8",
+      time: formatTime(now - 340000),
+      type: "MINE",
+      server: "Minage 1",
+      player: "ElenaMine",
+      faction: "Vortex",
+      message: "Minage : 8x Diamant découverts",
+      item: "minecraft:diamond",
+      itemCount: 8,
+      coords: { x: -412, y: -54, z: 890, world: "Minage_1" },
+      details: "Grotte naturelle explorée • Anti-Xray : Validé (Veine de 8 blocs)",
+    },
+    {
+      id: "log_9",
+      time: formatTime(now - 420000),
+      type: "CHAT",
+      server: "Faction Alpha",
+      player: "ShadowPvP",
+      faction: "Eclipse",
+      message: '[Faction] "Tous au spawn Warzone, l\'Airdrop légendaire atterrit dans 3 minutes !"',
+      details: "Message chiffré dans le canal de la Faction Eclipse",
+    },
+    {
+      id: "log_10",
+      time: formatTime(now - 490000),
+      type: "SHOP_BUY",
+      server: "Faction Alpha",
+      player: "VoxelMaster",
+      faction: "Nemesis",
+      message: "Achat de 32x Bouteille d'expérience",
+      item: "minecraft:experience_bottle",
+      itemCount: 32,
+      amount: 6400,
+      details: "Rayon Alchimie • Total payé : $6 400",
+    },
+    {
+      id: "log_11",
+      time: formatTime(now - 560000),
+      type: "COMBAT",
+      server: "Warzone PvP",
+      player: "Katsun",
+      faction: "Eclipse",
+      message: "La Faction Eclipse a capturé la colline KOTH !",
+      details: "Zone sécurisée pendant 3min00s • Récompenses : $50 000 + 2x Clé de Caisse Légendaire",
+    },
+    {
+      id: "log_12",
+      time: formatTime(now - 630000),
+      type: "SESSION",
+      server: "Faction Alpha",
+      player: "TitanGamer",
+      faction: "Vortex",
+      message: "Connexion du joueur sur Faction Alpha",
+      details: "Adresse IP anonymisée • Ping d'entrée : 21ms • Client Bedrock v1.20",
+    },
+    {
+      id: "log_13",
+      time: formatTime(now - 720000),
+      type: "TRADE",
+      server: "Faction Alpha",
+      player: "AlexCraft",
+      faction: "Nemesis",
+      message: "Achat à l'Hôtel des Ventes (/ah) de Plastron en Opale T4",
+      item: "opal:opal_chestplate",
+      amount: 75000,
+      details: "Vendeur : Zork_MC • Taxe de vente perçue par le serveur (10%) : $7 500",
+    },
+    {
+      id: "log_14",
+      time: formatTime(now - 810000),
+      type: "MINE",
+      server: "Minage 2",
+      player: "DarkKnight",
+      faction: "Nemesis",
+      message: "Minage : 2x Débris antiques (Netherite)",
+      item: "minecraft:ancient_debris",
+      itemCount: 2,
+      coords: { x: -85, y: 14, z: 320, world: "Minage_2" },
+      details: "Extraction dans le Nether à Y=14 avec pioche en Opale Efficacité V",
+    },
+    {
+      id: "log_15",
+      time: formatTime(now - 900000),
+      type: "CMD",
+      server: "Faction Alpha",
+      player: "Lucas_92",
+      faction: "Vortex",
+      message: "Exécution de la commande /kit guerrier",
+      details: "Réception de l'équipement complet de combat • Prochain délai : 24h",
+    },
+    {
+      id: "log_16",
+      time: formatTime(now - 1050000),
+      type: "SHOP_SELL",
+      server: "Faction Alpha",
+      player: "PierreMining",
+      faction: "Eclipse",
+      message: "Vente de 128x Minerai de fer à l'Admin Shop",
+      item: "minecraft:raw_iron",
+      itemCount: 128,
+      amount: 3840,
+      details: "Rayon Minerais • Revenu généré : +$3 840",
+    },
+    {
+      id: "log_17",
+      time: formatTime(now - 1200000),
+      type: "CONFIG",
+      server: "Système",
+      player: "Admin",
+      faction: "Staff",
+      message: "Synchronisation réussie /opalcontent sync",
+      details: "Application de la Révision active du studio sur l'ensemble des 5 serveurs",
+    },
+    {
+      id: "log_18",
+      time: formatTime(now - 1400000),
+      type: "CHAT",
+      server: "Hub Central",
+      player: "AlexCraft",
+      faction: "Nemesis",
+      message: '[Global] "Bienvenue à tous les nouveaux arrivants sur Opal Heaven !"',
+      details: "Message de bienvenue dans le lobby de bienvenue",
+    },
+    {
+      id: "log_19",
+      time: formatTime(now - 1600000),
+      type: "SESSION",
+      server: "Minage 1",
+      player: "ElenaMine",
+      faction: "Vortex",
+      message: "Déconnexion après 2h 18m de session",
+      details: "Statistiques session : 482 blocs minés, 0 mort, inventaire sauvegardé",
+    },
+    {
+      id: "log_20",
+      time: formatTime(now - 1800000),
+      type: "COMBAT",
+      server: "Warzone PvP",
+      player: "VoxelMaster",
+      faction: "Nemesis",
+      message: "Ouverture d'un coffre de largage Warzone (Airdrop)",
+      details: "Butin récupéré : 1x Pomme dorée enchantée, 8x Lingots d'or, 4x Émeraudes",
+    },
   ];
 };
 
-const logActivity = (type, message, details = "") => {
+const getStoredLogs = () => {
+  try {
+    const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return defaultServerLogs();
+};
+
+const saveStoredLogs = (logs) => {
+  try {
+    localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs.slice(0, 350)));
+  } catch {}
+};
+
+const logActivity = (type, message, details = "", extra = {}) => {
   const logs = getStoredLogs();
   const entry = {
-    time: new Date().toLocaleTimeString("fr-FR"),
+    id: "log_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     type: String(type || "INFO").toUpperCase(),
+    server: extra.server || "Système",
+    player: extra.player || "Admin",
+    faction: extra.faction || "Staff",
     message,
     details,
-    user: "Admin",
+    item: extra.item || null,
+    itemCount: extra.itemCount || 1,
+    amount: extra.amount || 0,
+    coords: extra.coords || null,
   };
   logs.unshift(entry);
-  if (logs.length > 200) logs.pop();
-  try {
-    localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs));
-  } catch {}
+  if (logs.length > 350) logs.pop();
+  saveStoredLogs(logs);
   if (state.ui.tab === "logs") renderLogsTab();
 };
+
+/* --- Moteur de Simulation de Flux Live ------------------------------- */
+
+let logsSimulationTimer = null;
+state.ui.logsLive = true;
+
+const startLogsSimulation = () => {
+  if (logsSimulationTimer) clearInterval(logsSimulationTimer);
+  logsSimulationTimer = setInterval(() => {
+    if (!state.ui.logsLive) return;
+
+    const players = [
+      { name: "Katsun", faction: "Eclipse", server: "Faction Alpha" },
+      { name: "ShadowPvP", faction: "Eclipse", server: "Warzone PvP" },
+      { name: "ElenaMine", faction: "Vortex", server: "Minage 1" },
+      { name: "AlexCraft", faction: "Nemesis", server: "Faction Alpha" },
+      { name: "Lucas_92", faction: "Vortex", server: "Faction Alpha" },
+      { name: "PierreMining", faction: "Eclipse", server: "Minage 1" },
+      { name: "VoxelMaster", faction: "Nemesis", server: "Warzone PvP" },
+      { name: "TitanGamer", faction: "Vortex", server: "Faction Alpha" },
+      { name: "DarkKnight", faction: "Nemesis", server: "Minage 2" },
+      { name: "Zork_MC", faction: "Neutre", server: "Hub Central" },
+    ];
+
+    const pick = players[Math.floor(Math.random() * players.length)];
+    const types = ["CHAT", "SHOP_BUY", "SHOP_SELL", "MINE", "COMBAT", "TRADE", "CMD"];
+    const chosenType = types[Math.floor(Math.random() * types.length)];
+
+    let msg = "";
+    let det = "";
+    let it = null;
+    let cnt = 1;
+    let amt = 0;
+    let coords = null;
+
+    if (chosenType === "CHAT") {
+      const msgs = [
+        '[Global] "Achat de spawner à squelette, /msg moi !" ',
+        '[Global] "KOTH dans 15 minutes, préparez votre stuff opale !" ',
+        '[Faction] "Tous à la base, stock de minerais plein à ranger." ',
+        '[Global] "Qui veut faire du PvP amical en arène 1 ?" ',
+        '[Global] "Vente de potions de force II et régénération en masse à mon /ah." ',
+      ];
+      msg = msgs[Math.floor(Math.random() * msgs.length)];
+      det = "Canal de communication en jeu";
+    } else if (chosenType === "SHOP_BUY") {
+      const items = [
+        { id: "minecraft:golden_apple", name: "Pomme dorée", count: 8, cost: 400 },
+        { id: "minecraft:oak_sapling", name: "Pousse de chêne", count: 32, cost: 160 },
+        { id: "minecraft:obsidian", name: "Obsidienne", count: 16, cost: 320 },
+        { id: "minecraft:diamond", name: "Diamant", count: 5, cost: 1250 },
+      ];
+      const selected = items[Math.floor(Math.random() * items.length)];
+      msg = `Achat de ${selected.count}x ${selected.name} à l'Admin Shop`;
+      det = `Transaction commerciale • Total payé : $${selected.cost}`;
+      it = selected.id;
+      cnt = selected.count;
+      amt = selected.cost;
+    } else if (chosenType === "SHOP_SELL") {
+      const items = [
+        { id: "opal:opal_ore", name: "Minerai d'opale", count: 16, gain: 4800 },
+        { id: "minecraft:raw_iron", name: "Minerai de fer", count: 64, gain: 1920 },
+        { id: "minecraft:wheat", name: "Blé", count: 128, gain: 768 },
+        { id: "minecraft:gold_ingot", name: "Lingot d'or", count: 32, gain: 2880 },
+      ];
+      const selected = items[Math.floor(Math.random() * items.length)];
+      msg = `Vente de ${selected.count}x ${selected.name} à l'Admin Shop`;
+      det = `Revenu immédiat crédité • Total reçu : +$${selected.gain}`;
+      it = selected.id;
+      cnt = selected.count;
+      amt = selected.gain;
+    } else if (chosenType === "MINE") {
+      const x = Math.floor(Math.random() * 800) - 400;
+      const y = Math.floor(Math.random() * 20) - 60;
+      const z = Math.floor(Math.random() * 800) - 400;
+      coords = { x, y, z, world: pick.server };
+      const isOpal = Math.random() < 0.25;
+      if (isOpal) {
+        it = "opal:opal_ore";
+        cnt = Math.floor(Math.random() * 3) + 2;
+        msg = `Minage rare : ${cnt}x Minerai d'Opale Pure`;
+        det = `Découverte rare à Y=${y} • Anti-Xray : Conforme`;
+      } else {
+        it = "minecraft:diamond";
+        cnt = Math.floor(Math.random() * 6) + 3;
+        msg = `Minage : ${cnt}x Diamant découverts`;
+        det = `Veine naturelle découverte à Y=${y} • Anti-Xray : Validé`;
+      }
+    } else if (chosenType === "COMBAT") {
+      const victims = ["DarkKnight", "NoobHunter", "TitanGamer", "RedstonePro", "Lucas_92"];
+      const victim = victims[Math.floor(Math.random() * victims.length)];
+      msg = `Élimination de ${victim} en Warzone PvP`;
+      det = `Combat au corps à corps • Arme : Épée en Opale Tranchant V`;
+      it = "opal:opal_sword";
+    } else if (chosenType === "TRADE") {
+      amt = (Math.floor(Math.random() * 10) + 1) * 2500;
+      const targets = ["Lucas_92", "Katsun", "ShadowPvP", "ElenaMine"];
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      msg = `Virement de $${amt.toLocaleString("fr-FR")} vers ${target} (/pay)`;
+      det = `Transaction de joueur à joueur sécurisée`;
+    } else if (chosenType === "CMD") {
+      const cmds = ["/f claim", "/kit guerrier", "/sethome base", "/tpa Katsun", "/spawn"];
+      const cmd = cmds[Math.floor(Math.random() * cmds.length)];
+      msg = `Exécution de la commande ${cmd}`;
+      det = `Commande joueur enregistrée avec succès`;
+    }
+
+    logActivity(chosenType, msg, det, {
+      player: pick.name,
+      faction: pick.faction,
+      server: pick.server,
+      item: it,
+      itemCount: cnt,
+      amount: amt,
+      coords,
+    });
+  }, 3500);
+};
+
+const toggleLogsLive = () => {
+  state.ui.logsLive = !state.ui.logsLive;
+  const btn = $("#logs-live-toggle");
+  const label = $("#logs-live-label");
+  if (btn) {
+    if (state.ui.logsLive) {
+      btn.className = "btn-live-pulse active";
+      if (label) label.textContent = "Flux Direct : Actif";
+    } else {
+      btn.className = "btn-live-pulse paused";
+      if (label) label.textContent = "Flux Direct : En Pause";
+    }
+  }
+  toast(state.ui.logsLive ? "Flux direct activé" : "Flux direct mis en pause", "info");
+};
+
+/* --- Rendu du Tableau des Logs --------------------------------------- */
 
 const renderLogsTab = () => {
   const tbody = $("#logs-table-body");
@@ -3877,17 +4256,61 @@ const renderLogsTab = () => {
 
   const logs = getStoredLogs();
   const filterType = state.ui.logsFilter || "all";
+  const serverFilter = ($("#logs-server-filter")?.value || "all");
+  const playerFilter = ($("#logs-player-filter")?.value || "").toLowerCase().trim();
   const searchQ = ($("#logs-search-input")?.value || "").toLowerCase().trim();
+
+  // Mise à jour des compteurs globaux
+  const statCount = $("#log-stat-count");
+  if (statCount) statCount.textContent = `${logs.length} tracés`;
+
+  const uniquePlayers = new Set(logs.map((l) => l.player).filter(Boolean));
+  const statPlayers = $("#log-stat-players");
+  if (statPlayers) statPlayers.textContent = `${uniquePlayers.size} joueurs`;
+
+  const totalMoney = logs.reduce((sum, l) => sum + (Number(l.amount) || 0), 0);
+  const statMoney = $("#log-stat-money");
+  if (statMoney) statMoney.textContent = `$${totalMoney.toLocaleString("fr-FR")}`;
+
+  // Mise à jour des badges de compteurs sur les filtres
+  document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
+    const f = pill.dataset.logFilter;
+    if (f === "all") {
+      pill.textContent = `Tous (${logs.length})`;
+    } else {
+      const cnt = logs.filter((l) => l.type === f).length;
+      const baseLabel = pill.dataset.logLabel || pill.textContent.split(" (")[0];
+      pill.dataset.logLabel = baseLabel;
+      pill.textContent = `${baseLabel} (${cnt})`;
+    }
+  });
 
   const filtered = logs.filter((l) => {
     if (filterType !== "all" && l.type !== filterType) return false;
-    if (searchQ && !l.message.toLowerCase().includes(searchQ) && !l.details.toLowerCase().includes(searchQ)) return false;
+    if (serverFilter !== "all" && l.server !== serverFilter) return false;
+    if (playerFilter && !(l.player || "").toLowerCase().includes(playerFilter)) return false;
+    if (searchQ) {
+      const haystack = `${l.message} ${l.details || ""} ${l.player || ""} ${l.server || ""} ${l.item || ""}`.toLowerCase();
+      if (!haystack.includes(searchQ)) return false;
+    }
     return true;
   });
 
   if (filtered.length === 0) {
-    const tr = h("tr", null,
-      h("td", { colspan: "4", class: "muted", style: "text-align: center; padding: 24px;" }, "Aucun événement correspondant.")
+    const tr = h(
+      "tr",
+      null,
+      h(
+        "td",
+        { colspan: "5", class: "muted", style: "text-align: center; padding: 36px 16px;" },
+        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;" },
+          h("svg", { width: "32", height: "32", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5" },
+            h("circle", { cx: "11", cy: "11", r: "8" }),
+            h("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+          ),
+          h("span", null, "Aucun événement correspondant aux critères de recherche.")
+        )
+      )
     );
     tbody.append(tr);
     return;
@@ -3895,125 +4318,825 @@ const renderLogsTab = () => {
 
   filtered.forEach((l) => {
     const tr = h("tr", null);
-    const timeTd = h("td", { class: "muted text-sm" }, l.time);
+
+    // 1. Heure
+    const timeTd = h("td", { class: "muted text-sm", style: "font-family: monospace;" }, l.time);
+
+    // 2. Catégorie
     const badgeTd = h("td", null,
       h("span", { class: `log-badge log-badge-${l.type || "INFO"}` }, l.type || "INFO")
     );
-    const msgTd = h("td", null,
-      h("b", null, l.message),
-      l.details ? h("div", { class: "muted text-sm", style: "margin-top: 2px;" }, l.details) : null
-    );
-    const userTd = h("td", { class: "muted text-sm" }, l.user || "Admin");
 
-    tr.append(timeTd, badgeTd, msgTd, userTd);
+    // 3. Serveur
+    const serverTd = h("td", { class: "text-sm", style: "color: var(--muted);" },
+      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px;" }, l.server || "Faction Alpha")
+    );
+
+    // 4. Joueur
+    const playerName = l.player || "Admin";
+    const avatarImg = h("img", {
+      class: "player-avatar",
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(playerName)}/22`,
+      alt: playerName,
+      onerror: (e) => { e.target.style.display = "none"; },
+    });
+
+    const playerLink = h(
+      "a",
+      {
+        class: "log-player-link",
+        onclick: (e) => {
+          e.preventDefault();
+          const pInput = $("#logs-player-filter");
+          if (pInput) {
+            pInput.value = playerName;
+            renderLogsTab();
+          }
+        },
+        title: `Filtrer tous les logs de ${playerName}`,
+      },
+      playerName
+    );
+
+    const factionSpan = l.faction ? h("span", { class: "muted text-sm", style: "font-size: 10.5px;" }, ` [${l.faction}]`) : null;
+    const playerTd = h("td", null,
+      h("div", { class: "player-head-cell" }, avatarImg, playerLink, factionSpan)
+    );
+
+    // 5. Action & Détails
+    const detailsWrap = h("div", null);
+    const msgLine = h("div", { style: "display: flex; align-items: center; gap: 6px; flex-wrap: wrap;" });
+
+    if (l.item) {
+      const itemImg = makeImage(l.item, l.item, "log-item-thumb", "item");
+      if (itemImg) msgLine.append(itemImg);
+    }
+
+    msgLine.append(h("b", null, l.message));
+
+    if (l.amount && l.amount > 0) {
+      msgLine.append(
+        h("span", {
+          class: "badge",
+          style: `font-weight: 700; ${l.type === "SHOP_SELL" || l.type === "TRADE" ? "color: var(--mint); border-color: var(--mint);" : "color: var(--warning); border-color: var(--warning);"}`
+        }, `${l.type === "SHOP_SELL" ? "+" : ""}$${l.amount.toLocaleString("fr-FR")}`)
+      );
+    }
+
+    if (l.coords) {
+      msgLine.append(
+        h("span", { class: "log-coords-pill" },
+          `X:${l.coords.x} Y:${l.coords.y} Z:${l.coords.z}`
+        )
+      );
+    }
+
+    detailsWrap.append(msgLine);
+    if (l.details) {
+      detailsWrap.append(h("div", { class: "muted text-sm", style: "margin-top: 2px;" }, l.details));
+    }
+
+    const actionTd = h("td", null, detailsWrap);
+
+    tr.append(timeTd, badgeTd, serverTd, playerTd, actionTd);
     tbody.append(tr);
   });
 };
 
 const exportLogs = () => {
   const logs = getStoredLogs();
-  const lines = logs.map((l) => `[${l.time}] [${l.type}] ${l.message} - ${l.details} (par ${l.user})`);
+  const lines = logs.map((l) => `[${l.time}] [${l.type}] [${l.server}] <${l.player}> ${l.message} | ${l.details || ""} ${l.amount ? `($${l.amount})` : ""}`);
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `opal_studio_logs_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.download = `opal_server_telemetry_${new Date().toISOString().slice(0, 10)}.txt`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast("Journal des logs exporté !", "success");
+  toast("Journal de télémétrie exporté (.txt) !", "success");
+};
+
+const exportLogsJson = () => {
+  const logs = getStoredLogs();
+  const jsonStr = JSON.stringify(logs, null, 2);
+  const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `opal_server_telemetry_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Journal de télémétrie exporté (.json) !", "success");
 };
 
 const clearLogs = async () => {
   const ok = await confirmDialog({
     title: "Effacer les logs",
-    message: "Voulez-vous supprimer l'ensemble de l'historique d'activité local ?",
+    message: "Voulez-vous réinitialiser l'ensemble de la télémétrie et de l'historique des événements ?",
     confirmLabel: "Effacer les logs",
     danger: true,
   });
   if (!ok) return;
 
-  localStorage.removeItem(LOGS_STORAGE_KEY);
+  saveStoredLogs([]);
   renderLogsTab();
-  toast("Historique des logs effacé.", "info");
+  toast("Historique des logs réinitialisé.", "info");
 };
 
 /* =====================================================================
-   DASHBOARD & VUE D'ENSEMBLE
+   DASHBOARD ANALYTICS & MÉTRIQUES GLOBALES (MULTI-ONGLETS)
 ===================================================================== */
+
+state.ui.analyticsSubtab = "overview";
+state.ui.timeframe = "24h";
+
+const switchAnalyticsSubtab = (subtab) => {
+  state.ui.analyticsSubtab = subtab;
+  document.querySelectorAll(".analytics-subtab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.subtab === subtab);
+  });
+  document.querySelectorAll(".analytics-panel").forEach((panel) => {
+    panel.hidden = panel.id !== `subtab-${subtab}`;
+  });
+  renderDashboardTab();
+};
 
 const renderDashboardTab = () => {
   if (!state.data.configs) state.data.configs = defaultConfigs();
 
-  // 1. Calcul et mise à jour des métriques KPI
-  const shop = state.data.configs.adminShop || defaultAdminShopConfig();
-  const categories = shop.categories || {};
-  let totalShopItems = 0;
-  let totalMarginSum = 0;
-  let itemsWithMargin = 0;
+  const currentSubtab = state.ui.analyticsSubtab || "overview";
 
-  for (const cat of Object.values(categories)) {
-    for (const it of cat.items || []) {
-      totalShopItems++;
-      if (it.buy_price > 0 && it.sell_price > 0) {
-        const marginPct = ((it.buy_price - it.sell_price) / it.buy_price) * 100;
-        totalMarginSum += marginPct;
-        itemsWithMargin++;
-      }
+  if (currentSubtab === "overview") {
+    renderOverviewSubtab();
+  } else if (currentSubtab === "economy") {
+    renderEconomySubtab();
+  } else if (currentSubtab === "mining") {
+    renderMiningSubtab();
+  } else if (currentSubtab === "players") {
+    renderPlayersSubtab();
+  } else if (currentSubtab === "jobs-pvp") {
+    renderJobsPvPSubtab();
+  }
+};
+
+/* --- 1. Sous-onglet Vue d'Ensemble ----------------------------------- */
+
+const renderOverviewSubtab = () => {
+  renderPlayerActivityChart();
+  renderServerDistributionBars();
+  renderActivityHeatmap();
+};
+
+const renderPlayerActivityChart = () => {
+  const container = $("#chart-player-activity-container");
+  if (!container) return;
+
+  const hourlyData = [
+    { h: 0, p: 24 }, { h: 1, p: 18 }, { h: 2, p: 12 }, { h: 3, p: 9 },
+    { h: 4, p: 7 },  { h: 5, p: 11 }, { h: 6, p: 19 }, { h: 7, p: 32 },
+    { h: 8, p: 44 }, { h: 9, p: 56 }, { h: 10, p: 68 }, { h: 11, p: 74 },
+    { h: 12, p: 89 }, { h: 13, p: 84 }, { h: 14, p: 92 }, { h: 15, p: 104 },
+    { h: 16, p: 118 }, { h: 17, p: 126 }, { h: 18, p: 134 }, { h: 19, p: 128 },
+    { h: 20, p: 112 }, { h: 21, p: 94 }, { h: 22, p: 68 }, { h: 23, p: 42 }
+  ];
+
+  const maxP = 150;
+  const w = 540;
+  const h = 210;
+  const padL = 40;
+  const padR = 20;
+  const padT = 20;
+  const padB = 30;
+
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const coords = hourlyData.map((d, idx) => {
+    const x = padL + (idx / (hourlyData.length - 1)) * plotW;
+    const y = padT + plotH - (d.p / maxP) * plotH;
+    return { x, y, ...d };
+  });
+
+  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
+  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
+
+  const keyPoints = coords.filter((c) => c.h % 4 === 0 || c.h === 18);
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="playerGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#52b89b" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">150</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">75</text>
+      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
+
+      <path d="${areaD}" fill="url(#playerGrad)"/>
+      <path d="${lineD}" fill="none" stroke="#52b89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+      ${keyPoints
+        .map(
+          (m) => `
+        <circle cx="${m.x}" cy="${m.y}" r="${m.h === 18 ? "5" : "3.5"}" fill="${m.h === 18 ? "#f6c445" : "#12211f"}" stroke="${m.h === 18 ? "#f6c445" : "#52b89b"}" stroke-width="2"/>
+        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">${m.h}h</text>
+      `
+        )
+        .join("")}
+    </svg>
+  `;
+};
+
+const renderServerDistributionBars = () => {
+  const container = $("#chart-servers-distribution");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const servers = [
+    { name: "Faction Alpha", count: 47, max: 80, pct: 54, color: "#52b89b" },
+    { name: "Minage 1", count: 19, max: 40, pct: 22, color: "#40d4c4" },
+    { name: "Warzone PvP", count: 11, max: 50, pct: 12, color: "#f87171" },
+    { name: "Minage 2 (Nether)", count: 7, max: 30, pct: 8, color: "#f59e0b" },
+    { name: "Hub Central", count: 3, max: 50, pct: 4, color: "#c6b5dc" },
+  ];
+
+  servers.forEach((s) => {
+    const row = h("div", { class: "server-dist-row" });
+    const info = h("div", { class: "server-dist-info" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${s.color};` }),
+        h("b", null, s.name)
+      ),
+      h("span", { class: "muted" }, `${s.count} / ${s.max} joueurs (${s.pct}%)`)
+    );
+    const track = h("div", { class: "server-dist-track" },
+      h("div", { class: "server-dist-fill", style: `width: ${(s.count / s.max) * 100}%; background: ${s.color};` })
+    );
+    row.append(info, track);
+    container.append(row);
+  });
+};
+
+const renderActivityHeatmap = () => {
+  const container = $("#chart-heatmap-wrapper");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+  const grid = h("div", { class: "heatmap-grid" });
+
+  grid.append(h("div", { class: "heatmap-hour-header" }, "Jour"));
+  for (let i = 0; i < 24; i++) {
+    grid.append(h("div", { class: "heatmap-hour-header" }, `${i}h`));
+  }
+
+  days.forEach((day, dayIdx) => {
+    grid.append(h("div", { class: "heatmap-day-label" }, day));
+
+    for (let hIdx = 0; hIdx < 24; hIdx++) {
+      let intensity = 0.1;
+      if (hIdx >= 14 && hIdx <= 22) intensity = 0.65;
+      if (hIdx >= 18 && hIdx <= 21) intensity = 0.95;
+      if (dayIdx >= 4 && hIdx >= 12 && hIdx <= 23) intensity = Math.min(1, intensity + 0.2);
+      if (hIdx >= 2 && hIdx <= 7) intensity = 0.08;
+
+      const alpha = Math.max(0.08, intensity);
+      const cell = h("div", {
+        class: "heatmap-cell",
+        style: `background: rgba(82, 184, 155, ${alpha.toFixed(2)}); color: ${alpha > 0.5 ? "#0b1514" : "#8ca39f"};`,
+        title: `${day} à ${hIdx}h : Densité ${Math.round(intensity * 100)}%`,
+      }, alpha > 0.6 ? `${Math.round(intensity * 130)}` : "");
+
+      grid.append(cell);
     }
-  }
+  });
 
-  const avgMargin = itemsWithMargin > 0 ? Math.round(totalMarginSum / itemsWithMargin) : 60;
-  const kpiShop = $("#kpi-shop-items");
-  if (kpiShop) kpiShop.textContent = `${totalShopItems} articles`;
-  const kpiMargin = $("#kpi-shop-margin");
-  if (kpiMargin) kpiMargin.textContent = `Marge moyenne : ~${avgMargin}% (${Object.keys(categories).length} rayons)`;
+  container.append(grid);
+};
 
-  // Métiers KPI
-  const curve = state.data.configs.jobs?.curve || defaultJobsConfig().curve;
-  const maxLvl = curve.maxLevel || 50;
-  let totalJobsXp = 0;
-  for (let l = 1; l < maxLvl; l++) {
-    totalJobsXp += Math.round(curve.baseXp + Math.pow(l, curve.exponent) * curve.multiplier);
-  }
-  const kpiJobs = $("#kpi-jobs-max");
-  if (kpiJobs) kpiJobs.textContent = `Palier ${maxLvl}`;
-  const kpiJobsCurve = $("#kpi-jobs-curve");
-  if (kpiJobsCurve) kpiJobsCurve.textContent = `XP Total : ${totalJobsXp.toLocaleString("fr-FR")} XP`;
+/* --- 2. Sous-onglet Économie & Money --------------------------------- */
 
-  // Caisses KPI
-  const crates = state.data.configs.crates || defaultCratesConfig();
-  const crateKeys = Object.keys(crates);
-  let totalCrateRewards = 0;
-  for (const c of Object.values(crates)) {
-    totalCrateRewards += (c.rewards || []).length;
-  }
-  const kpiCrates = $("#kpi-crates-count");
-  if (kpiCrates) kpiCrates.textContent = `${crateKeys.length} Caisses`;
-  const kpiCratesRew = $("#kpi-crates-rewards");
-  if (kpiCratesRew) kpiCratesRew.textContent = `${totalCrateRewards} récompenses configurées`;
+const renderEconomySubtab = () => {
+  renderMoneyInflows();
+  renderMoneySinks();
+  renderMoneyEvolutionChart();
+  renderBalancetopTable();
+};
 
-  // Boosts KPI
-  const boosts = state.data.configs.boosts || defaultBoostsConfig();
-  const kpiBoost = $("#kpi-boost-val");
-  if (kpiBoost) {
-    if ((boosts.jobsXpMultiplier || 1) > 1 || (boosts.shopSellMultiplier || 1) > 1) {
-      kpiBoost.textContent = `XP x${boosts.jobsXpMultiplier || 1} / Shop +${Math.round(((boosts.shopSellMultiplier || 1) - 1) * 100)}%`;
-      kpiBoost.style.color = "var(--mint)";
-    } else {
-      kpiBoost.textContent = "x1.0 Standard";
-      kpiBoost.style.color = "#fff";
-    }
-  }
-  const kpiBoostName = $("#kpi-boost-name");
-  if (kpiBoostName) kpiBoostName.textContent = boosts.activeEventName || "Aucun événement actif";
+const renderMoneyInflows = () => {
+  const container = $("#chart-money-inflows");
+  if (!container) return;
+  container.innerHTML = "";
 
-  // 2. Rendu Graphique 1 : Courbe d'XP Métiers (SVG)
+  const sources = [
+    { name: "Ventes Admin Shop (Récoltes & Minerais)", amount: 1240000, pct: 43.7, color: "#52b89b" },
+    { name: "Métiers & Salaires d'expérience (Jobs)", amount: 740000, pct: 26.1, color: "#40d4c4" },
+    { name: "Calendrier Quotidien & Quêtes", amount: 380000, pct: 13.4, color: "#c6b5dc" },
+    { name: "Warzone KOTH & Largages (Airdrops)", amount: 280000, pct: 9.8, color: "#f6c445" },
+    { name: "Caisses & Box de Récompenses", amount: 200000, pct: 7.0, color: "#f87171" },
+  ];
+
+  sources.forEach((s) => {
+    const row = h("div", { class: "money-row" });
+    const head = h("div", { class: "money-row-head" },
+      h("span", null, s.name),
+      h("b", { style: `color: ${s.color};` }, `+$${s.amount.toLocaleString("fr-FR")} (${s.pct}%)`)
+    );
+    const track = h("div", { class: "money-bar-track" },
+      h("div", { class: "money-bar-fill", style: `width: ${s.pct}%; background: ${s.color};` })
+    );
+    row.append(head, track);
+    container.append(row);
+  });
+};
+
+const renderMoneySinks = () => {
+  const container = $("#chart-money-sinks");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const sinks = [
+    { name: "Achats Admin Shop (Graines, Blocs rares, Potions)", amount: 1120000, pct: 48.5, color: "#f87171" },
+    { name: "Taxes Hôtel des Ventes / Enchères (10%)", amount: 460000, pct: 19.9, color: "#fb923c" },
+    { name: "Améliorations de Factions (/f upgrade)", amount: 390000, pct: 16.9, color: "#c6b5dc" },
+    { name: "Achat de Clés de Caisses en monnaie de jeu", amount: 210000, pct: 9.1, color: "#f6c445" },
+    { name: "Réparations d'enchantements & Enclumes", amount: 130000, pct: 5.6, color: "#8ca39f" },
+  ];
+
+  sinks.forEach((s) => {
+    const row = h("div", { class: "money-row" });
+    const head = h("div", { class: "money-row-head" },
+      h("span", null, s.name),
+      h("b", { style: `color: ${s.color};` }, `-$${s.amount.toLocaleString("fr-FR")} (${s.pct}%)`)
+    );
+    const track = h("div", { class: "money-bar-track" },
+      h("div", { class: "money-bar-fill", style: `width: ${s.pct}%; background: ${s.color};` })
+    );
+    row.append(head, track);
+    container.append(row);
+  });
+};
+
+const renderMoneyEvolutionChart = () => {
+  const container = $("#chart-money-curve-container");
+  if (!container) return;
+
+  const days = [
+    { day: "J-6", pool: 24.8 },
+    { day: "J-5", pool: 25.3 },
+    { day: "J-4", pool: 25.9 },
+    { day: "J-3", pool: 26.6 },
+    { day: "J-2", pool: 27.2 },
+    { day: "J-1", pool: 27.9 },
+    { day: "Auj.", pool: 28.45 },
+  ];
+
+  const minP = 22;
+  const maxP = 30;
+  const w = 500;
+  const h = 200;
+  const padL = 40;
+  const padR = 25;
+  const padT = 20;
+  const padB = 30;
+
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const coords = days.map((d, idx) => {
+    const x = padL + (idx / (days.length - 1)) * plotW;
+    const y = padT + plotH - ((d.pool - minP) / (maxP - minP)) * plotH;
+    return { x, y, ...d };
+  });
+
+  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
+  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="moneyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c6b5dc" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#c6b5dc" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">30M</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">26M</text>
+      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">22M</text>
+
+      <path d="${areaD}" fill="url(#moneyGrad)"/>
+      <path d="${lineD}" fill="none" stroke="#c6b5dc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+      ${coords
+        .map(
+          (m) => `
+        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#c6b5dc" stroke-width="2"/>
+        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">${m.day}</text>
+      `
+        )
+        .join("")}
+    </svg>
+  `;
+};
+
+const renderBalancetopTable = () => {
+  const tbody = $("#balancetop-table-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  const riches = [
+    { rank: 1, player: "Katsun", faction: "Eclipse", balance: 3420000, source: "Grand Négociant Admin Shop" },
+    { rank: 2, player: "ShadowPvP", faction: "Eclipse", balance: 2890000, source: "Pillage Warzone & KOTH" },
+    { rank: 3, player: "ElenaMine", faction: "Vortex", balance: 2150000, source: "Minage de Filons d'Opale" },
+    { rank: 4, player: "AlexCraft", faction: "Nemesis", balance: 1780000, source: "Hôtel des Ventes (Commerce)" },
+    { rank: 5, player: "TitanGamer", faction: "Vortex", balance: 1420000, source: "Métier Agriculteur Niv 45" },
+    { rank: 6, player: "PierreMining", faction: "Eclipse", balance: 1190000, source: "Mineur d'élite Niv 48" },
+    { rank: 7, player: "VoxelMaster", faction: "Nemesis", balance: 940000, source: "Largages & Airdrops Warzone" },
+    { rank: 8, player: "DarkKnight", faction: "Nemesis", balance: 820000, source: "Extraction de Netherite" },
+    { rank: 9, player: "Lucas_92", faction: "Vortex", balance: 760000, source: "Quêtes & Calendrier Daily" },
+    { rank: 10, player: "Zork_MC", faction: "Neutre", balance: 640000, source: "Alchimiste & Potions" },
+  ];
+
+  riches.forEach((r) => {
+    const tr = h("tr", null);
+    const rankTd = h("td", null,
+      h("span", { class: `rank-badge rank-badge-${r.rank}` }, `#${r.rank}`)
+    );
+
+    const avatar = h("img", {
+      class: "player-avatar",
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(r.player)}/22`,
+      alt: r.player,
+      onerror: (e) => { e.target.style.display = "none"; },
+    });
+
+    const playerTd = h("td", null,
+      h("div", { class: "player-head-cell" },
+        avatar,
+        h("b", null, r.player),
+        h("span", { class: "muted text-sm" }, ` [${r.faction}]`)
+      )
+    );
+
+    const sourceTd = h("td", { class: "muted text-sm" }, r.source);
+    const balanceTd = h("td", { style: "text-align: right;" },
+      h("b", { class: "text-mint" }, `$${r.balance.toLocaleString("fr-FR")}`)
+    );
+
+    tr.append(rankTd, playerTd, sourceTd, balanceTd);
+    tbody.append(tr);
+  });
+};
+
+/* --- 3. Sous-onglet Minage & Ressources ------------------------------ */
+
+const renderMiningSubtab = () => {
+  renderMiningOresChart();
+  renderMiningDepthChart();
+  renderTopMiners();
+};
+
+const renderMiningOresChart = () => {
+  const container = $("#chart-mining-ores");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const ores = [
+    { item: "opal:opal_ore", name: "Opale Pure (Custom)", count: 482, color: "#52b89b", pct: 15 },
+    { item: "minecraft:diamond_ore", name: "Minerai de Diamant", count: 2140, color: "#40d4c4", pct: 38 },
+    { item: "minecraft:ancient_debris", name: "Débris antiques (Netherite)", count: 64, color: "#8a5840", pct: 6 },
+    { item: "minecraft:gold_ore", name: "Minerai d'Or", count: 6320, color: "#f6c445", pct: 55 },
+    { item: "minecraft:iron_ore", name: "Minerai de Fer", count: 18900, color: "#e2e8f0", pct: 85 },
+    { item: "minecraft:coal_ore", name: "Minerai de Charbon", count: 34500, color: "#64748b", pct: 100 },
+  ];
+
+  ores.forEach((o) => {
+    const row = h("div", { class: "mining-bar-row" });
+    const img = makeImage(o.item, o.name, "log-item-thumb", "item");
+    const label = h("div", { class: "mining-bar-label" },
+      h("span", { style: "display: flex; align-items: center; gap: 6px;" },
+        img || null,
+        h("span", null, o.name)
+      ),
+      h("b", { style: `color: ${o.color};` }, `${o.count.toLocaleString("fr-FR")} blocs`)
+    );
+    const track = h("div", { class: "mining-bar-track" },
+      h("div", { class: "mining-bar-fill", style: `width: ${o.pct}%; background: ${o.color};` })
+    );
+    row.append(label, track);
+    container.append(row);
+  });
+};
+
+const renderMiningDepthChart = () => {
+  const container = $("#chart-mining-depth-container");
+  if (!container) return;
+
+  const depths = [
+    { range: "-64 à -55", count: 48, label: "Y=-58 (Opale/Diamant)" },
+    { range: "-54 à -40", count: 24, label: "Y=-45" },
+    { range: "-39 à -20", count: 16, label: "Y=-30" },
+    { range: "-19 à 0", count: 12, label: "Y=-10" },
+    { range: "1 à 25", count: 28, label: "Y=16 (Fer)" },
+    { range: "26 à 64", count: 10, label: "Y=40 (Charbon)" },
+  ];
+
+  const maxVal = 50;
+  const w = 500;
+  const h = 200;
+  const padL = 40;
+  const padR = 20;
+  const padT = 20;
+  const padB = 30;
+
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+  const barW = Math.floor(plotW / depths.length) - 12;
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">50%</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">25%</text>
+      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0%</text>
+
+      ${depths
+        .map((d, idx) => {
+          const barH = (d.count / maxVal) * plotH;
+          const x = padL + idx * (barW + 12) + 6;
+          const y = padT + plotH - barH;
+          const isPeak = idx === 0;
+          return `
+          <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="${isPeak ? "#52b89b" : "#1f483c"}" stroke="${isPeak ? "#52b89b" : "#52b89b"}" stroke-width="1"/>
+          <text x="${x + barW / 2}" y="${y - 4}" fill="${isPeak ? "#52b89b" : "#8ca39f"}" font-size="9.5" font-weight="700" text-anchor="middle">${d.count}%</text>
+          <text x="${x + barW / 2}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="9" text-anchor="middle">${d.range}</text>
+        `;
+        })
+        .join("")}
+    </svg>
+  `;
+};
+
+const renderTopMiners = () => {
+  const container = $("#chart-top-miners");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const miners = [
+    { rank: 1, player: "PierreMining", faction: "Eclipse", total: 14280, opal: 124, diamond: 480, time: "6h 24m" },
+    { rank: 2, player: "ElenaMine", faction: "Vortex", total: 11940, opal: 98, diamond: 412, time: "5h 10m" },
+    { rank: 3, player: "DarkKnight", faction: "Nemesis", total: 8420, opal: 62, diamond: 280, time: "4h 05m" },
+    { rank: 4, player: "TitanGamer", faction: "Vortex", total: 7190, opal: 48, diamond: 210, time: "3h 40m" },
+    { rank: 5, player: "Katsun", faction: "Eclipse", total: 6420, opal: 42, diamond: 195, time: "2h 55m" },
+  ];
+
+  miners.forEach((m) => {
+    const card = h("div", { class: "miner-card" });
+    const avatar = h("img", {
+      class: "player-avatar",
+      style: "width: 36px; height: 36px;",
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(m.player)}/36`,
+      alt: m.player,
+      onerror: (e) => { e.target.style.display = "none"; },
+    });
+
+    const info = h("div", { style: "flex: 1;" },
+      h("div", { style: "display: flex; justify-content: space-between; align-items: center;" },
+        h("b", null, `#${m.rank} ${m.player}`),
+        h("span", { class: "badge text-mint", style: "font-size: 11px;" }, `${m.total} blocs`)
+      ),
+      h("div", { class: "muted text-sm", style: "font-size: 11px; margin-top: 4px;" },
+        `Opale: ${m.opal} • Diamants: ${m.diamond} • Temps: ${m.time}`
+      )
+    );
+
+    card.append(avatar, info);
+    container.append(card);
+  });
+};
+
+/* --- 4. Sous-onglet Joueurs & Réseau Serveurs ------------------------ */
+
+const renderPlayersSubtab = () => {
+  renderServerNodes();
+  renderServerPerformance();
+  renderRetentionStats();
+};
+
+const renderServerNodes = () => {
+  const container = $("#server-nodes-grid");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const nodes = [
+    { name: "Faction Alpha", type: "Survie Faction", online: 47, max: 80, tps: 19.98, ram: "3.4 / 8.0 GB", border: "15 000 x 15 000" },
+    { name: "Minage 1 (Overworld)", type: "Ressources Minage", online: 19, max: 40, tps: 20.00, ram: "1.8 / 4.0 GB", border: "8 000 x 8 000" },
+    { name: "Minage 2 (Nether)", type: "Nether & Forteresses", online: 7, max: 30, tps: 20.00, ram: "1.2 / 4.0 GB", border: "4 000 x 4 000" },
+    { name: "Warzone PvP", type: "Arène & KOTH", online: 11, max: 50, tps: 19.94, ram: "1.5 / 4.0 GB", border: "1 000 x 1 000" },
+    { name: "Hub Central", type: "Lobby & Portails", online: 3, max: 50, tps: 20.00, ram: "0.8 / 2.0 GB", border: "Spawn protégé" },
+  ];
+
+  nodes.forEach((n) => {
+    const card = h("div", { class: "server-node-card" });
+    const head = h("div", { class: "server-node-head" },
+      h("div", null,
+        h("b", null, n.name),
+        h("div", { class: "muted text-sm" }, n.type)
+      ),
+      h("span", { class: "badge text-mint", style: "border-color: var(--mint);" }, `TPS ${n.tps}`)
+    );
+
+    const stats = h("div", { class: "server-node-stats" },
+      h("div", { class: "server-node-row" },
+        h("span", { class: "muted" }, "Joueurs connectés"),
+        h("b", null, `${n.online} / ${n.max}`)
+      ),
+      h("div", { class: "server-dist-track" },
+        h("div", { class: "server-dist-fill", style: `width: ${(n.online / n.max) * 100}%; background: var(--mint);` })
+      ),
+      h("div", { class: "server-node-row", style: "margin-top: 4px;" },
+        h("span", { class: "muted" }, "Mémoire RAM"),
+        h("span", null, n.ram)
+      ),
+      h("div", { class: "server-node-row" },
+        h("span", { class: "muted" }, "Limite du monde"),
+        h("span", null, n.border)
+      )
+    );
+
+    card.append(head, stats);
+    container.append(card);
+  });
+};
+
+const renderServerPerformance = () => {
+  const container = $("#server-perf-bars");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const perfs = [
+    { name: "Faction Alpha", tps: 19.98, cpu: 32, ramPct: 42 },
+    { name: "Minage 1", tps: 20.00, cpu: 18, ramPct: 45 },
+    { name: "Warzone PvP", tps: 19.94, cpu: 28, ramPct: 38 },
+    { name: "Minage 2", tps: 20.00, cpu: 12, ramPct: 30 },
+    { name: "Hub Central", tps: 20.00, cpu: 8, ramPct: 40 },
+  ];
+
+  perfs.forEach((p) => {
+    const row = h("div", { style: "display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;" });
+    const label = h("div", { style: "display: flex; justify-content: space-between; font-size: 12.5px;" },
+      h("b", null, p.name),
+      h("span", { class: "muted" }, `TPS: ${p.tps} • CPU: ${p.cpu}% • RAM: ${p.ramPct}%`)
+    );
+    const track = h("div", { class: "shop-bar-track" },
+      h("div", { class: "shop-bar-fill", style: `width: ${(p.tps / 20) * 100}%; background: var(--mint);` })
+    );
+    row.append(label, track);
+    container.append(row);
+  });
+};
+
+const renderRetentionStats = () => {
+  const container = $("#retention-stats-wrap");
+  if (!container) return;
+  container.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div class="card" style="padding: 12px; background: var(--card-soft);">
+        <span class="muted text-sm">Rétention Jour 1 (D1)</span>
+        <div style="font-size: 22px; font-weight: 700; color: var(--mint); margin-top: 4px;">64.2%</div>
+        <span class="muted text-sm">Des nouveaux joueurs reviennent le lendemain</span>
+      </div>
+      <div class="card" style="padding: 12px; background: var(--card-soft);">
+        <span class="muted text-sm">Rétention Semaine 1 (D7)</span>
+        <div style="font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px;">42.8%</div>
+        <span class="muted text-sm">Fidélité hebdomadaire active</span>
+      </div>
+      <div class="card" style="padding: 12px; background: var(--card-soft);">
+        <span class="muted text-sm">Durée Moyenne de Session</span>
+        <div style="font-size: 22px; font-weight: 700; color: #fff; margin-top: 4px;">1h 48m</div>
+        <span class="muted text-sm">Temps passé en jeu par connexion</span>
+      </div>
+      <div class="card" style="padding: 12px; background: var(--card-soft);">
+        <span class="muted text-sm">Nouveaux Joueurs / Jour</span>
+        <div style="font-size: 22px; font-weight: 700; color: var(--warning); margin-top: 4px;">+28 joueurs</div>
+        <span class="muted text-sm">Croissance organique constante</span>
+      </div>
+    </div>
+  `;
+};
+
+/* --- 5. Sous-onglet Métiers & PvP ------------------------------------ */
+
+const renderJobsPvPSubtab = () => {
+  renderJobsDistribution();
+  const curve = state.data.configs?.jobs?.curve || defaultJobsConfig().curve;
   renderJobsChartSvg(curve);
+  renderPvPWeapons();
+  renderTopPvPWarriors();
+};
 
-  // 3. Rendu Graphique 2 : Distribution Admin Shop par Rayon
-  renderShopBarsChart(categories);
+const renderJobsDistribution = () => {
+  const container = $("#chart-jobs-distribution");
+  if (!container) return;
+  container.innerHTML = "";
 
-  // 4. Rendu Graphique 3 : Distribution Probabilités Caisses
-  renderCratesDistributionChart(crates);
+  const jobs = [
+    { name: "Mineur", players: 48, avgLvl: 28, pct: 34, color: "#52b89b" },
+    { name: "Bûcheron", players: 30, avgLvl: 24, pct: 21, color: "#f6c445" },
+    { name: "Agriculteur", players: 27, avgLvl: 22, pct: 19, color: "#40d4c4" },
+    { name: "Guerrier", players: 23, avgLvl: 26, pct: 16, color: "#f87171" },
+    { name: "Alchimiste", players: 14, avgLvl: 19, pct: 10, color: "#c6b5dc" },
+  ];
+
+  jobs.forEach((j) => {
+    const row = h("div", { class: "shop-bar-row", style: "margin-bottom: 8px;" });
+    const label = h("div", { class: "shop-bar-label-row" },
+      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
+        h("span", { class: "crate-color-dot", style: `background: ${j.color};` }),
+        h("b", null, j.name)
+      ),
+      h("span", { class: "muted" }, `${j.players} joueurs (${j.pct}%) • Nv. moyen ${j.avgLvl}`)
+    );
+    const track = h("div", { class: "shop-bar-track" },
+      h("div", { class: "shop-bar-fill", style: `width: ${j.pct}%; background: ${j.color};` })
+    );
+    row.append(label, track);
+    container.append(row);
+  });
+};
+
+const renderPvPWeapons = () => {
+  const container = $("#chart-pvp-weapons");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const weapons = [
+    { name: "Épée en Opale Tranchant V", kills: 184, pct: 58, color: "#52b89b" },
+    { name: "Hache de Guerre en Opale", kills: 76, pct: 24, color: "#f87171" },
+    { name: "Arc de Maître Puissance V", kills: 58, pct: 18, color: "#f6c445" },
+  ];
+
+  weapons.forEach((w) => {
+    const row = h("div", { class: "shop-bar-row", style: "margin-bottom: 8px;" });
+    const label = h("div", { class: "shop-bar-label-row" },
+      h("b", null, w.name),
+      h("span", { class: "muted" }, `${w.kills} frags (${w.pct}%)`)
+    );
+    const track = h("div", { class: "shop-bar-track" },
+      h("div", { class: "shop-bar-fill", style: `width: ${w.pct}%; background: ${w.color};` })
+    );
+    row.append(label, track);
+    container.append(row);
+  });
+};
+
+const renderTopPvPWarriors = () => {
+  const tbody = $("#pvp-top-table-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  const fighters = [
+    { rank: 1, player: "Katsun", kills: 74, deaths: 12, kdr: "6.17", faction: "Eclipse" },
+    { rank: 2, player: "ShadowPvP", kills: 62, deaths: 15, kdr: "4.13", faction: "Eclipse" },
+    { rank: 3, player: "DarkKnight", kills: 48, deaths: 22, kdr: "2.18", faction: "Nemesis" },
+    { rank: 4, player: "VoxelMaster", kills: 38, deaths: 19, kdr: "2.00", faction: "Nemesis" },
+    { rank: 5, player: "TitanGamer", kills: 29, deaths: 18, kdr: "1.61", faction: "Vortex" },
+  ];
+
+  fighters.forEach((f) => {
+    const tr = h("tr", null);
+    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${f.rank}` }, `#${f.rank}`));
+    const avatar = h("img", {
+      class: "player-avatar",
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(f.player)}/22`,
+      alt: f.player,
+      onerror: (e) => { e.target.style.display = "none"; },
+    });
+    const playerTd = h("td", null,
+      h("div", { class: "player-head-cell" },
+        avatar,
+        h("b", null, f.player),
+        h("span", { class: "muted text-sm" }, ` [${f.faction}]`)
+      )
+    );
+    const killsTd = h("td", { class: "text-mint font-bold" }, String(f.kills));
+    const deathsTd = h("td", { class: "muted" }, String(f.deaths));
+    const kdrTd = h("td", { style: "text-align: right;" }, h("b", { class: "badge text-mint" }, f.kdr));
+
+    tr.append(rankTd, playerTd, killsTd, deathsTd, kdrTd);
+    tbody.append(tr);
+  });
 };
 
 const renderJobsChartSvg = (curve) => {
@@ -4088,80 +5211,6 @@ const renderJobsChartSvg = (curve) => {
   if (badge) badge.textContent = `Base ${curve.baseXp} XP • Exp ${curve.exponent}`;
 };
 
-const renderShopBarsChart = (categories) => {
-  const container = $("#chart-shop-bars");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const cats = Object.entries(categories);
-  if (cats.length === 0) {
-    container.append(h("p", { class: "muted" }, "Aucune catégorie configurée."));
-    return;
-  }
-
-  let maxItems = 1;
-  const rows = cats.map(([key, cat]) => {
-    const items = cat.items || [];
-    const count = items.length;
-    if (count > maxItems) maxItems = count;
-    const avgSell = count > 0 ? Math.round(items.reduce((s, it) => s + (Number(it.sell_price) || 0), 0) / count) : 0;
-    return { key, name: cat.name || key, count, avgSell };
-  });
-
-  rows.forEach((r) => {
-    const pct = Math.max(8, Math.round((r.count / maxItems) * 100));
-    const rowEl = h("div", { class: "shop-bar-row" });
-    const labelRow = h("div", { class: "shop-bar-label-row" },
-      h("span", null, r.name),
-      h("span", { class: "muted" }, `${r.count} article(s) • Prix moy. ${r.avgSell} $`)
-    );
-    const track = h("div", { class: "shop-bar-track" },
-      h("div", { class: "shop-bar-fill", style: `width: ${pct}%;` })
-    );
-    rowEl.append(labelRow, track);
-    container.append(rowEl);
-  });
-};
-
-const renderCratesDistributionChart = (crates) => {
-  const container = $("#chart-crates-distribution");
-  if (!container) return;
-  container.innerHTML = "";
-
-  for (const [key, crate] of Object.entries(crates)) {
-    const card = h("div", { class: "crate-dist-card" });
-    const header = h("div", { class: "crate-dist-header" },
-      h("span", { class: "crate-color-dot", style: `background: ${crate.color || "#52b89b"}` }),
-      h("span", null, crate.name || key)
-    );
-
-    const rewards = crate.rewards || [];
-    const totalW = rewards.reduce((s, r) => s + (Number(r.weight) || 0), 0);
-
-    const track = h("div", {
-      style: "display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--line); margin: 6px 0;"
-    });
-
-    const colors = ["#52b89b", "#c6b5dc", "#3b82f6", "#eab308", "#eb6875", "#a855f7"];
-    rewards.forEach((r, idx) => {
-      const p = totalW > 0 ? ((Number(r.weight) || 0) / totalW * 100) : 0;
-      const c = colors[idx % colors.length];
-      track.append(h("div", {
-        style: `width: ${p}%; background: ${c};`,
-        title: `${r.name || r.id}: ${p.toFixed(1)}%`
-      }));
-    });
-
-    const sub = h("div", { style: "display: flex; justify-content: space-between; font-size: 11.5px;", class: "muted" },
-      h("span", null, `${rewards.length} récompenses`),
-      h("span", null, `Poids total : ${totalW}`)
-    );
-
-    card.append(header, track, sub);
-    container.append(card);
-  }
-};
-
 /* =====================================================================
    MODULE CONFIGURATION : BOX & CAISSES (CRATES)
 ===================================================================== */
@@ -4189,7 +5238,7 @@ const renderCratesNavBar = () => {
   if (!bar) return;
   bar.innerHTML = "";
 
-  const crates = state.data.configs.crates;
+  const crates = state.data.configs?.crates || {};
   for (const [key, crate] of Object.entries(crates)) {
     const pill = h(
       "button",
@@ -4210,12 +5259,127 @@ const renderCratesNavBar = () => {
     );
     bar.append(pill);
   }
+
+  const addBtn = h(
+    "button",
+    {
+      type: "button",
+      class: "crate-pill add-crate-pill",
+      title: "Créer une nouvelle caisse",
+      onclick: openCreateCrateDialog,
+    },
+    "+ Nouvelle Caisse"
+  );
+  bar.append(addBtn);
+};
+
+const openCreateCrateDialog = () => {
+  const dlg = $("#crate-create-dialog");
+  if (!dlg) return;
+  const idInput = $("#crate-create-id");
+  const nameInput = $("#crate-create-name");
+  const keyInput = $("#crate-create-key");
+  const colorInput = $("#crate-create-color");
+  if (idInput) idInput.value = "";
+  if (nameInput) nameInput.value = "";
+  if (keyInput) keyInput.value = "";
+  if (colorInput) colorInput.value = "#52b89b";
+  if (typeof dlg.showModal === "function") dlg.showModal();
+  else dlg.setAttribute("open", "");
+  setTimeout(() => idInput?.focus(), 50);
+};
+
+const closeCreateCrateDialog = () => {
+  const dlg = $("#crate-create-dialog");
+  if (!dlg) return;
+  if (typeof dlg.close === "function") dlg.close();
+  else dlg.removeAttribute("open");
+};
+
+const submitCreateCrate = (event) => {
+  event.preventDefault();
+  const rawId = ($("#crate-create-id")?.value || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  if (!rawId) {
+    toast("Identifiant invalide (minuscules et chiffres).", "error");
+    return;
+  }
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.crates) state.data.configs.crates = {};
+  if (state.data.configs.crates[rawId]) {
+    toast(`Une caisse avec l'identifiant "${rawId}" existe déjà.`, "error");
+    return;
+  }
+  const name = ($("#crate-create-name")?.value || "").trim() || rawId;
+  const keyId = ($("#crate-create-key")?.value || "").trim() || rawId;
+  const color = $("#crate-create-color")?.value || "#52b89b";
+
+  state.data.configs.crates[rawId] = {
+    name,
+    key_id: keyId,
+    color,
+    rewards: [],
+  };
+
+  logActivity("CONFIG", `Création d'une nouvelle caisse : ${name} (${rawId})`);
+  state.ui.selectedCrate = rawId;
+  setDirty(true);
+  closeCreateCrateDialog();
+  renderCratesNavBar();
+  renderSelectedCrate();
+  toast(`Caisse "${name}" créée avec succès !`, "success");
+};
+
+const deleteCurrentCrate = async () => {
+  const key = state.ui.selectedCrate;
+  const crates = state.data.configs?.crates;
+  if (!crates || !crates[key]) return;
+  const crateName = crates[key].name || key;
+  const keys = Object.keys(crates);
+  if (keys.length <= 1) {
+    toast("Vous devez conserver au moins une caisse.", "warning");
+    return;
+  }
+  const ok = await confirmDialog({
+    title: `Supprimer la caisse "${crateName}" ?`,
+    message: `Êtes-vous sûr de vouloir supprimer définitivement la caisse "${crateName}" (${key}) et sa table de récompenses ?`,
+    confirmLabel: "Supprimer",
+    danger: true,
+  });
+  if (!ok) return;
+
+  delete crates[key];
+  logActivity("CONFIG", `Suppression de la caisse : ${crateName} (${key})`);
+  const remainingKeys = Object.keys(crates);
+  state.ui.selectedCrate = remainingKeys[0] || "";
+  setDirty(true);
+  renderCratesNavBar();
+  renderSelectedCrate();
+  toast(`Caisse "${crateName}" supprimée.`, "info");
 };
 
 const renderSelectedCrate = () => {
   const key = state.ui.selectedCrate;
   const crate = state.data.configs.crates?.[key];
-  if (!crate) return;
+  const delBtn = $("#crate-delete-btn");
+  if (delBtn) {
+    delBtn.onclick = deleteCurrentCrate;
+    delBtn.style.display = crate ? "inline-flex" : "none";
+  }
+  if (!crate) {
+    $("#current-crate-title").textContent = "Aucune caisse";
+    const badge = $("#current-crate-badge");
+    if (badge) badge.textContent = "";
+    $("#crate-name").value = "";
+    $("#crate-key-id").value = "";
+    $("#crate-color").value = "#52b89b";
+    const table = $("#crate-rewards-table");
+    if (table) table.innerHTML = `<p class="muted">Aucune caisse sélectionnée. Cliquez sur "+ Nouvelle Caisse" pour en créer une.</p>`;
+    const prob = $("#crate-prob-breakdown");
+    if (prob) prob.innerHTML = "";
+    const sim = $("#crate-sim-results");
+    if (sim) sim.hidden = true;
+    return;
+  }
 
   $("#current-crate-title").textContent = crate.name || key;
   const badge = $("#current-crate-badge");
@@ -4436,7 +5600,7 @@ const renderKitsNavBar = () => {
   if (!bar) return;
   bar.innerHTML = "";
 
-  const kits = state.data.configs.kits;
+  const kits = state.data.configs?.kits || {};
   for (const [key, kit] of Object.entries(kits)) {
     const pill = h(
       "button",
@@ -4453,12 +5617,124 @@ const renderKitsNavBar = () => {
     );
     bar.append(pill);
   }
+
+  const addBtn = h(
+    "button",
+    {
+      type: "button",
+      class: "kit-pill add-kit-pill",
+      title: "Créer un nouveau kit",
+      onclick: openCreateKitDialog,
+    },
+    "+ Nouveau Kit"
+  );
+  bar.append(addBtn);
+};
+
+const openCreateKitDialog = () => {
+  const dlg = $("#kit-create-dialog");
+  if (!dlg) return;
+  const idInput = $("#kit-create-id");
+  const nameInput = $("#kit-create-name");
+  const cdInput = $("#kit-create-cooldown");
+  const permInput = $("#kit-create-permission");
+  if (idInput) idInput.value = "";
+  if (nameInput) nameInput.value = "";
+  if (cdInput) cdInput.value = "24";
+  if (permInput) permInput.value = "";
+  if (typeof dlg.showModal === "function") dlg.showModal();
+  else dlg.setAttribute("open", "");
+  setTimeout(() => idInput?.focus(), 50);
+};
+
+const closeCreateKitDialog = () => {
+  const dlg = $("#kit-create-dialog");
+  if (!dlg) return;
+  if (typeof dlg.close === "function") dlg.close();
+  else dlg.removeAttribute("open");
+};
+
+const submitCreateKit = (event) => {
+  event.preventDefault();
+  const rawId = ($("#kit-create-id")?.value || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  if (!rawId) {
+    toast("Identifiant invalide (utilisez des minuscules et chiffres).", "error");
+    return;
+  }
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.kits) state.data.configs.kits = {};
+  if (state.data.configs.kits[rawId]) {
+    toast(`Un kit avec l'identifiant "${rawId}" existe déjà.`, "error");
+    return;
+  }
+  const name = ($("#kit-create-name")?.value || "").trim() || rawId;
+  const cooldown = Math.max(0, Number($("#kit-create-cooldown")?.value) || 0);
+  const permission = ($("#kit-create-permission")?.value || "").trim();
+
+  state.data.configs.kits[rawId] = {
+    id: rawId,
+    name,
+    cooldown_hours: cooldown,
+    ...(permission ? { permission } : {}),
+    items: [],
+  };
+
+  logActivity("CONFIG", `Création d'un nouveau kit : ${name} (${rawId})`);
+  state.ui.selectedKit = rawId;
+  setDirty(true);
+  closeCreateKitDialog();
+  renderKitsNavBar();
+  renderSelectedKit();
+  toast(`Kit "${name}" créé avec succès !`, "success");
+};
+
+const deleteCurrentKit = async () => {
+  const key = state.ui.selectedKit;
+  const kits = state.data.configs?.kits;
+  if (!kits || !kits[key]) return;
+  const kitName = kits[key].name || key;
+  const keys = Object.keys(kits);
+  if (keys.length <= 1) {
+    toast("Vous devez conserver au moins un kit.", "warning");
+    return;
+  }
+  const ok = await confirmDialog({
+    title: `Supprimer le kit "${kitName}" ?`,
+    message: `Êtes-vous sûr de vouloir supprimer définitivement le kit "${kitName}" (${key}) et son inventaire ?`,
+    confirmLabel: "Supprimer",
+    danger: true,
+  });
+  if (!ok) return;
+
+  delete kits[key];
+  logActivity("CONFIG", `Suppression du kit joueur : ${kitName} (${key})`);
+  const remainingKeys = Object.keys(kits);
+  state.ui.selectedKit = remainingKeys[0] || "";
+  setDirty(true);
+  renderKitsNavBar();
+  renderSelectedKit();
+  toast(`Kit "${kitName}" supprimé.`, "info");
 };
 
 const renderSelectedKit = () => {
   const key = state.ui.selectedKit;
   const kit = state.data.configs.kits?.[key];
-  if (!kit) return;
+  const delBtn = $("#kit-delete-btn");
+  if (delBtn) {
+    delBtn.onclick = deleteCurrentKit;
+    delBtn.style.display = kit ? "inline-flex" : "none";
+  }
+  if (!kit) {
+    $("#current-kit-title").textContent = "Aucun kit";
+    $("#kit-name").value = "";
+    $("#kit-cooldown").value = 0;
+    $("#kit-permission").value = "";
+    const list = $("#kit-items-list");
+    if (list) list.innerHTML = `<p class="muted">Aucun kit sélectionné. Cliquez sur "+ Nouveau Kit" pour en créer un.</p>`;
+    const preview = $("#kit-inventory-preview");
+    if (preview) preview.innerHTML = "";
+    return;
+  }
 
   $("#current-kit-title").textContent = kit.name || key;
   $("#kit-name").value = kit.name || "";
@@ -5378,6 +6654,10 @@ on("#server-broadcast-interval", "change", (e) => {
 on("#crates-reset-defaults-btn", "click", resetCratesDefaults);
 on("#crate-simulate-btn", "click", simulateCratePulls);
 on("#crate-add-reward-form", "submit", addCrateReward);
+on("#crate-create-form", "submit", submitCreateCrate);
+on("#crate-create-close", "click", closeCreateCrateDialog);
+on("#crate-create-cancel", "click", closeCreateCrateDialog);
+on("#crate-delete-btn", "click", deleteCurrentCrate);
 on("#crate-reward-type", "change", (e) => {
   const type = e.target.value;
   const itemLabelEl = $("#crate-reward-item-label");
@@ -5417,6 +6697,10 @@ on("#crate-color", "change", (e) => {
 
 on("#kits-reset-defaults-btn", "click", resetKitsDefaults);
 on("#kit-add-item-form", "submit", addKitItem);
+on("#kit-create-form", "submit", submitCreateKit);
+on("#kit-create-close", "click", closeCreateKitDialog);
+on("#kit-create-cancel", "click", closeCreateKitDialog);
+on("#kit-delete-btn", "click", deleteCurrentKit);
 on("#kit-name", "input", (e) => {
   const key = state.ui.selectedKit;
   if (state.data.configs.kits?.[key]) {
@@ -5568,6 +6852,21 @@ on("#dashboard-refresh-btn", "click", () => {
   toast("Métriques et graphiques actualisés !", "success");
 });
 
+document.querySelectorAll(".analytics-subtab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    switchAnalyticsSubtab(btn.dataset.subtab || "overview");
+  });
+});
+
+document.querySelectorAll(".btn-timeframe").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".btn-timeframe").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.ui.timeframe = btn.dataset.timeframe || "24h";
+    renderDashboardTab();
+  });
+});
+
 /* --- Journal d'Activité & Logs --------------------------------------- */
 
 document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
@@ -5579,8 +6878,12 @@ document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
   });
 });
 
+on("#logs-live-toggle", "click", toggleLogsLive);
+on("#logs-server-filter", "change", () => renderLogsTab());
+on("#logs-player-filter", "input", debounce(renderLogsTab, 100));
 on("#logs-search-input", "input", debounce(renderLogsTab, 100));
 on("#logs-export-btn", "click", exportLogs);
+on("#logs-export-json-btn", "click", exportLogsJson);
 on("#logs-clear-btn", "click", clearLogs);
 
 /* --- Recherche Universelle (Spotlight) -------------------------------- */
