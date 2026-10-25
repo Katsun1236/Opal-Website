@@ -6,10 +6,15 @@ import {
   LIMITS,
   TIER_RE,
   defaultAdminShopConfig,
+  defaultBoostsConfig,
   defaultConfigs,
+  defaultCratesConfig,
   defaultDailyRewards,
   defaultJobsConfig,
+  defaultKitsConfig,
+  defaultQuestsConfig,
   defaultServerConfig,
+  defaultWarzoneConfig,
   isAllowedTextureValue,
   normalizeConfigs,
   normalizeTextures,
@@ -507,6 +512,11 @@ const TAB_TITLES = {
   "config-daily": { title: "Calendrier (Daily Rewards)", sub: "Récompenses quotidiennes sur 30 jours consécutifs (/daily)" },
   "config-jobs": { title: "Métiers & Jobs", sub: "Paramétrage des gains d’XP, courbe de niveaux et récompenses de palier" },
   "config-shop": { title: "Admin Shop", sub: "Gestion des rayons, prix d’achat et de rachat des articles (/shop)" },
+  "config-crates": { title: "Box & Caisses", sub: "Tables de drop, probabilités et simulateur de tirages (/crates)" },
+  "config-kits": { title: "Kits & Équipements", sub: "Paquetages d’items, temps d’attente et permissions (/kit)" },
+  "config-quests": { title: "Quêtes Journalières", sub: "Missions quotidiennes de minage, monstres et récoltes" },
+  "config-warzone": { title: "Warzone & KOTH", sub: "Captures de colline, largages Airdrops et combat-tag" },
+  "tools-audit": { title: "Audit & Boosts", sub: "Diagnostic anti-duplication et multiplicateurs temporaires" },
   "config-server": { title: "Paramètres Généraux", sub: "Économie de départ, annonces dans le chat, règles d’anti-lag" },
   data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
@@ -520,6 +530,11 @@ const renderActiveTab = () => {
   else if (state.ui.tab === "config-daily") renderDailyTab();
   else if (state.ui.tab === "config-jobs") renderJobsTab();
   else if (state.ui.tab === "config-shop") renderShopTab();
+  else if (state.ui.tab === "config-crates") renderCratesTab();
+  else if (state.ui.tab === "config-kits") renderKitsTab();
+  else if (state.ui.tab === "config-quests") renderQuestsTab();
+  else if (state.ui.tab === "config-warzone") renderWarzoneTab();
+  else if (state.ui.tab === "tools-audit") renderAuditTab();
   else if (state.ui.tab === "config-server") renderServerConfigTab();
   else if (state.ui.tab === "sync-guide") renderSyncGuideTab();
 };
@@ -3798,6 +3813,884 @@ const renderSyncGuideTab = () => {
 };
 
 /* =====================================================================
+   MODULE CONFIGURATION : BOX & CAISSES (CRATES)
+===================================================================== */
+
+const renderCratesTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.crates) state.data.configs.crates = defaultCratesConfig();
+
+  const crates = state.data.configs.crates;
+  const keys = Object.keys(crates);
+  if (keys.length === 0) {
+    state.data.configs.crates = defaultCratesConfig();
+  }
+
+  if (!state.ui.selectedCrate || !crates[state.ui.selectedCrate]) {
+    state.ui.selectedCrate = Object.keys(crates)[0] || "commune";
+  }
+
+  renderCratesNavBar();
+  renderSelectedCrate();
+};
+
+const renderCratesNavBar = () => {
+  const bar = $("#crates-nav-bar");
+  if (!bar) return;
+  bar.innerHTML = "";
+
+  const crates = state.data.configs.crates;
+  for (const [key, crate] of Object.entries(crates)) {
+    const pill = h(
+      "button",
+      {
+        type: "button",
+        class: "crate-pill" + (state.ui.selectedCrate === key ? " active" : ""),
+        onclick: () => {
+          state.ui.selectedCrate = key;
+          renderCratesNavBar();
+          renderSelectedCrate();
+        },
+      },
+      h("span", {
+        class: "crate-color-dot",
+        style: `background: ${crate.color || "#52b89b"}`,
+      }),
+      crate.name || key
+    );
+    bar.append(pill);
+  }
+};
+
+const renderSelectedCrate = () => {
+  const key = state.ui.selectedCrate;
+  const crate = state.data.configs.crates?.[key];
+  if (!crate) return;
+
+  $("#current-crate-title").textContent = crate.name || key;
+  const badge = $("#current-crate-badge");
+  if (badge) {
+    badge.textContent = `Clé : ${crate.key_id || key}`;
+    badge.style.borderColor = crate.color || "var(--mint)";
+    badge.style.color = crate.color || "var(--mint)";
+  }
+
+  $("#crate-name").value = crate.name || "";
+  $("#crate-key-id").value = crate.key_id || key;
+  $("#crate-color").value = crate.color || "#52b89b";
+
+  renderCrateRewards(crate);
+  renderCrateProbabilities(crate);
+  const sim = $("#crate-sim-results");
+  if (sim) sim.hidden = true;
+};
+
+const renderCrateRewards = (crate) => {
+  const table = $("#crate-rewards-table");
+  if (!table) return;
+  table.innerHTML = "";
+
+  const rewards = crate.rewards || [];
+  if (rewards.length === 0) {
+    table.append(h("p", { class: "muted" }, "Aucune récompense dans cette caisse."));
+    return;
+  }
+
+  const totalWeight = rewards.reduce((sum, r) => sum + (Number(r.weight) || 0), 0);
+
+  rewards.forEach((r, idx) => {
+    const percent = totalWeight > 0 ? ((Number(r.weight) || 0) / totalWeight * 100).toFixed(1) : "0";
+    const row = h("div", { class: "crate-reward-row" });
+
+    const iconImg = makeImage(r.item || r.icon || "minecraft:chest", r.name || "", "", "item");
+    const nameSpan = h("span", { style: "flex: 1;" }, r.name || r.id);
+    const weightSpan = h("span", { class: "reward-weight-tag" }, `${r.weight} pt (${percent}%)`);
+
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        rewards.splice(idx, 1);
+        setDirty(true);
+        renderSelectedCrate();
+      },
+    }, "✕");
+
+    row.append(iconImg || h("span", null, "•"), nameSpan, weightSpan, delBtn);
+    table.append(row);
+  });
+};
+
+const renderCrateProbabilities = (crate) => {
+  const container = $("#crate-prob-breakdown");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const rewards = crate.rewards || [];
+  const totalWeight = rewards.reduce((sum, r) => sum + (Number(r.weight) || 0), 0);
+
+  if (rewards.length === 0 || totalWeight === 0) {
+    container.append(h("p", { class: "muted" }, "Ajoutez des récompenses pour voir les probabilités."));
+    return;
+  }
+
+  rewards.forEach((r) => {
+    const percent = ((Number(r.weight) || 0) / totalWeight * 100).toFixed(1);
+    const row = h("div", { class: "crate-prob-row" });
+    const info = h("div", { class: "crate-prob-info" },
+      h("span", null, r.name || r.id),
+      h("span", { class: "muted" }, `${percent}%`)
+    );
+    const bar = h("div", { class: "crate-prob-bar-container" },
+      h("div", {
+        class: "crate-prob-fill",
+        style: `width: ${percent}%; background: ${crate.color || "var(--mint)"};`,
+      })
+    );
+    row.append(info, bar);
+    container.append(row);
+  });
+};
+
+const simulateCratePulls = () => {
+  const key = state.ui.selectedCrate;
+  const crate = state.data.configs.crates?.[key];
+  if (!crate || !crate.rewards || crate.rewards.length === 0) return;
+
+  const totalWeight = crate.rewards.reduce((sum, r) => sum + (Number(r.weight) || 0), 0);
+  if (totalWeight <= 0) return;
+
+  const counts = new Map();
+  crate.rewards.forEach((r) => counts.set(r.name || r.id, 0));
+
+  for (let i = 0; i < 100; i++) {
+    let roll = Math.random() * totalWeight;
+    for (const r of crate.rewards) {
+      const w = Number(r.weight) || 0;
+      if (roll < w) {
+        const name = r.name || r.id;
+        counts.set(name, (counts.get(name) || 0) + 1);
+        break;
+      }
+      roll -= w;
+    }
+  }
+
+  const resultsDiv = $("#crate-sim-results");
+  const barsDiv = $("#crate-sim-bars");
+  if (!resultsDiv || !barsDiv) return;
+
+  barsDiv.innerHTML = "";
+  for (const [name, count] of counts.entries()) {
+    const row = h("div", { class: "sim-bar-row" });
+    const label = h("div", { style: "display: flex; justify-content: space-between;" },
+      h("span", null, name),
+      h("b", null, `${count} / 100 (${count}%)`)
+    );
+    const bar = h("div", { class: "crate-prob-bar-container" },
+      h("div", { class: "sim-bar-fill", style: `width: ${count}%;` })
+    );
+    row.append(label, bar);
+    barsDiv.append(row);
+  }
+
+  resultsDiv.hidden = false;
+};
+
+const addCrateReward = (event) => {
+  event.preventDefault();
+  const key = state.ui.selectedCrate;
+  const crate = state.data.configs.crates?.[key];
+  if (!crate) return;
+
+  const type = $("#crate-reward-type").value;
+  const name = $("#crate-reward-name").value.trim();
+  const weight = Math.max(1, Number($("#crate-reward-weight").value) || 25);
+  const item = $("#crate-reward-item").value.trim();
+  const count = Math.max(1, Number($("#crate-reward-count").value) || 1);
+  const amount = Math.max(1, Number($("#crate-reward-amount").value) || 5000);
+
+  if (!name) {
+    toast("Indiquez un nom affiché pour la récompense.", "error");
+    return;
+  }
+
+  const rewardObj = {
+    id: "rew_" + Date.now().toString(36),
+    type,
+    name,
+    weight,
+  };
+
+  if (type === "item") {
+    rewardObj.item = item || "minecraft:diamond";
+    rewardObj.count = count;
+  } else if (type === "money") {
+    rewardObj.amount = amount;
+  } else if (type === "key") {
+    rewardObj.key = item || "commune";
+    rewardObj.count = count;
+  } else if (type === "shard") {
+    rewardObj.count = count;
+  }
+
+  if (!crate.rewards) crate.rewards = [];
+  crate.rewards.push(rewardObj);
+
+  $("#crate-reward-name").value = "";
+  setDirty(true);
+  renderSelectedCrate();
+  toast(`Récompense "${name}" ajoutée !`, "success");
+};
+
+const resetCratesDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser les Caisses",
+    message: "Restaurer toutes les caisses et leurs tables de butin par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.crates = defaultCratesConfig();
+  state.ui.selectedCrate = "commune";
+  setDirty(true);
+  renderCratesTab();
+  toast("Caisses réinitialisées aux valeurs d'origine.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : KITS & ÉQUIPEMENTS
+===================================================================== */
+
+const renderKitsTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.kits) state.data.configs.kits = defaultKitsConfig();
+
+  const kits = state.data.configs.kits;
+  const keys = Object.keys(kits);
+  if (keys.length === 0) {
+    state.data.configs.kits = defaultKitsConfig();
+  }
+
+  if (!state.ui.selectedKit || !kits[state.ui.selectedKit]) {
+    state.ui.selectedKit = Object.keys(kits)[0] || "joueur";
+  }
+
+  renderKitsNavBar();
+  renderSelectedKit();
+};
+
+const renderKitsNavBar = () => {
+  const bar = $("#kits-nav-bar");
+  if (!bar) return;
+  bar.innerHTML = "";
+
+  const kits = state.data.configs.kits;
+  for (const [key, kit] of Object.entries(kits)) {
+    const pill = h(
+      "button",
+      {
+        type: "button",
+        class: "kit-pill" + (state.ui.selectedKit === key ? " active" : ""),
+        onclick: () => {
+          state.ui.selectedKit = key;
+          renderKitsNavBar();
+          renderSelectedKit();
+        },
+      },
+      kit.name || key
+    );
+    bar.append(pill);
+  }
+};
+
+const renderSelectedKit = () => {
+  const key = state.ui.selectedKit;
+  const kit = state.data.configs.kits?.[key];
+  if (!kit) return;
+
+  $("#current-kit-title").textContent = kit.name || key;
+  $("#kit-name").value = kit.name || "";
+  $("#kit-cooldown").value = kit.cooldown_hours ?? 24;
+  $("#kit-permission").value = kit.permission || "";
+
+  renderKitItems(kit);
+  renderKitInventoryPreview(kit);
+};
+
+const renderKitItems = (kit) => {
+  const container = $("#kit-items-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const items = kit.items || [];
+  if (items.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucun item dans ce kit."));
+    return;
+  }
+
+  items.forEach((it, idx) => {
+    const row = h("div", { class: "kit-item-row" });
+    const img = makeImage(it.item, it.name || it.item, "", "item");
+    const nameSpan = h("span", { style: "flex: 1;" }, `${it.name || it.item} (${it.count || 1}x)`);
+    const idSpan = h("code", { class: "muted text-sm" }, it.item);
+
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        items.splice(idx, 1);
+        setDirty(true);
+        renderSelectedKit();
+      },
+    }, "✕");
+
+    row.append(img || h("span", null, "•"), nameSpan, idSpan, delBtn);
+    container.append(row);
+  });
+};
+
+const renderKitInventoryPreview = (kit) => {
+  const preview = $("#kit-inventory-preview");
+  if (!preview) return;
+  preview.innerHTML = "";
+
+  const items = kit.items || [];
+  const totalSlots = Math.max(9, Math.ceil(items.length / 9) * 9);
+
+  for (let i = 0; i < totalSlots; i++) {
+    const slot = h("div", { class: "kit-slot" });
+    if (i < items.length) {
+      const it = items[i];
+      const img = makeImage(it.item, it.name || it.item, "", "item");
+      if (img) slot.append(img);
+      if ((it.count || 1) > 1) {
+        slot.append(h("span", { class: "kit-slot-count" }, String(it.count)));
+      }
+    }
+    preview.append(slot);
+  }
+};
+
+const addKitItem = (event) => {
+  event.preventDefault();
+  const key = state.ui.selectedKit;
+  const kit = state.data.configs.kits?.[key];
+  if (!kit) return;
+
+  const item = $("#kit-new-item-id").value.trim();
+  const name = $("#kit-new-item-name").value.trim();
+  const count = Math.max(1, Number($("#kit-new-item-count").value) || 1);
+
+  if (!item) {
+    toast("Indiquez l'identifiant de l'item.", "error");
+    return;
+  }
+
+  if (!kit.items) kit.items = [];
+  kit.items.push({ item, count, ...(name ? { name } : {}) });
+
+  $("#kit-new-item-id").value = "";
+  $("#kit-new-item-name").value = "";
+  $("#kit-new-item-count").value = "1";
+
+  setDirty(true);
+  renderSelectedKit();
+  toast("Item ajouté au kit !", "success");
+};
+
+const resetKitsDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser les Kits",
+    message: "Restaurer tous les kits et leurs équipements par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.kits = defaultKitsConfig();
+  state.ui.selectedKit = "joueur";
+  setDirty(true);
+  renderKitsTab();
+  toast("Kits réinitialisés aux valeurs d'origine.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : QUÊTES JOURNALIÈRES
+===================================================================== */
+
+const renderQuestsTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.quests) state.data.configs.quests = defaultQuestsConfig();
+
+  const container = $("#quests-list-table");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const quests = state.data.configs.quests.daily || [];
+  if (quests.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucune quête configurée."));
+    return;
+  }
+
+  quests.forEach((q, idx) => {
+    const row = h("div", { class: "quest-row" });
+    const info = h("div", { class: "quest-info-block" },
+      h("b", null, q.name || q.id),
+      h("span", { class: "muted text-sm" }, `Objectif : ${q.type || "action"} de ${q.count || 1}x ${q.target}`)
+    );
+    const rewards = h("div", { class: "quest-reward-pill" },
+      h("span", null, `+${(q.reward_money || 0).toLocaleString()} $`),
+      h("span", { class: "muted" }, `+${q.reward_xp || 0} XP`)
+    );
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        quests.splice(idx, 1);
+        setDirty(true);
+        renderQuestsTab();
+      },
+    }, "✕");
+
+    row.append(info, rewards, delBtn);
+    container.append(row);
+  });
+};
+
+const addQuestFormSubmit = (event) => {
+  event.preventDefault();
+  const id = $("#quest-id").value.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_");
+  const name = $("#quest-name").value.trim();
+  const type = $("#quest-type").value;
+  const target = $("#quest-target").value.trim();
+  const count = Math.max(1, Number($("#quest-count").value) || 1);
+  const reward_money = Math.max(0, Number($("#quest-reward-money").value) || 0);
+  const reward_xp = Math.max(0, Number($("#quest-reward-xp").value) || 0);
+
+  if (!id || !name || !target) {
+    toast("Remplissez tous les champs requis.", "error");
+    return;
+  }
+
+  const quests = state.data.configs.quests;
+  if (!quests.daily) quests.daily = [];
+
+  quests.daily.push({ id, name, type, target, count, reward_money, reward_xp });
+
+  $("#quest-id").value = "";
+  $("#quest-name").value = "";
+  $("#quest-target").value = "";
+
+  setDirty(true);
+  renderQuestsTab();
+  toast(`Quête "${name}" ajoutée !`, "success");
+};
+
+const resetQuestsDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser les Quêtes",
+    message: "Restaurer les quêtes journalières par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.quests = defaultQuestsConfig();
+  setDirty(true);
+  renderQuestsTab();
+  toast("Quêtes réinitialisées par défaut.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : WARZONE & KOTH
+===================================================================== */
+
+const renderWarzoneTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+
+  const wz = state.data.configs.warzone;
+  const koth = wz.koth || {};
+  const airdrop = wz.airdrop || {};
+
+  $("#warzone-koth-duration").value = koth.duration_minutes ?? 3;
+  $("#warzone-koth-money").value = koth.reward_money ?? 50000;
+  $("#warzone-koth-key").value = koth.reward_key || "legendaire";
+  $("#warzone-koth-schedule").value = Array.isArray(koth.schedule_hours) ? koth.schedule_hours.join(", ") : "14, 18, 21";
+
+  $("#warzone-combattag").value = wz.combat_tag_seconds ?? 30;
+
+  $("#warzone-airdrop-interval").value = airdrop.interval_minutes ?? 120;
+  $("#warzone-airdrop-minx").value = airdrop.min_x ?? -250;
+  $("#warzone-airdrop-maxx").value = airdrop.max_x ?? 250;
+  $("#warzone-airdrop-minz").value = airdrop.min_z ?? -250;
+  $("#warzone-airdrop-maxz").value = airdrop.max_z ?? 250;
+
+  renderAirdropItemsList();
+};
+
+const renderAirdropItemsList = () => {
+  const container = $("#warzone-airdrop-items");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const items = state.data.configs.warzone?.airdrop?.items || [];
+  if (items.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucun item dans l'Airdrop."));
+    return;
+  }
+
+  items.forEach((it, idx) => {
+    const row = h("div", { class: "airdrop-item-row" });
+    const img = makeImage(it.item, it.name || it.item, "", "item");
+    const name = h("span", { style: "flex: 1;" }, `${it.name || it.item} (${it.count || 1}x)`);
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        items.splice(idx, 1);
+        setDirty(true);
+        renderAirdropItemsList();
+      },
+    }, "✕");
+
+    row.append(img || h("span", null, "•"), name, delBtn);
+    container.append(row);
+  });
+};
+
+const addAirdropItem = () => {
+  const item = $("#warzone-new-airdrop-item").value.trim();
+  const count = Math.max(1, Number($("#warzone-new-airdrop-count").value) || 1);
+  const name = $("#warzone-new-airdrop-name").value.trim();
+
+  if (!item) {
+    toast("Indiquez l'identifiant de l'item d'Airdrop.", "error");
+    return;
+  }
+
+  const wz = state.data.configs.warzone;
+  if (!wz.airdrop) wz.airdrop = defaultWarzoneConfig().airdrop;
+  if (!wz.airdrop.items) wz.airdrop.items = [];
+
+  wz.airdrop.items.push({ item, count, ...(name ? { name } : {}) });
+
+  $("#warzone-new-airdrop-item").value = "";
+  $("#warzone-new-airdrop-name").value = "";
+
+  setDirty(true);
+  renderAirdropItemsList();
+  toast("Item ajouté à l'Airdrop !", "success");
+};
+
+const resetWarzoneDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser la Warzone",
+    message: "Restaurer les configurations KOTH et Airdrop par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.warzone = defaultWarzoneConfig();
+  setDirty(true);
+  renderWarzoneTab();
+  toast("Warzone réinitialisée par défaut.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : AUDIT ÉCONOMIQUE & BOOSTS
+===================================================================== */
+
+const renderAuditTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+
+  const boosts = state.data.configs.boosts;
+  $("#boost-event-name").value = boosts.activeEventName || "";
+  $("#boost-jobs-mult").value = boosts.jobsXpMultiplier ?? 1.0;
+  $("#boost-jobs-mult-val").textContent = `x${boosts.jobsXpMultiplier ?? 1.0}`;
+  $("#boost-shop-mult").value = boosts.shopSellMultiplier ?? 1.0;
+  const sellPct = Math.round(((boosts.shopSellMultiplier ?? 1.0) - 1.0) * 100);
+  $("#boost-shop-mult-val").textContent = `+${sellPct}% (x${boosts.shopSellMultiplier ?? 1.0})`;
+};
+
+const runEconomicAudit = () => {
+  const resultsDiv = $("#audit-results-area");
+  if (!resultsDiv) return;
+  resultsDiv.innerHTML = "";
+
+  // 1. Build map of Shop Buy and Sell Prices
+  const shopBuyPrices = new Map();
+  const shopSellPrices = new Map();
+
+  const categories = state.data.configs.adminShop?.categories || {};
+  const directLeaks = [];
+
+  for (const cat of Object.values(categories)) {
+    for (const it of cat.items || []) {
+      if (it.item_id) {
+        if (it.buy_enabled && it.buy_price > 0) {
+          shopBuyPrices.set(it.item_id, it.buy_price);
+        }
+        if (it.sell_enabled && it.sell_price > 0) {
+          shopSellPrices.set(it.item_id, it.sell_price);
+        }
+        if (it.buy_enabled && it.sell_enabled && it.sell_price >= it.buy_price && it.buy_price > 0) {
+          directLeaks.push({
+            item: it.item_id,
+            name: it.name,
+            buy: it.buy_price,
+            sell: it.sell_price,
+          });
+        }
+      }
+    }
+  }
+
+  // 2. Check all custom and vanilla recipes
+  const craftLeaks = [];
+  const allRecipes = [...state.data.recipes];
+
+  for (const r of allRecipes) {
+    const resultItem = r.result?.item;
+    const resultCount = r.result?.count || 1;
+    if (!resultItem || !shopSellPrices.has(resultItem)) continue;
+
+    const sellPricePerUnit = shopSellPrices.get(resultItem);
+    const totalSellGain = sellPricePerUnit * resultCount;
+
+    let ingredients = [];
+    if (r.type === "furnace") {
+      if (r.input) ingredients.push(r.input);
+    } else if (r.type === "shapeless") {
+      ingredients = r.ingredients || [];
+    } else if (r.type === "shaped") {
+      const used = (r.pattern || []).join("").replace(/ /g, "");
+      for (const char of used) {
+        if (r.key && r.key[char]) ingredients.push(r.key[char]);
+      }
+    }
+
+    if (ingredients.length === 0) continue;
+
+    let canBuyAll = true;
+    let totalCraftCost = 0;
+    for (const ing of ingredients) {
+      if (shopBuyPrices.has(ing)) {
+        totalCraftCost += shopBuyPrices.get(ing);
+      } else {
+        canBuyAll = false;
+        break;
+      }
+    }
+
+    if (canBuyAll && totalSellGain > totalCraftCost) {
+      const profit = totalSellGain - totalCraftCost;
+      craftLeaks.push({
+        recipeId: r.id,
+        result: resultItem,
+        resultName: itemLabel(resultItem),
+        count: resultCount,
+        craftCost: totalCraftCost,
+        sellGain: totalSellGain,
+        profit,
+      });
+    }
+  }
+
+  // 3. Render Audit Report
+  if (directLeaks.length === 0 && craftLeaks.length === 0) {
+    resultsDiv.append(
+      h("div", { class: "audit-clean-box" },
+        "Économie saine : Aucune faille de duplication ou de monnaie infinie détectée dans les recettes et le shop !"
+      )
+    );
+    toast("Audit terminé : Économie 100% saine !", "success");
+    return;
+  }
+
+  if (directLeaks.length > 0) {
+    resultsDiv.append(h("h4", { style: "color: var(--danger); margin-top: 10px;" }, `Failles directes Admin Shop (${directLeaks.length})`));
+    directLeaks.forEach((leak) => {
+      const card = h("div", { class: "audit-leak-card" },
+        h("div", null,
+          h("b", null, leak.name || leak.item),
+          h("div", { class: "muted text-sm" }, `Achat : ${leak.buy} $ | Vente : ${leak.sell} $ (Revente avec gain direct)`),
+        ),
+        h("span", { class: "audit-leak-badge" }, "FAILLE DIRECTE")
+      );
+      resultsDiv.append(card);
+    });
+  }
+
+  if (craftLeaks.length > 0) {
+    resultsDiv.append(h("h4", { style: "color: var(--danger); margin-top: 14px;" }, `Failles Craft vs Shop (${craftLeaks.length})`));
+    craftLeaks.forEach((leak) => {
+      const card = h("div", { class: "audit-leak-card" },
+        h("div", null,
+          h("b", null, `Recette : ${leak.resultName} (${leak.count}x)`),
+          h("div", { class: "muted text-sm" }, `Coût ingrédients : ${leak.craftCost} $ -> Revente : ${leak.sellGain} $ (Bénéfice : +${leak.profit} $ par craft)`),
+        ),
+        h("span", { class: "audit-leak-badge" }, `+${leak.profit} $`)
+      );
+      resultsDiv.append(card);
+    });
+  }
+
+  toast(`Alerte : ${directLeaks.length + craftLeaks.length} faille(s) économique(s) détectée(s) !`, "error");
+};
+
+/* =====================================================================
+   MODULE RECHERCHE UNIVERSELLE (SPOTLIGHT / CTRL+K)
+===================================================================== */
+
+const openSpotlightSearch = () => {
+  const dialog = $("#search-modal");
+  if (!dialog) return;
+  dialog.showModal();
+  const input = $("#spotlight-input");
+  if (input) {
+    input.value = "";
+    input.focus();
+  }
+  renderSpotlightResults("");
+};
+
+const closeSpotlightSearch = () => {
+  const dialog = $("#search-modal");
+  if (dialog && dialog.open) dialog.close();
+};
+
+const renderSpotlightResults = (query) => {
+  const container = $("#spotlight-results");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) {
+    container.append(h("p", { class: "muted text-sm spotlight-hint" }, "Tapez au moins 2 caractères pour rechercher dans tout le serveur."));
+    return;
+  }
+
+  const results = [];
+
+  for (const it of state.data.entries) {
+    if ((it.id && it.id.toLowerCase().includes(q)) || (it.name && it.name.toLowerCase().includes(q))) {
+      results.push({
+        group: "Contenus Custom",
+        title: it.name || it.id,
+        sub: `opal:${it.id} (${KIND_LABELS[it.kind] || it.kind})`,
+        icon: it.id,
+        action: () => {
+          openTab("entries");
+          editEntry(it.id);
+        },
+      });
+    }
+  }
+
+  for (const r of state.data.recipes) {
+    const res = itemLabel(r.result?.item);
+    if ((r.id && r.id.toLowerCase().includes(q)) || res.toLowerCase().includes(q)) {
+      results.push({
+        group: "Crafts & Recettes",
+        title: res,
+        sub: `Craft ${r.type} (${r.id})`,
+        icon: r.result?.item,
+        action: () => {
+          openTab("recipes");
+          editRecipe(r.id);
+        },
+      });
+    }
+  }
+
+  const cats = state.data.configs.adminShop?.categories || {};
+  for (const [cKey, cat] of Object.entries(cats)) {
+    for (const it of cat.items || []) {
+      if ((it.name && it.name.toLowerCase().includes(q)) || (it.item_id && it.item_id.toLowerCase().includes(q))) {
+        results.push({
+          group: "Admin Shop",
+          title: it.name || it.item_id,
+          sub: `Rayon ${cat.name || cKey} • Achat: ${it.buy_price}$ / Vente: ${it.sell_price}$`,
+          icon: it.item_id,
+          action: () => {
+            state.ui.selectedShopCategory = cKey;
+            openTab("config-shop");
+          },
+        });
+      }
+    }
+  }
+
+  const crates = state.data.configs.crates || {};
+  for (const [cKey, crate] of Object.entries(crates)) {
+    if ((crate.name && crate.name.toLowerCase().includes(q)) || cKey.toLowerCase().includes(q)) {
+      results.push({
+        group: "Box & Caisses",
+        title: crate.name || cKey,
+        sub: `Caisse • Clé: ${crate.key_id || cKey}`,
+        icon: crate.icon || "minecraft:chest",
+        action: () => {
+          state.ui.selectedCrate = cKey;
+          openTab("config-crates");
+        },
+      });
+    }
+  }
+
+  const kits = state.data.configs.kits || {};
+  for (const [kKey, kit] of Object.entries(kits)) {
+    if ((kit.name && kit.name.toLowerCase().includes(q)) || kKey.toLowerCase().includes(q)) {
+      results.push({
+        group: "Kits & Équipements",
+        title: kit.name || kKey,
+        sub: `Kit • Cooldown: ${kit.cooldown_hours || 24}h`,
+        icon: kit.icon || "minecraft:chest",
+        action: () => {
+          state.ui.selectedKit = kKey;
+          openTab("config-kits");
+        },
+      });
+    }
+  }
+
+  if (results.length === 0) {
+    container.append(h("p", { class: "muted text-sm spotlight-hint" }, `Aucun résultat pour « ${query} ».`));
+    return;
+  }
+
+  let currentGroup = "";
+  results.slice(0, 15).forEach((res) => {
+    if (res.group !== currentGroup) {
+      currentGroup = res.group;
+      container.append(h("div", { class: "spotlight-group-title" }, currentGroup));
+    }
+
+    const itemRow = h(
+      "div",
+      {
+        class: "spotlight-item",
+        onclick: () => {
+          closeSpotlightSearch();
+          res.action();
+        },
+      },
+      makeImage(res.icon, res.title, "", "item") || h("span", null, "•"),
+      h("div", { style: "display: flex; flex-direction: column;" },
+        h("span", null, res.title),
+        h("span", { class: "muted text-sm" }, res.sub)
+      ),
+      h("span", { class: "spotlight-item-badge" }, res.group)
+    );
+    container.append(itemRow);
+  });
+};
+
+/* =====================================================================
    ÉCOUTEURS D’ÉVÉNEMENTS
 ===================================================================== */
 
@@ -4130,12 +5023,211 @@ on("#server-broadcast-interval", "change", (e) => {
   setDirty(true);
 });
 
+/* --- Box & Caisses --------------------------------------------------- */
+
+on("#crates-reset-defaults-btn", "click", resetCratesDefaults);
+on("#crate-simulate-btn", "click", simulateCratePulls);
+on("#crate-add-reward-form", "submit", addCrateReward);
+on("#crate-reward-type", "change", (e) => {
+  const type = e.target.value;
+  const itemLabelEl = $("#crate-reward-item-label");
+  const countLabelEl = $("#crate-reward-count-label");
+  const amountLabelEl = $("#crate-reward-amount-label");
+  if (itemLabelEl) itemLabelEl.hidden = (type === "money" || type === "shard");
+  if (countLabelEl) countLabelEl.hidden = (type === "money");
+  if (amountLabelEl) amountLabelEl.hidden = (type !== "money");
+});
+on("#crate-name", "input", (e) => {
+  const key = state.ui.selectedCrate;
+  if (state.data.configs.crates?.[key]) {
+    state.data.configs.crates[key].name = e.target.value;
+    renderCratesNavBar();
+    $("#current-crate-title").textContent = e.target.value || key;
+    setDirty(true);
+  }
+});
+on("#crate-key-id", "change", (e) => {
+  const key = state.ui.selectedCrate;
+  if (state.data.configs.crates?.[key]) {
+    state.data.configs.crates[key].key_id = e.target.value;
+    setDirty(true);
+  }
+});
+on("#crate-color", "change", (e) => {
+  const key = state.ui.selectedCrate;
+  if (state.data.configs.crates?.[key]) {
+    state.data.configs.crates[key].color = e.target.value;
+    renderCratesNavBar();
+    renderSelectedCrate();
+    setDirty(true);
+  }
+});
+
+/* --- Kits & Équipements ---------------------------------------------- */
+
+on("#kits-reset-defaults-btn", "click", resetKitsDefaults);
+on("#kit-add-item-form", "submit", addKitItem);
+on("#kit-name", "input", (e) => {
+  const key = state.ui.selectedKit;
+  if (state.data.configs.kits?.[key]) {
+    state.data.configs.kits[key].name = e.target.value;
+    renderKitsNavBar();
+    $("#current-kit-title").textContent = e.target.value || key;
+    setDirty(true);
+  }
+});
+on("#kit-cooldown", "change", (e) => {
+  const key = state.ui.selectedKit;
+  if (state.data.configs.kits?.[key]) {
+    state.data.configs.kits[key].cooldown_hours = Math.max(0, Number(e.target.value) || 0);
+    setDirty(true);
+  }
+});
+on("#kit-permission", "input", (e) => {
+  const key = state.ui.selectedKit;
+  if (state.data.configs.kits?.[key]) {
+    state.data.configs.kits[key].permission = e.target.value.trim();
+    setDirty(true);
+  }
+});
+
+/* --- Quêtes Journalières -------------------------------------------- */
+
+on("#quests-reset-defaults-btn", "click", resetQuestsDefaults);
+on("#quest-add-form", "submit", addQuestFormSubmit);
+
+/* --- Warzone & KOTH ------------------------------------------------- */
+
+on("#warzone-reset-defaults-btn", "click", resetWarzoneDefaults);
+on("#warzone-add-airdrop-btn", "click", addAirdropItem);
+on("#warzone-koth-duration", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  if (!state.data.configs.warzone.koth) state.data.configs.warzone.koth = defaultWarzoneConfig().koth;
+  state.data.configs.warzone.koth.duration_minutes = Math.max(1, Number(e.target.value) || 3);
+  setDirty(true);
+});
+on("#warzone-koth-money", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  if (!state.data.configs.warzone.koth) state.data.configs.warzone.koth = defaultWarzoneConfig().koth;
+  state.data.configs.warzone.koth.reward_money = Math.max(0, Number(e.target.value) || 0);
+  setDirty(true);
+});
+on("#warzone-koth-key", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  if (!state.data.configs.warzone.koth) state.data.configs.warzone.koth = defaultWarzoneConfig().koth;
+  state.data.configs.warzone.koth.reward_key = e.target.value.trim();
+  setDirty(true);
+});
+on("#warzone-koth-schedule", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  if (!state.data.configs.warzone.koth) state.data.configs.warzone.koth = defaultWarzoneConfig().koth;
+  const hours = e.target.value
+    .split(",")
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n >= 0 && n <= 23);
+  state.data.configs.warzone.koth.schedule_hours = hours.length > 0 ? hours : [14, 18, 21];
+  setDirty(true);
+});
+on("#warzone-combattag", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  state.data.configs.warzone.combat_tag_seconds = Math.max(5, Number(e.target.value) || 30);
+  setDirty(true);
+});
+on("#warzone-airdrop-interval", "change", (e) => {
+  if (!state.data.configs.warzone) state.data.configs.warzone = defaultWarzoneConfig();
+  if (!state.data.configs.warzone.airdrop) state.data.configs.warzone.airdrop = defaultWarzoneConfig().airdrop;
+  state.data.configs.warzone.airdrop.interval_minutes = Math.max(15, Number(e.target.value) || 120);
+  setDirty(true);
+});
+on("#warzone-airdrop-minx", "change", (e) => {
+  if (!state.data.configs.warzone?.airdrop) return;
+  state.data.configs.warzone.airdrop.min_x = Number(e.target.value) || -250;
+  setDirty(true);
+});
+on("#warzone-airdrop-maxx", "change", (e) => {
+  if (!state.data.configs.warzone?.airdrop) return;
+  state.data.configs.warzone.airdrop.max_x = Number(e.target.value) || 250;
+  setDirty(true);
+});
+on("#warzone-airdrop-minz", "change", (e) => {
+  if (!state.data.configs.warzone?.airdrop) return;
+  state.data.configs.warzone.airdrop.min_z = Number(e.target.value) || -250;
+  setDirty(true);
+});
+on("#warzone-airdrop-maxz", "change", (e) => {
+  if (!state.data.configs.warzone?.airdrop) return;
+  state.data.configs.warzone.airdrop.max_z = Number(e.target.value) || 250;
+  setDirty(true);
+});
+
+/* --- Audit Économique & Boosts -------------------------------------- */
+
+on("#audit-run-btn", "click", runEconomicAudit);
+on("#boost-event-name", "input", (e) => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  state.data.configs.boosts.activeEventName = e.target.value.trim();
+  setDirty(true);
+});
+on("#boost-jobs-mult", "input", (e) => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  const val = Number(e.target.value) || 1.0;
+  state.data.configs.boosts.jobsXpMultiplier = val;
+  $("#boost-jobs-mult-val").textContent = `x${val.toFixed(2)}`;
+  setDirty(true);
+});
+on("#boost-shop-mult", "input", (e) => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  const val = Number(e.target.value) || 1.0;
+  state.data.configs.boosts.shopSellMultiplier = val;
+  const pct = Math.round((val - 1.0) * 100);
+  $("#boost-shop-mult-val").textContent = `+${pct}% (x${val.toFixed(2)})`;
+  setDirty(true);
+});
+on("#boost-preset-normal", "click", () => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  state.data.configs.boosts.jobsXpMultiplier = 1.0;
+  state.data.configs.boosts.shopSellMultiplier = 1.0;
+  state.data.configs.boosts.activeEventName = "";
+  setDirty(true);
+  renderAuditTab();
+  toast("Boosts désactivés (mode standard).", "info");
+});
+on("#boost-preset-weekend", "click", () => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  state.data.configs.boosts.jobsXpMultiplier = 1.5;
+  state.data.configs.boosts.shopSellMultiplier = 1.2;
+  state.data.configs.boosts.activeEventName = "Weekend Boost : XP x1.5 & Shop +20%";
+  setDirty(true);
+  renderAuditTab();
+  toast("Boost Weekend appliqué (x1.5 XP / +20% Revente) !", "success");
+});
+on("#boost-preset-mega", "click", () => {
+  if (!state.data.configs.boosts) state.data.configs.boosts = defaultBoostsConfig();
+  state.data.configs.boosts.jobsXpMultiplier = 2.0;
+  state.data.configs.boosts.shopSellMultiplier = 1.5;
+  state.data.configs.boosts.activeEventName = "Mega Event : Double XP & Shop +50%";
+  setDirty(true);
+  renderAuditTab();
+  toast("Mega Event appliqué (Double XP / +50% Revente) !", "success");
+});
+
+/* --- Recherche Universelle (Spotlight) -------------------------------- */
+
+on("#quick-search-trigger", "click", openSpotlightSearch);
+on("#spotlight-close-btn", "click", closeSpotlightSearch);
+on("#spotlight-input", "input", debounce((e) => {
+  renderSpotlightResults(e.target.value);
+}, 100));
+
 /* --- Raccourcis ------------------------------------------------------ */
 
 document.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
     event.preventDefault();
     if (state.ready && state.dirty && !state.saving) save();
+  } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    openSpotlightSearch();
   }
 });
 

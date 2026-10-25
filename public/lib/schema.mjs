@@ -468,11 +468,165 @@ export const defaultServerConfig = () => ({
   ],
 });
 
+export const defaultCratesConfig = () => ({
+  commune: {
+    name: "Caisse Commune",
+    key_id: "commune",
+    color: "#6b7280",
+    icon: "minecraft:chest",
+    rewards: [
+      { id: "iron", type: "item", item: "minecraft:iron_ingot", count: 16, weight: 35, name: "16x Fer" },
+      { id: "money_small", type: "money", amount: 2500, weight: 35, name: "2 500 $" },
+      { id: "opal_shard", type: "item", item: "opal:gemme_opale", count: 1, weight: 15, name: "1x Tesson d'Opale" },
+      { id: "key_rare", type: "key", key: "rare", count: 1, weight: 15, name: "1x Clé Rare" },
+    ],
+  },
+  rare: {
+    name: "Caisse Rare",
+    key_id: "rare",
+    color: "#3b82f6",
+    icon: "minecraft:ender_chest",
+    rewards: [
+      { id: "diamond", type: "item", item: "minecraft:diamond", count: 8, weight: 30, name: "8x Diamants" },
+      { id: "money_medium", type: "money", amount: 10000, weight: 30, name: "10 000 $" },
+      { id: "pick_silver", type: "item", item: "opal:pioche_argent_icon", count: 1, weight: 20, name: "Pioche en Argent" },
+      { id: "key_epique", type: "key", key: "epique", count: 1, weight: 20, name: "1x Clé Épique" },
+    ],
+  },
+  epique: {
+    name: "Caisse Épique",
+    key_id: "epique",
+    color: "#a855f7",
+    icon: "minecraft:trapped_chest",
+    rewards: [
+      { id: "netherite", type: "item", item: "minecraft:netherite_ingot", count: 2, weight: 25, name: "2x Netherite" },
+      { id: "money_large", type: "money", amount: 35000, weight: 25, name: "35 000 $" },
+      { id: "pick_opal", type: "item", item: "opal:pioche_opale_icon", count: 1, weight: 25, name: "Pioche en Opale" },
+      { id: "rubis_gems", type: "item", item: "opal:gemme_rubis", count: 4, weight: 25, name: "4x Gemmes de Rubis" },
+    ],
+  },
+  legendaire: {
+    name: "Caisse Légendaire",
+    key_id: "legendaire",
+    color: "#eab308",
+    icon: "minecraft:beacon",
+    rewards: [
+      { id: "money_huge", type: "money", amount: 100000, weight: 30, name: "100 000 $" },
+      { id: "hammer_opal", type: "item", item: "opal:hammer_opale", count: 1, weight: 25, name: "Marteau en Opale" },
+      { id: "celestial_opals", type: "item", item: "opal:gemme_opale", count: 10, weight: 25, name: "10x Opales Célestes" },
+      { id: "stick_force", type: "item", item: "opal:stick_force", count: 1, weight: 20, name: "Bâton de Force III" },
+    ],
+  },
+});
+
+export const defaultKitsConfig = () => ({
+  joueur: {
+    id: "joueur",
+    name: "Kit Joueur",
+    cooldown_hours: 24,
+    permission: "",
+    icon: "minecraft:stone_pickaxe",
+    items: [
+      { item: "minecraft:stone_sword", count: 1, name: "Épée du débutant" },
+      { item: "minecraft:stone_pickaxe", count: 1, name: "Pioche du débutant" },
+      { item: "minecraft:bread", count: 32, name: "Rations de survie" },
+      { item: "minecraft:leather_helmet", count: 1, name: "Casque en cuir" },
+      { item: "minecraft:leather_chestplate", count: 1, name: "Tunique en cuir" },
+    ],
+  },
+  guerrier: {
+    id: "guerrier",
+    name: "Kit Guerrier",
+    cooldown_hours: 48,
+    permission: "opal.kit.guerrier",
+    icon: "minecraft:iron_sword",
+    items: [
+      { item: "minecraft:iron_sword", count: 1, name: "Lame de fer aiguisée" },
+      { item: "minecraft:iron_helmet", count: 1, name: "Heaume de fer" },
+      { item: "minecraft:iron_chestplate", count: 1, name: "Cuirasse de fer" },
+      { item: "minecraft:iron_leggings", count: 1, name: "Jambières de fer" },
+      { item: "minecraft:iron_boots", count: 1, name: "Grèves de fer" },
+      { item: "minecraft:golden_apple", count: 4, name: "Pommes dorées" },
+    ],
+  },
+  vip: {
+    id: "vip",
+    name: "Kit VIP",
+    cooldown_hours: 72,
+    permission: "opal.kit.vip",
+    icon: "minecraft:diamond_sword",
+    items: [
+      { item: "minecraft:diamond_sword", count: 1, name: "Tranchant VIP" },
+      { item: "minecraft:diamond_pickaxe", count: 1, name: "Foreuse VIP" },
+      { item: "minecraft:diamond_helmet", count: 1, name: "Casque VIP" },
+      { item: "minecraft:diamond_chestplate", count: 1, name: "Plastron VIP" },
+      { item: "minecraft:golden_apple", count: 8, name: "Pommes dorées" },
+      { item: "minecraft:cooked_beef", count: 64, name: "Steaks grillés" },
+    ],
+  },
+  opal: {
+    id: "opal",
+    name: "Kit Opal Céleste",
+    cooldown_hours: 168,
+    permission: "opal.kit.opal",
+    icon: "opal:gemme_opale",
+    items: [
+      { item: "opal:epee_opale_icon", count: 1, name: "Épée en Opale" },
+      { item: "opal:pioche_opale_icon", count: 1, name: "Pioche en Opale" },
+      { item: "opal:gemme_opale", count: 3, name: "Opales Célestes" },
+      { item: "minecraft:golden_apple", count: 16, name: "Pommes d'or bénies" },
+    ],
+  },
+});
+
+export const defaultQuestsConfig = () => ({
+  daily: [
+    { id: "mine_coal", name: "Mineur de houille", type: "mine", target: "minecraft:coal_ore", count: 32, reward_money: 1500, reward_xp: 50 },
+    { id: "mine_iron", name: "Extraction de fer", type: "mine", target: "minecraft:iron_ore", count: 24, reward_money: 2000, reward_xp: 75 },
+    { id: "kill_zombies", name: "Purge de monstres", type: "kill", target: "zombie", count: 15, reward_money: 1800, reward_xp: 60 },
+    { id: "harvest_crops", name: "Moisson dorée", type: "harvest", target: "minecraft:wheat", count: 48, reward_money: 1200, reward_xp: 40 },
+  ],
+});
+
+export const defaultWarzoneConfig = () => ({
+  koth: {
+    duration_minutes: 3,
+    reward_money: 50000,
+    reward_key: "legendaire",
+    schedule_hours: [14, 18, 21],
+  },
+  airdrop: {
+    interval_minutes: 120,
+    min_x: -250,
+    max_x: 250,
+    min_z: -250,
+    max_z: 250,
+    items: [
+      { item: "opal:gemme_opale", count: 2, name: "Opales Célestes" },
+      { item: "minecraft:diamond", count: 8, name: "Diamants" },
+      { item: "minecraft:golden_apple", count: 4, name: "Pommes Dorées" },
+      { item: "opal:koth_key", count: 1, name: "Clé de Conquête" },
+    ],
+  },
+  combat_tag_seconds: 30,
+});
+
+export const defaultBoostsConfig = () => ({
+  jobsXpMultiplier: 1.0,
+  shopSellMultiplier: 1.0,
+  activeEventName: "",
+});
+
 export const defaultConfigs = () => ({
   dailyRewards: defaultDailyRewards(),
   jobs: defaultJobsConfig(),
   adminShop: defaultAdminShopConfig(),
   server: defaultServerConfig(),
+  crates: defaultCratesConfig(),
+  kits: defaultKitsConfig(),
+  quests: defaultQuestsConfig(),
+  warzone: defaultWarzoneConfig(),
+  boosts: defaultBoostsConfig(),
 });
 
 export const normalizeConfigs = (raw, { strict = true } = {}) => {
@@ -588,6 +742,35 @@ export const normalizeConfigs = (raw, { strict = true } = {}) => {
       broadcastMessages: Array.isArray(raw.server.broadcastMessages)
         ? raw.server.broadcastMessages.map((m) => String(m).slice(0, 200)).filter(Boolean)
         : out.server.broadcastMessages,
+    };
+  }
+
+  // 5. Crates / Caisses
+  if (raw.crates && typeof raw.crates === "object") {
+    out.crates = { ...out.crates, ...raw.crates };
+  }
+
+  // 6. Kits
+  if (raw.kits && typeof raw.kits === "object") {
+    out.kits = { ...out.kits, ...raw.kits };
+  }
+
+  // 7. Quests
+  if (raw.quests && typeof raw.quests === "object") {
+    out.quests = { ...out.quests, ...raw.quests };
+  }
+
+  // 8. Warzone
+  if (raw.warzone && typeof raw.warzone === "object") {
+    out.warzone = { ...out.warzone, ...raw.warzone };
+  }
+
+  // 9. Boosts / Events temporaires
+  if (raw.boosts && typeof raw.boosts === "object") {
+    out.boosts = {
+      jobsXpMultiplier: Math.max(0.5, Math.min(10, Number(raw.boosts.jobsXpMultiplier) || 1.0)),
+      shopSellMultiplier: Math.max(0.5, Math.min(5, Number(raw.boosts.shopSellMultiplier) || 1.0)),
+      activeEventName: String(raw.boosts.activeEventName || "").trim().slice(0, 60),
     };
   }
 

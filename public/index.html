@@ -39,7 +39,9 @@
     <!-- MENU LATÉRAL (SIDEBAR) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-icon">💎</div>
+        <div class="brand-icon">
+          <img src="/assets/logo_opal.png" alt="Opal Heaven Logo" class="brand-logo-img">
+        </div>
         <div class="brand-text">
           <span class="brand-title">Opal Heaven</span>
           <span class="brand-sub">Studio & Configuration</span>
@@ -50,43 +52,63 @@
       <nav class="sidebar-nav" role="tablist" aria-label="Sections du studio">
         <div class="nav-group-title">Studio & Texturing</div>
         <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="true" data-tab="library" class="nav-item active" tabindex="0">
-          <span class="nav-icon">🎨</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           <span class="nav-label">Catalogue & Textures</span>
         </button>
         <button type="button" role="tab" id="nav-entries" aria-controls="tab-entries" aria-selected="false" data-tab="entries" class="nav-item" tabindex="-1">
-          <span class="nav-icon">📦</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
           <span class="nav-label">Contenus Custom</span>
         </button>
         <button type="button" role="tab" id="nav-recipes" aria-controls="tab-recipes" aria-selected="false" data-tab="recipes" class="nav-item" tabindex="-1">
-          <span class="nav-icon">🔨</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           <span class="nav-label">Crafts & Recettes</span>
         </button>
 
         <div class="nav-group-title">Configuration Serveur</div>
         <button type="button" role="tab" id="nav-config-daily" aria-controls="tab-config-daily" aria-selected="false" data-tab="config-daily" class="nav-item" tabindex="-1">
-          <span class="nav-icon">📅</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
           <span class="nav-label">Calendrier (Daily)</span>
         </button>
         <button type="button" role="tab" id="nav-config-jobs" aria-controls="tab-config-jobs" aria-selected="false" data-tab="config-jobs" class="nav-item" tabindex="-1">
-          <span class="nav-icon">⚒️</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="18" x2="18" y2="6"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M15 9l-6 6"/></svg>
           <span class="nav-label">Métiers & XP</span>
         </button>
         <button type="button" role="tab" id="nav-config-shop" aria-controls="tab-config-shop" aria-selected="false" data-tab="config-shop" class="nav-item" tabindex="-1">
-          <span class="nav-icon">🏪</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span class="nav-label">Admin Shop</span>
         </button>
+        <button type="button" role="tab" id="nav-config-crates" aria-controls="tab-config-crates" aria-selected="false" data-tab="config-crates" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+          <span class="nav-label">Box & Caisses</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-kits" aria-controls="tab-config-kits" aria-selected="false" data-tab="config-kits" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="nav-label">Kits & Équipements</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-quests" aria-controls="tab-config-quests" aria-selected="false" data-tab="config-quests" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span class="nav-label">Quêtes Journalières</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-warzone" aria-controls="tab-config-warzone" aria-selected="false" data-tab="config-warzone" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="nav-label">Warzone & KOTH</span>
+        </button>
+        <button type="button" role="tab" id="nav-tools-audit" aria-controls="tab-tools-audit" aria-selected="false" data-tab="tools-audit" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span class="nav-label">Audit & Boosts</span>
+        </button>
         <button type="button" role="tab" id="nav-config-server" aria-controls="tab-config-server" aria-selected="false" data-tab="config-server" class="nav-item" tabindex="-1">
-          <span class="nav-icon">⚙️</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span class="nav-label">Paramètres Généraux</span>
         </button>
 
         <div class="nav-group-title">Système</div>
         <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" class="nav-item" tabindex="-1">
-          <span class="nav-icon">💾</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
           <span class="nav-label">Données & Versions</span>
         </button>
         <button type="button" role="tab" id="nav-sync-guide" aria-controls="tab-sync-guide" aria-selected="false" data-tab="sync-guide" class="nav-item" tabindex="-1">
-          <span class="nav-icon">🔄</span>
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           <span class="nav-label">Synchronisation</span>
         </button>
       </nav>
@@ -113,8 +135,13 @@
           </div>
         </div>
         <div class="topbar-actions">
+          <button type="button" id="quick-search-trigger" class="quick-search-btn ghost btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Rechercher…</span>
+            <kbd class="kbd-shortcut">Ctrl+K</kbd>
+          </button>
           <span id="status" aria-live="polite">Synchronisé</span>
-          <button id="save" type="button" class="btn-save">💾 Enregistrer</button>
+          <button id="save" type="button" class="btn-save">Enregistrer</button>
         </div>
       </header>
 
@@ -160,7 +187,7 @@
         </label>
         <div id="entry-preview" class="entry-preview" aria-live="polite"></div>
         <div class="row row-tight">
-          <button type="button" id="entry-change-texture" class="ghost btn-sm">🎨 Modifier la texture</button>
+          <button type="button" id="entry-change-texture" class="ghost btn-sm">Modifier la texture</button>
           <span id="entry-texture-status" class="muted text-sm"></span>
         </div>
         <label for="entry-base">Item vanilla de base
@@ -320,11 +347,11 @@
   <section id="tab-config-daily" class="tab" role="tabpanel" aria-labelledby="nav-config-daily" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
-        <h2>📅 Calendrier de Récompenses Quotidiennes (/daily)</h2>
+        <h2>Calendrier de Récompenses Quotidiennes (/daily)</h2>
         <p class="muted">Définissez les récompenses des 30 jours du cycle de connexion. Les séries consécutives récompensent les joueurs chaque jour avec de l'argent, des tokens de métier, des clés de box et des items rares.</p>
       </div>
       <div class="row row-tight">
-        <button type="button" id="daily-auto-money-btn" class="ghost btn-sm">⚡ Progression auto d’argent</button>
+        <button type="button" id="daily-auto-money-btn" class="ghost btn-sm">Progression auto d’argent</button>
         <button type="button" id="daily-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
       </div>
     </div>
@@ -359,9 +386,9 @@
           <label for="daily-key">Clé de Box / Caisse
             <select id="daily-key">
               <option value="">Aucune clé</option>
-              <option value="commune">🔑 Clé Commune</option>
-              <option value="rare">🗝️ Clé Rare</option>
-              <option value="epique">💎 Clé Épique</option>
+              <option value="commune">Clé Commune</option>
+              <option value="rare">Clé Rare</option>
+              <option value="epique">Clé Épique</option>
               <option value="legendaire">⭐ Clé Légendaire</option>
             </select>
           </label>
@@ -404,7 +431,7 @@
   <section id="tab-config-jobs" class="tab" role="tabpanel" aria-labelledby="nav-config-jobs" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
-        <h2>⚒️ Configuration des Métiers & Système d’XP</h2>
+        <h2>Configuration des Métiers & Système d’XP</h2>
         <p class="muted">Ajustez l’expérience accordée par chaque action (minage, agriculture, combat), réglez la courbe d’XP par niveau (1 à 50) et les gains en monnaie et jetons.</p>
       </div>
       <div class="row row-tight">
@@ -413,9 +440,9 @@
     </div>
 
     <div class="jobs-tabs-bar">
-      <button type="button" class="jobs-subtab active" data-job-tab="actions">⚒️ Actions & Gains d’XP</button>
-      <button type="button" class="jobs-subtab" data-job-tab="curve">📈 Courbe & Paliers (1–50)</button>
-      <button type="button" class="jobs-subtab" data-job-tab="rewards">🎁 Récompenses de niveau</button>
+      <button type="button" class="jobs-subtab active" data-job-tab="actions">Actions & Gains d’XP</button>
+      <button type="button" class="jobs-subtab" data-job-tab="curve">Courbe & Paliers (1–50)</button>
+      <button type="button" class="jobs-subtab" data-job-tab="rewards">Récompenses de niveau</button>
     </div>
 
     <!-- Sous-onglet 1 : Actions & Gains d'XP -->
@@ -424,7 +451,7 @@
         <!-- Voie des Abysses -->
         <div class="card job-card-vocation">
           <div class="job-card-header vocation-abysses">
-            <h3>⛏️ Voie des Abysses (Minage)</h3>
+            <h3>Voie des Abysses (Minage)</h3>
             <span class="muted text-sm">Gains d'XP par bloc miné</span>
           </div>
           <div id="jobs-actions-abysses" class="job-actions-table"></div>
@@ -433,7 +460,7 @@
         <!-- Voie de la Terre -->
         <div class="card job-card-vocation">
           <div class="job-card-header vocation-terre">
-            <h3>🌾 Voie de la Terre (Agriculture)</h3>
+            <h3>Voie de la Terre (Agriculture)</h3>
             <span class="muted text-sm">Gains d'XP par récolte et semis</span>
           </div>
           <div id="jobs-actions-terre" class="job-actions-table"></div>
@@ -442,7 +469,7 @@
         <!-- Voie de la Guerre -->
         <div class="card job-card-vocation">
           <div class="job-card-header vocation-guerre">
-            <h3>⚔️ Voie de la Guerre (Combat)</h3>
+            <h3>Voie de la Guerre (Combat)</h3>
             <span class="muted text-sm">Gains d'XP par élimination</span>
           </div>
           <div id="jobs-actions-guerre" class="job-actions-table"></div>
@@ -541,11 +568,11 @@
   <section id="tab-config-shop" class="tab" role="tabpanel" aria-labelledby="nav-config-shop" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
-        <h2>🏪 Configuration de l’Admin Shop (/shop)</h2>
+        <h2>Configuration de l’Admin Shop (/shop)</h2>
         <p class="muted">Configurez les rayons de l'Admin Shop : gérez les catégories, ajoutez ou retirez des articles, ajustez les prix d’achat (illimité pour les joueurs) et de rachat (vente des récoltes/minerais au serveur).</p>
       </div>
       <div class="row row-tight">
-        <button type="button" id="shop-auto-sell-btn" class="ghost btn-sm">⚖️ Règle auto (Vente = 40% de l’achat)</button>
+        <button type="button" id="shop-auto-sell-btn" class="ghost btn-sm">Règle auto (Vente = 40% de l’achat)</button>
         <button type="button" id="shop-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser l’Admin Shop</button>
       </div>
     </div>
@@ -618,7 +645,7 @@
   <section id="tab-config-server" class="tab" role="tabpanel" aria-labelledby="nav-config-server" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
-        <h2>⚙️ Paramètres Généraux du Serveur</h2>
+        <h2>Paramètres Généraux du Serveur</h2>
         <p class="muted">Gérez l’économie de base, la fréquence et les messages des annonces automatiques dans le chat, ainsi que les règles d’antilag.</p>
       </div>
     </div>
@@ -626,7 +653,7 @@
     <div class="server-config-grid">
       <!-- Économie -->
       <div class="card">
-        <h3>💰 Économie & Marché</h3>
+        <h3>Économie & Marché</h3>
         <label for="server-starting-money">Solde de départ des nouveaux joueurs ($)
           <input type="number" id="server-starting-money" min="0" max="1000000" step="50" value="500">
         </label>
@@ -637,7 +664,7 @@
 
       <!-- Optimisation Antilag -->
       <div class="card">
-        <h3>🧹 Anti-Lag & Nettoyage Sol</h3>
+        <h3>Anti-Lag & Nettoyage Sol</h3>
         <label for="server-clearlag-interval">Intervalle de purge des items au sol (secondes)
           <input type="number" id="server-clearlag-interval" min="60" max="3600" step="30" value="300">
         </label>
@@ -646,7 +673,7 @@
 
       <!-- Annonces automatiques -->
       <div class="card server-broadcast-card">
-        <h3>📢 Annonces Automatiques dans le Chat</h3>
+        <h3>Annonces Automatiques dans le Chat</h3>
         <label for="server-broadcast-interval">Intervalle de diffusion (minutes)
           <input type="number" id="server-broadcast-interval" min="1" max="120" step="1" value="10">
         </label>
@@ -665,17 +692,375 @@
     </div>
   </section>
 
+  <!-- TAB : BOX & CAISSES -->
+  <section id="tab-config-crates" class="tab" role="tabpanel" aria-labelledby="nav-config-crates" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Box & Caisses de Récompenses</h2>
+        <p class="muted">Configurez les tables de drop, les clés requises et les probabilités des caisses (/crates).</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="crates-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="crates-layout">
+      <!-- Sélecteur de caisses -->
+      <div class="crates-nav-bar" id="crates-nav-bar"></div>
+
+      <div class="split">
+        <!-- Configuration & Récompenses de la caisse sélectionnée -->
+        <div class="card">
+          <div class="crate-header-edit">
+            <h3 id="current-crate-title">Caisse</h3>
+            <span id="current-crate-badge" class="badge"></span>
+          </div>
+
+          <div class="row">
+            <label for="crate-name">Nom de la caisse
+              <input type="text" id="crate-name">
+            </label>
+            <label for="crate-key-id">Identifiant de clé
+              <input type="text" id="crate-key-id" placeholder="ex: commune">
+            </label>
+            <label for="crate-color">Couleur d'accent
+              <input type="color" id="crate-color" value="#52b89b">
+            </label>
+          </div>
+
+          <h4>Contenu & Tables de Butin</h4>
+          <div id="crate-rewards-table" class="crate-rewards-table"></div>
+
+          <hr class="separator">
+
+          <h4>+ Ajouter une récompense à la caisse</h4>
+          <form id="crate-add-reward-form" class="crate-add-reward-form">
+            <div class="row">
+              <label for="crate-reward-type">Type
+                <select id="crate-reward-type">
+                  <option value="item">Item Minecraft / Opal</option>
+                  <option value="money">Argent ($)</option>
+                  <option value="key">Clé de caisse</option>
+                  <option value="shard">Tessons d'Opale</option>
+                </select>
+              </label>
+              <label for="crate-reward-name">Nom affiché
+                <input type="text" id="crate-reward-name" placeholder="ex: 16x Diamants" required>
+              </label>
+              <label for="crate-reward-item" id="crate-reward-item-label">Item
+                <input type="text" id="crate-reward-item" list="ingredients" placeholder="ex: minecraft:diamond">
+              </label>
+              <label for="crate-reward-count" id="crate-reward-count-label">Quantité
+                <input type="number" id="crate-reward-count" min="1" max="64" value="1">
+              </label>
+              <label for="crate-reward-amount" id="crate-reward-amount-label" hidden>Montant ($)
+                <input type="number" id="crate-reward-amount" min="1" max="10000000" value="5000">
+              </label>
+              <label for="crate-reward-weight">Poids de drop (Weight)
+                <input type="number" id="crate-reward-weight" min="1" max="1000" value="25" required>
+              </label>
+            </div>
+            <button type="submit" class="ghost btn-sm">+ Ajouter la récompense</button>
+          </form>
+        </div>
+
+        <!-- Simulation & Probabilités -->
+        <div class="card">
+          <h3>Simulation & Probabilités</h3>
+          <p class="field-hint">Répartition théorique des gains selon les poids configurés :</p>
+          <div id="crate-prob-breakdown" class="crate-prob-breakdown"></div>
+
+          <hr class="separator">
+
+          <h4>Simulateur de Tirages (Monte Carlo)</h4>
+          <p class="field-hint">Simulez instantanément 100 ouvertures de cette caisse pour tester le taux de sortie réel.</p>
+          <button type="button" id="crate-simulate-btn" class="primary">Tester 100 ouvertures</button>
+
+          <div id="crate-sim-results" class="crate-sim-results" hidden>
+            <h5>Résultats de la simulation (100 tirages) :</h5>
+            <div id="crate-sim-bars" class="crate-sim-bars"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB : KITS & ÉQUIPEMENTS -->
+  <section id="tab-config-kits" class="tab" role="tabpanel" aria-labelledby="nav-config-kits" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Kits & Équipements Joueurs</h2>
+        <p class="muted">Définissez les paquetages d'items, temps d'attente (cooldown) et permissions d'accès (/kit).</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="kits-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="kits-layout">
+      <!-- Barre d'onglets kits -->
+      <div class="kits-nav-bar" id="kits-nav-bar"></div>
+
+      <div class="split">
+        <!-- Configuration du kit -->
+        <div class="card">
+          <div class="kit-header-edit">
+            <h3 id="current-kit-title">Kit</h3>
+          </div>
+          <div class="row">
+            <label for="kit-name">Nom affiché
+              <input type="text" id="kit-name">
+            </label>
+            <label for="kit-cooldown">Cooldown (heures)
+              <input type="number" id="kit-cooldown" min="0" max="720" step="1">
+            </label>
+            <label for="kit-permission">Permission requise
+              <input type="text" id="kit-permission" placeholder="ex: opal.kit.vip (vide = tous)">
+            </label>
+          </div>
+
+          <h4>Items contenus dans le kit</h4>
+          <div id="kit-items-list" class="kit-items-list"></div>
+
+          <hr class="separator">
+
+          <h4>+ Ajouter un item au kit</h4>
+          <form id="kit-add-item-form" class="kit-add-item-form">
+            <div class="row">
+              <label for="kit-new-item-id">Identifiant de l'item
+                <input type="text" id="kit-new-item-id" list="ingredients" required placeholder="ex: opal:epee_opale">
+              </label>
+              <label for="kit-new-item-name">Nom personnalisé (optionnel)
+                <input type="text" id="kit-new-item-name" placeholder="ex: Lame Céleste">
+              </label>
+              <label for="kit-new-item-count">Quantité
+                <input type="number" id="kit-new-item-count" min="1" max="64" value="1">
+              </label>
+            </div>
+            <button type="submit" class="ghost btn-sm">+ Ajouter l'item</button>
+          </form>
+        </div>
+
+        <!-- Aperçu visuel de l'inventaire du kit -->
+        <div class="card">
+          <h3>Aperçu du Paquetage</h3>
+          <p class="field-hint">Aperçu direct de ce que le joueur recevra dans son inventaire :</p>
+          <div id="kit-inventory-preview" class="kit-inventory-preview"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB : QUÊTES JOURNALIÈRES -->
+  <section id="tab-config-quests" class="tab" role="tabpanel" aria-labelledby="nav-config-quests" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Quêtes Journalières</h2>
+        <p class="muted">Gérez les missions quotidiennes attribuées aux joueurs : minage, éliminations et récoltes.</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="quests-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="card">
+        <h3>Missions en rotation quotidienne</h3>
+        <div id="quests-list-table" class="quests-list-table"></div>
+      </div>
+
+      <div class="card">
+        <h3>+ Ajouter une quête journalière</h3>
+        <form id="quest-add-form">
+          <label for="quest-id">Identifiant unique
+            <input type="text" id="quest-id" placeholder="ex: mine_diamond" required>
+          </label>
+          <label for="quest-name">Titre de la quête
+            <input type="text" id="quest-name" placeholder="ex: Chercheur de Diamants" required>
+          </label>
+          <div class="row">
+            <label for="quest-type">Type d'objectif
+              <select id="quest-type">
+                <option value="mine">Minage (blocs)</option>
+                <option value="kill">Élimination (monstres/joueurs)</option>
+                <option value="harvest">Récolte (agriculture)</option>
+                <option value="craft">Fabrication (craft)</option>
+              </select>
+            </label>
+            <label for="quest-target">Cible
+              <input type="text" id="quest-target" list="ingredients" placeholder="ex: minecraft:diamond_ore" required>
+            </label>
+            <label for="quest-count">Quantité requise
+              <input type="number" id="quest-count" min="1" max="1000" value="16" required>
+            </label>
+          </div>
+          <div class="row">
+            <label for="quest-reward-money">Récompense Monnaie ($)
+              <input type="number" id="quest-reward-money" min="0" max="1000000" step="100" value="2500">
+            </label>
+            <label for="quest-reward-xp">Récompense XP Métier
+              <input type="number" id="quest-reward-xp" min="0" max="10000" step="10" value="100">
+            </label>
+          </div>
+          <button type="submit">+ Ajouter la quête</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB : WARZONE, KOTH & AIRDROPS -->
+  <section id="tab-config-warzone" class="tab" role="tabpanel" aria-labelledby="nav-config-warzone" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Warzone, KOTH & Événements PvP</h2>
+        <p class="muted">Réglez la zone de guerre, les captures de points KOTH, les largages Airdrops et le combat-tag.</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="warzone-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="warzone-grid">
+      <!-- KOTH -->
+      <div class="card">
+        <h3>KOTH (King of the Hill)</h3>
+        <p class="field-hint">Paramètres de capture de la colline en Warzone.</p>
+        <div class="row">
+          <label for="warzone-koth-duration">Durée de capture (minutes)
+            <input type="number" id="warzone-koth-duration" min="1" max="30" value="3">
+          </label>
+          <label for="warzone-koth-money">Récompense Monnaie ($)
+            <input type="number" id="warzone-koth-money" min="0" max="10000000" step="1000" value="50000">
+          </label>
+          <label for="warzone-koth-key">Clé offerte au vainqueur
+            <input type="text" id="warzone-koth-key" value="legendaire">
+          </label>
+        </div>
+        <label for="warzone-koth-schedule">Heures de déclenchement (séparées par virgules)
+          <input type="text" id="warzone-koth-schedule" placeholder="ex: 14, 18, 21" value="14, 18, 21">
+        </label>
+      </div>
+
+      <!-- Combat-Tag -->
+      <div class="card">
+        <h3>Protection & Anti-Déconnexion</h3>
+        <label for="warzone-combattag">Durée du Combat-Tag (secondes)
+          <input type="number" id="warzone-combattag" min="5" max="120" value="30">
+        </label>
+        <p class="field-hint">Pendant cette durée après avoir reçu ou infligé un coup, le joueur ne peut pas se téléporter ni quitter sans mourir.</p>
+      </div>
+
+      <!-- Airdrops -->
+      <div class="card warzone-airdrop-card">
+        <h3>Largages Aériens (Airdrops)</h3>
+        <div class="row">
+          <label for="warzone-airdrop-interval">Intervalle d'apparition (minutes)
+            <input type="number" id="warzone-airdrop-interval" min="15" max="720" value="120">
+          </label>
+          <label for="warzone-airdrop-minx">X Min
+            <input type="number" id="warzone-airdrop-minx" value="-250">
+          </label>
+          <label for="warzone-airdrop-maxx">X Max
+            <input type="number" id="warzone-airdrop-maxx" value="250">
+          </label>
+          <label for="warzone-airdrop-minz">Z Min
+            <input type="number" id="warzone-airdrop-minz" value="-250">
+          </label>
+          <label for="warzone-airdrop-maxz">Z Max
+            <input type="number" id="warzone-airdrop-maxz" value="250">
+          </label>
+        </div>
+
+        <h4>Items contenus dans le largage</h4>
+        <div id="warzone-airdrop-items" class="airdrop-items-list"></div>
+
+        <div class="row row-tight">
+          <label for="warzone-new-airdrop-item" style="flex: 2;">Item
+            <input type="text" id="warzone-new-airdrop-item" list="ingredients" placeholder="ex: opal:gemme_opale">
+          </label>
+          <label for="warzone-new-airdrop-count">Quantité
+            <input type="number" id="warzone-new-airdrop-count" min="1" max="64" value="1">
+          </label>
+          <label for="warzone-new-airdrop-name" style="flex: 2;">Nom
+            <input type="text" id="warzone-new-airdrop-name" placeholder="ex: Opale Céleste">
+          </label>
+          <button type="button" id="warzone-add-airdrop-btn" class="ghost btn-sm">+ Ajouter au largage</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB : AUDIT ÉCONOMIQUE & BOOSTS -->
+  <section id="tab-tools-audit" class="tab" role="tabpanel" aria-labelledby="nav-tools-audit" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Audit Économique & Boosts Temporaires</h2>
+        <p class="muted">Détectez automatiquement les failles de monnaie infinie et activez les multiplicateurs du weekend.</p>
+      </div>
+    </div>
+
+    <div class="split">
+      <!-- Section Audit Anti-Duplication -->
+      <div class="card">
+        <h3>Audit Anti-Faille Économique</h3>
+        <p class="field-hint">Ce scanner analyse l'ensemble des recettes de craft et des prix de l'Admin Shop pour détecter :</p>
+        <ul class="audit-rules-list">
+          <li><b>Faille Craft vs Vente :</b> Un joueur achète les ingrédients au shop, fabrique l'objet et le revend plus cher (gain infini sans effort).</li>
+          <li><b>Faille Achat vs Vente directe :</b> Un item dont le prix de rachat serveur est supérieur ou égal au prix d'achat joueur.</li>
+        </ul>
+        <div class="row">
+          <button type="button" id="audit-run-btn" class="primary">Analyser l'économie du serveur</button>
+        </div>
+
+        <div id="audit-results-area" class="audit-results-area">
+          <div class="audit-placeholder muted">Cliquez sur « Analyser l'économie du serveur » pour lancer le diagnostic.</div>
+        </div>
+      </div>
+
+      <!-- Section Boosts & Événements Weekend -->
+      <div class="card">
+        <h3>Boosts & Multiplicateurs Temporaires</h3>
+        <p class="field-hint">Activez des bonus serveur temporaires sans redémarrage (pris en compte dès la synchronisation).</p>
+
+        <label for="boost-event-name">Nom de l'événement en cours
+          <input type="text" id="boost-event-name" placeholder="ex: Weekend Double XP & Soldes">
+        </label>
+
+        <label for="boost-jobs-mult">Multiplicateur XP Métiers
+          <div class="range-with-val">
+            <input type="range" id="boost-jobs-mult" min="1.0" max="3.0" step="0.25" value="1.0">
+            <span id="boost-jobs-mult-val" class="badge">x1.0</span>
+          </div>
+        </label>
+
+        <label for="boost-shop-mult">Bonus de revente au Shop (+%)
+          <div class="range-with-val">
+            <input type="range" id="boost-shop-mult" min="1.0" max="2.0" step="0.1" value="1.0">
+            <span id="boost-shop-mult-val" class="badge">+0% (x1.0)</span>
+          </div>
+        </label>
+
+        <div class="boost-presets-bar">
+          <span class="muted text-sm">Préréglages rapides :</span>
+          <button type="button" id="boost-preset-normal" class="ghost btn-sm">Désactiver (x1.0)</button>
+          <button type="button" id="boost-preset-weekend" class="ghost btn-sm">Weekend (x1.5 XP / +20% Sell)</button>
+          <button type="button" id="boost-preset-mega" class="ghost btn-sm">Mega Event (x2.0 XP / +50% Sell)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- NOUVEAU TAB : GUIDE SYNCHRONISATION -->
   <section id="tab-sync-guide" class="tab" role="tabpanel" aria-labelledby="nav-sync-guide" tabindex="0" hidden>
     <div class="card">
-      <h2>🔄 Guide & Statut de Synchronisation Serveur</h2>
+      <h2>Guide & Statut de Synchronisation Serveur</h2>
       <p class="muted">Comment les modifications apportées sur ce studio sont appliquées sur votre serveur Minecraft Opal Heaven.</p>
 
       <div class="sync-steps-grid">
         <div class="sync-step-box">
           <div class="step-num">1</div>
           <h4>Modifiez sur le studio</h4>
-          <p>Ajustez les récompenses daily, l'Admin Shop, les métiers, créez des items ou changez des textures. Tout est sauvegardé en cliquant sur <b>💾 Enregistrer</b>.</p>
+          <p>Ajustez les récompenses daily, l'Admin Shop, les métiers, créez des items ou changez des textures. Tout est sauvegardé en cliquant sur <b>Enregistrer</b>.</p>
         </div>
 
         <div class="sync-step-box">
@@ -757,6 +1142,19 @@
       <button type="submit" value="confirm" id="confirm-ok">Confirmer</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="search-modal" class="card modal-dialog search-dialog">
+  <div class="search-modal-header">
+    <div class="search-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="spotlight-input" placeholder="Rechercher items, crafts, caisses, kits, shop… (Échap pour fermer)" autocomplete="off">
+    </div>
+    <button type="button" id="spotlight-close-btn" class="ghost close-btn" aria-label="Fermer">✕</button>
+  </div>
+  <div id="spotlight-results" class="spotlight-results">
+    <p class="muted text-sm spotlight-hint">Tapez au moins 2 caractères pour rechercher dans tout le serveur.</p>
+  </div>
 </dialog>
 
 <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false"></div>
