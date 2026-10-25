@@ -312,3 +312,34 @@ test("applique les limites de taille", () => {
   );
   assert.throws(() => validateContent(baseContent({ entries: tooManyEntries })), /trop d'éléments/);
 });
+
+test("valide et normalise les configurations serveur", () => {
+  const result = validateContent(
+    baseContent({
+      configs: {
+        dailyRewards: [
+          { day: 1, money: 750, tokens: 10, key: "commune", items: [{ item: "minecraft:bread", count: 16 }] },
+        ],
+        jobs: {
+          curve: { maxLevel: 60, baseXp: 120 },
+          actions: {
+            abysses: [{ id: "ore_opal", name: "Opale", xp: 100 }],
+          },
+        },
+        adminShop: {
+          categories: {
+            MINERAIS: {
+              name: "Minerais",
+              items: [{ id: "diamond", name: "Diamant", item_id: "minecraft:diamond", buy_price: 150, sell_price: 60 }],
+            },
+          },
+        },
+      },
+    })
+  );
+  assert.ok(result.configs);
+  assert.equal(result.configs.dailyRewards[0].money, 750);
+  assert.equal(result.configs.jobs.curve.maxLevel, 60);
+  assert.equal(result.configs.jobs.actions.abysses[0].xp, 100);
+  assert.equal(result.configs.adminShop.categories.MINERAIS.items[0].buy_price, 150);
+});

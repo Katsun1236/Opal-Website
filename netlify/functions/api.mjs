@@ -122,6 +122,10 @@ const withMeta = (value) => {
       data.customTextures && typeof data.customTextures === "object" && !Array.isArray(data.customTextures)
         ? data.customTextures
         : {},
+    configs:
+      data.configs && typeof data.configs === "object" && !Array.isArray(data.configs)
+        ? data.configs
+        : undefined,
   };
 };
 
@@ -138,10 +142,11 @@ const readContent = async (store) => {
 
 const hasData = (content) =>
   Boolean(
-    content.entries.length ||
-      content.recipes.length ||
-      content.disabledVanillaRecipes.length ||
-      Object.keys(content.customTextures).length
+    content.entries?.length ||
+      content.recipes?.length ||
+      content.disabledVanillaRecipes?.length ||
+      (content.customTextures && Object.keys(content.customTextures).length) ||
+      (content.configs && Object.keys(content.configs).length)
   );
 
 const backup = async (store, content) => {

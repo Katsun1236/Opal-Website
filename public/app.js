@@ -5,7 +5,13 @@ import {
   KINDS,
   LIMITS,
   TIER_RE,
+  defaultAdminShopConfig,
+  defaultConfigs,
+  defaultDailyRewards,
+  defaultJobsConfig,
+  defaultServerConfig,
   isAllowedTextureValue,
+  normalizeConfigs,
   normalizeTextures,
   validateContent,
 } from "./lib/schema.mjs";
@@ -112,6 +118,7 @@ const state = {
     recipes: [],
     disabledVanillaRecipes: [],
     customTextures: {},
+    configs: defaultConfigs(),
     revision: 0,
   },
   revision: 0,
@@ -314,6 +321,11 @@ const refreshStatus = () => {
   save.disabled = !state.ready || !state.dirty || state.saving || state.loading;
   save.setAttribute("aria-busy", String(state.saving));
   document.title = (state.dirty ? "• " : "") + "Opal Heaven — Studio de contenu";
+
+  const revEl = $("#sidebar-revision-label");
+  if (revEl) revEl.textContent = "Rev " + (state.revision || 0);
+  const syncRevEl = $("#sync-active-revision");
+  if (syncRevEl) syncRevEl.textContent = "Rev " + (state.revision || 0);
 };
 
 const setDirty = (value) => {
@@ -374,6 +386,7 @@ const coreData = (data) =>
     recipes: data?.recipes ?? [],
     disabled: data?.disabledVanillaRecipes ?? [],
     textures: data?.customTextures ?? {},
+    configs: data?.configs ?? {},
   });
 
 const hideDraftBanner = () => {
@@ -484,19 +497,42 @@ const discardDraft = () => {
 };
 
 /* =====================================================================
-   ONGLETS
+   ONGLETS & NAVIGATION
 ===================================================================== */
+
+const TAB_TITLES = {
+  library: { title: "Catalogue & Textures", sub: "Consultez et modifiez les textures vanilla et personnalisées" },
+  entries: { title: "Contenus Custom", sub: "Création et gestion des items, blocs, armes, armures et outils" },
+  recipes: { title: "Crafts & Recettes", sub: "Création de crafts custom ou modification/écrasement de recettes vanilla" },
+  "config-daily": { title: "Calendrier (Daily Rewards)", sub: "Récompenses quotidiennes sur 30 jours consécutifs (/daily)" },
+  "config-jobs": { title: "Métiers & Jobs", sub: "Paramétrage des gains d’XP, courbe de niveaux et récompenses de palier" },
+  "config-shop": { title: "Admin Shop", sub: "Gestion des rayons, prix d’achat et de rachat des articles (/shop)" },
+  "config-server": { title: "Paramètres Généraux", sub: "Économie de départ, annonces dans le chat, règles d’anti-lag" },
+  data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
+  "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
+};
 
 const renderActiveTab = () => {
   if (!state.ready) return;
   if (state.ui.tab === "library") renderLibrary();
   else if (state.ui.tab === "entries") renderEntries();
   else if (state.ui.tab === "recipes") renderRecipes();
+  else if (state.ui.tab === "config-daily") renderDailyTab();
+  else if (state.ui.tab === "config-jobs") renderJobsTab();
+  else if (state.ui.tab === "config-shop") renderShopTab();
+  else if (state.ui.tab === "config-server") renderServerConfigTab();
+  else if (state.ui.tab === "sync-guide") renderSyncGuideTab();
 };
 
 const openTab = (name) => {
   state.ui.tab = name;
-  document.querySelectorAll("nav [role=tab]").forEach((button) => {
+  const meta = TAB_TITLES[name] || { title: "Opal Heaven Studio", sub: "" };
+  const titleEl = $("#current-section-title");
+  const subEl = $("#current-section-sub");
+  if (titleEl) titleEl.textContent = meta.title;
+  if (subEl) subEl.textContent = meta.sub;
+
+  document.querySelectorAll('.sidebar-nav [role="tab"], nav [role="tab"]').forEach((button) => {
     const active = button.dataset.tab === name;
     button.classList.toggle("active", active);
     button.setAttribute("aria-selected", String(active));
@@ -505,6 +541,13 @@ const openTab = (name) => {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.hidden = tab.id !== "tab-" + name;
   });
+
+  // Fermeture automatique du menu mobile si ouvert
+  const sidebar = $("#sidebar");
+  const backdrop = $("#sidebar-backdrop");
+  if (sidebar) sidebar.classList.remove("open");
+  if (backdrop) backdrop.classList.remove("active");
+
   renderActiveTab();
   if (name === "data" && state.ready) loadHistory().catch(() => {});
 };
@@ -525,6 +568,7 @@ const pickContent = (data) => ({
     data?.customTextures && typeof data.customTextures === "object" && !Array.isArray(data.customTextures)
       ? data.customTextures
       : {},
+  configs: normalizeConfigs(data?.configs),
   revision: Number(data?.revision) || 0,
 });
 
@@ -2850,6 +2894,910 @@ const logout = async () => {
 };
 
 /* =====================================================================
+   UTILITAIRES TEXTE & MINECRAFT
+===================================================================== */
+
+const parseMcColors = (text) => {
+  if (!text) return "";
+  const colorMap = {
+    "0": "#000000", "1": "#0000aa", "2": "#00aa00", "3": "#00aaaa",
+    "4": "#aa0000", "5": "#aa00aa", "6": "#ffaa00", "7": "#aaaaaa",
+    "8": "#555555", "9": "#5555ff", "a": "#55ff55", "b": "#55ffff",
+    "c": "#ff5555", "d": "#ff55ff", "e": "#ffff55", "f": "#ffffff",
+  };
+  const parts = String(text).split("§");
+  let html = "";
+  let currentColor = "#ffffff";
+  let isBold = false;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (i === 0) {
+      if (part) html += h("span", {}, part).outerHTML;
+      continue;
+    }
+    const code = part.charAt(0).toLowerCase();
+    const str = part.slice(1);
+    if (colorMap[code]) {
+      currentColor = colorMap[code];
+    } else if (code === "l") {
+      isBold = true;
+    } else if (code === "r") {
+      currentColor = "#ffffff";
+      isBold = false;
+    }
+    if (str) {
+      const style = `color: ${currentColor}; font-weight: ${isBold ? "bold" : "normal"};`;
+      html += `<span style="${style}">${h("span", {}, str).textContent}</span>`;
+    }
+  }
+  return html || text;
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : CALENDRIER (DAILY REWARDS)
+===================================================================== */
+
+const renderDailyTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!Array.isArray(state.data.configs.dailyRewards) || state.data.configs.dailyRewards.length === 0) {
+    state.data.configs.dailyRewards = defaultDailyRewards();
+  }
+  renderDailyGrid();
+  loadDailyDay(state.ui.selectedDailyDay || 1);
+};
+
+const renderDailyGrid = () => {
+  const container = $("#daily-grid");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const days = state.data.configs.dailyRewards;
+  let totalMoney = 0;
+  let totalTokens = 0;
+
+  for (const d of days) {
+    totalMoney += Number(d.money) || 0;
+    totalTokens += Number(d.tokens) || 0;
+
+    const isSelected = d.day === (state.ui.selectedDailyDay || 1);
+    const isMilestone = [7, 14, 21, 30].includes(d.day);
+    const card = h("div", {
+      class: "daily-day-card" + (isSelected ? " active" : "") + (isMilestone ? " milestone" : ""),
+      onclick: () => loadDailyDay(d.day),
+    });
+
+    const badgeNum = h("span", { class: "day-badge-num" }, "J" + d.day);
+    card.append(badgeNum);
+
+    let thumbItem = d.items?.[0]?.item || (d.key ? "minecraft:tripwire_hook" : (d.shard ? "opal:gemme_opale" : "minecraft:gold_ingot"));
+    const img = h("img", {
+      class: "day-thumb",
+      src: iconUrl(thumbItem),
+      alt: "Jour " + d.day,
+      loading: "lazy",
+    });
+    img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+    card.append(img);
+
+    card.append(h("span", { class: "day-money-label" }, (Number(d.money) || 0).toLocaleString("fr-FR") + " $"));
+
+    if (d.key) {
+      const keyClass = "key-" + d.key.toLowerCase();
+      card.append(h("span", { class: "day-key-pill " + keyClass }, d.key));
+    } else if (d.tokens > 0) {
+      card.append(h("span", { class: "badge badge-custom", style: "padding: 1px 4px; font-size: 9px;" }, "+" + d.tokens + " T"));
+    }
+
+    container.append(card);
+  }
+
+  const summary = $("#daily-total-summary");
+  if (summary) {
+    summary.textContent = `Total : ${totalMoney.toLocaleString("fr-FR")} $ • ${totalTokens.toLocaleString("fr-FR")} tokens`;
+  }
+};
+
+const loadDailyDay = (dayNum) => {
+  state.ui.selectedDailyDay = dayNum;
+  document.querySelectorAll(".daily-day-card").forEach((card, idx) => {
+    card.classList.toggle("active", idx + 1 === dayNum);
+  });
+
+  const days = state.data.configs.dailyRewards;
+  let dayData = days.find((d) => d.day === dayNum);
+  if (!dayData) {
+    dayData = { day: dayNum, money: 1000, tokens: 0, key: "", shard: 0, items: [] };
+    days.push(dayData);
+    days.sort((a, b) => a.day - b.day);
+  }
+
+  const title = $("#daily-editor-title");
+  if (title) title.textContent = "Édition du Jour " + dayNum;
+
+  const badge = $("#daily-editor-badge");
+  if (badge) {
+    if ([7, 14, 21, 30].includes(dayNum)) {
+      badge.textContent = "Palier Hebdo / Clé";
+      badge.className = "badge badge-override";
+    } else {
+      badge.textContent = "Jour normal";
+      badge.className = "badge badge-custom";
+    }
+  }
+
+  $("#daily-money").value = dayData.money || 0;
+  $("#daily-tokens").value = dayData.tokens || 0;
+  $("#daily-key").value = dayData.key || "";
+  $("#daily-shard").value = dayData.shard || 0;
+
+  renderDailyItemsList(dayData);
+  const statusEl = $("#daily-status");
+  if (statusEl) statusEl.textContent = "";
+};
+
+const renderDailyItemsList = (dayData) => {
+  const container = $("#daily-items-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!dayData.items || dayData.items.length === 0) {
+    container.append(h("p", { class: "muted text-sm", style: "margin: 6px 0;" }, "Aucun item offert pour ce jour."));
+    return;
+  }
+
+  dayData.items.forEach((it, idx) => {
+    const row = h("div", { class: "daily-item-row" });
+    const img = h("img", {
+      class: "daily-item-thumb",
+      src: iconUrl(it.item),
+      alt: it.name || it.item,
+    });
+    img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+
+    const info = h("div", { class: "daily-item-info" },
+      h("b", {}, (it.count || 1) + "x "),
+      document.createTextNode(it.name || it.item),
+      h("span", { class: "muted text-sm", style: "margin-left: 6px;" }, "(" + it.item + ")")
+    );
+
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        dayData.items.splice(idx, 1);
+        setDirty(true);
+        renderDailyItemsList(dayData);
+        renderDailyGrid();
+      },
+    }, "✕");
+
+    row.append(img, info, delBtn);
+    container.append(row);
+  });
+};
+
+const saveDailyDayForm = (event) => {
+  if (event) event.preventDefault();
+  const dayNum = state.ui.selectedDailyDay || 1;
+  const days = state.data.configs.dailyRewards;
+  let dayData = days.find((d) => d.day === dayNum);
+  if (!dayData) {
+    dayData = { day: dayNum, items: [] };
+    days.push(dayData);
+  }
+
+  dayData.money = Math.max(0, Number($("#daily-money").value) || 0);
+  dayData.tokens = Math.max(0, Number($("#daily-tokens").value) || 0);
+  dayData.key = String($("#daily-key").value).trim().toLowerCase();
+  dayData.shard = Math.max(0, Number($("#daily-shard").value) || 0);
+
+  setDirty(true);
+  renderDailyGrid();
+  const statusEl = $("#daily-status");
+  if (statusEl) {
+    statusEl.textContent = "✔ Récompenses du Jour " + dayNum + " enregistrées dans le projet.";
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 2500);
+  }
+  toast("Jour " + dayNum + " mis à jour.", "success");
+};
+
+const addDailyItem = () => {
+  const dayNum = state.ui.selectedDailyDay || 1;
+  const days = state.data.configs.dailyRewards;
+  const dayData = days.find((d) => d.day === dayNum);
+  if (!dayData) return;
+
+  const rawItem = $("#daily-new-item-id").value.trim().toLowerCase();
+  if (!rawItem) {
+    toast("Sélectionnez d'abord un identifiant d'item (ex: minecraft:bread).", "error");
+    $("#daily-new-item-id").focus();
+    return;
+  }
+
+  const itemId = rawItem.includes(":") ? rawItem : "minecraft:" + rawItem;
+  const count = Math.max(1, Math.min(64, Number($("#daily-new-item-count").value) || 1));
+  const name = $("#daily-new-item-name").value.trim() || itemLabel(itemId);
+
+  if (!dayData.items) dayData.items = [];
+  dayData.items.push({ item: itemId, count, name });
+
+  $("#daily-new-item-id").value = "";
+  $("#daily-new-item-count").value = "1";
+  $("#daily-new-item-name").value = "";
+
+  setDirty(true);
+  renderDailyItemsList(dayData);
+  renderDailyGrid();
+  toast("Item ajouté au Jour " + dayNum + ".", "info");
+};
+
+const copyDailyNext = () => {
+  const currentDay = state.ui.selectedDailyDay || 1;
+  if (currentDay >= 30) {
+    toast("Le jour 30 est le dernier jour du cycle.", "error");
+    return;
+  }
+  const nextDay = currentDay + 1;
+  const days = state.data.configs.dailyRewards;
+  const currData = days.find((d) => d.day === currentDay);
+  if (!currData) return;
+
+  let nextData = days.find((d) => d.day === nextDay);
+  if (!nextData) {
+    nextData = { day: nextDay, items: [] };
+    days.push(nextData);
+    days.sort((a, b) => a.day - b.day);
+  }
+
+  nextData.money = Math.round(currData.money * 1.1);
+  nextData.tokens = currData.tokens;
+  nextData.key = currData.key;
+  nextData.shard = currData.shard;
+  nextData.items = currData.items ? JSON.parse(JSON.stringify(currData.items)) : [];
+
+  setDirty(true);
+  renderDailyGrid();
+  loadDailyDay(nextDay);
+  toast(`Données copiées vers le Jour ${nextDay} (avec +10% monnaie).`, "success");
+};
+
+const autoDailyMoney = async () => {
+  const ok = await confirmDialog({
+    title: "Progression automatique d'argent",
+    message: "Voulez-vous générer une progression d'argent fluide (de 500 $ au Jour 1 jusqu'à 25 000 $ au Jour 30) sur les 30 jours ?",
+    confirmLabel: "Appliquer la progression",
+  });
+  if (!ok) return;
+
+  const days = state.data.configs.dailyRewards;
+  for (const d of days) {
+    d.money = Math.round(500 + Math.pow(d.day / 30, 1.4) * 24500);
+  }
+
+  setDirty(true);
+  renderDailyGrid();
+  loadDailyDay(state.ui.selectedDailyDay || 1);
+  toast("Progression d'argent générée sur 30 jours.", "success");
+};
+
+const resetDailyDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser le calendrier",
+    message: "Voulez-vous restaurer les 30 jours du calendrier aux valeurs officielles d'Opal Heaven ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.dailyRewards = defaultDailyRewards();
+  setDirty(true);
+  renderDailyGrid();
+  loadDailyDay(1);
+  toast("Calendrier réinitialisé aux valeurs par défaut.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : MÉTIERS & JOBS
+===================================================================== */
+
+const renderJobsTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.jobs) state.data.configs.jobs = defaultJobsConfig();
+
+  renderJobsActions();
+  renderJobsCurve();
+  renderJobsRewards();
+};
+
+const renderJobsActions = () => {
+  const jobs = state.data.configs.jobs;
+  const vocations = [
+    { key: "abysses", label: "Minage", container: "#jobs-actions-abysses" },
+    { key: "terre", label: "Agriculture", container: "#jobs-actions-terre" },
+    { key: "guerre", label: "Combat", container: "#jobs-actions-guerre" },
+  ];
+
+  for (const voc of vocations) {
+    const el = $(voc.container);
+    if (!el) continue;
+    el.innerHTML = "";
+    const list = jobs.actions?.[voc.key] || [];
+
+    for (const act of list) {
+      const row = h("div", { class: "job-action-row" });
+      const img = h("img", {
+        class: "job-action-icon",
+        src: iconUrl(act.icon || act.id),
+        alt: act.name,
+      });
+      img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+
+      const nameBox = h("div", { class: "job-action-name" },
+        h("div", { style: "font-weight: 500;" }, act.name),
+        h("span", { class: "muted text-sm" }, act.id)
+      );
+
+      const xpInput = h("input", {
+        type: "number",
+        class: "job-action-xp-input",
+        min: "1",
+        max: "10000",
+        value: act.xp,
+        onchange: (e) => {
+          act.xp = Math.max(1, Number(e.target.value) || 1);
+          setDirty(true);
+        },
+      });
+
+      const xpLabel = h("span", { class: "muted text-sm" }, "XP");
+
+      const delBtn = h("button", {
+        type: "button",
+        class: "danger ghost btn-sm",
+        style: "padding: 2px 6px;",
+        title: "Supprimer cette action",
+        onclick: () => {
+          const idx = list.indexOf(act);
+          if (idx >= 0) {
+            list.splice(idx, 1);
+            setDirty(true);
+            renderJobsActions();
+          }
+        },
+      }, "✕");
+
+      row.append(img, nameBox, xpInput, xpLabel, delBtn);
+      el.append(row);
+    }
+  }
+};
+
+const addJobCustomAction = () => {
+  const voc = $("#job-new-vocation").value;
+  const rawId = $("#job-new-action-id").value.trim().toLowerCase();
+  const name = $("#job-new-action-name").value.trim() || rawId;
+  const xp = Math.max(1, Number($("#job-new-action-xp").value) || 10);
+  const icon = $("#job-new-action-icon").value.trim();
+
+  if (!rawId) {
+    toast("Renseignez un identifiant pour l'action.", "error");
+    $("#job-new-action-id").focus();
+    return;
+  }
+
+  const jobs = state.data.configs.jobs;
+  if (!jobs.actions[voc]) jobs.actions[voc] = [];
+  jobs.actions[voc].push({ id: rawId, name, xp, icon: icon || rawId });
+
+  $("#job-new-action-id").value = "";
+  $("#job-new-action-name").value = "";
+  $("#job-new-action-xp").value = "15";
+  $("#job-new-action-icon").value = "";
+
+  setDirty(true);
+  renderJobsActions();
+  toast("Action ajoutée à la " + voc + ".", "success");
+};
+
+const renderJobsCurve = () => {
+  const curve = state.data.configs.jobs?.curve || defaultJobsConfig().curve;
+  $("#job-curve-base").value = curve.baseXp || 100;
+  $("#job-curve-exp").value = curve.exponent || 1.75;
+  $("#job-curve-mult").value = curve.multiplier || 55;
+  $("#job-curve-max").value = curve.maxLevel || 50;
+  $("#job-curve-bonus-main").value = curve.mainVocationBonusPercent || 25;
+  $("#job-curve-bonus-prestige").value = curve.prestigeBonusPercent || 5;
+
+  renderJobsCurveSimulation();
+};
+
+const applyJobsCurve = () => {
+  const jobs = state.data.configs.jobs;
+  if (!jobs.curve) jobs.curve = {};
+  jobs.curve.baseXp = Math.max(10, Number($("#job-curve-base").value) || 100);
+  jobs.curve.exponent = Math.max(1.0, Number($("#job-curve-exp").value) || 1.75);
+  jobs.curve.multiplier = Math.max(1, Number($("#job-curve-mult").value) || 55);
+  jobs.curve.maxLevel = Math.max(10, Math.min(100, Number($("#job-curve-max").value) || 50));
+  jobs.curve.mainVocationBonusPercent = Math.max(0, Number($("#job-curve-bonus-main").value) || 25);
+  jobs.curve.prestigeBonusPercent = Math.max(0, Number($("#job-curve-bonus-prestige").value) || 5);
+
+  setDirty(true);
+  renderJobsCurveSimulation();
+  toast("Formule d'XP recalculée.", "success");
+};
+
+const renderJobsCurveSimulation = () => {
+  const wrap = $("#jobs-curve-simulation");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+
+  const curve = state.data.configs.jobs?.curve || defaultJobsConfig().curve;
+  const rewards = state.data.configs.jobs?.levelRewards || defaultJobsConfig().levelRewards;
+  const maxLvl = Math.min(100, Math.max(10, curve.maxLevel || 50));
+
+  const table = h("table", { class: "jobs-sim-table" });
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Niveau</th>
+        <th>XP Requis</th>
+        <th>XP Cumulé</th>
+        <th>Gain $</th>
+        <th>Gain Jetons</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+  const tbody = table.querySelector("tbody");
+
+  let totalXp = 0;
+  for (let lvl = 1; lvl <= maxLvl; lvl++) {
+    const req = lvl < maxLvl ? Math.round(curve.baseXp + Math.pow(lvl, curve.exponent) * curve.multiplier) : 0;
+    totalXp += req;
+    const cash = lvl * (rewards.moneyMultiplier || 250);
+    const tokens = lvl * (rewards.tokensMultiplier || 5);
+
+    const tr = h("tr", {});
+    tr.innerHTML = `
+      <td><b>Nv. ${lvl}</b></td>
+      <td>${req > 0 ? req.toLocaleString("fr-FR") + " XP" : "<i>MAX</i>"}</td>
+      <td class="muted">${totalXp.toLocaleString("fr-FR")} XP</td>
+      <td style="color: var(--success);">+${cash.toLocaleString("fr-FR")} $</td>
+      <td style="color: var(--accent);">+${tokens}</td>
+    `;
+    tbody.append(tr);
+  }
+  wrap.append(table);
+};
+
+const renderJobsRewards = () => {
+  const rewards = state.data.configs.jobs?.levelRewards || defaultJobsConfig().levelRewards;
+  $("#job-reward-money").value = rewards.moneyMultiplier || 250;
+  $("#job-reward-tokens").value = rewards.tokensMultiplier || 5;
+  $("#job-reward-talent").value = rewards.talentPointsPerLevel || 1;
+};
+
+const applyJobsRewards = () => {
+  const jobs = state.data.configs.jobs;
+  if (!jobs.levelRewards) jobs.levelRewards = {};
+  jobs.levelRewards.moneyMultiplier = Math.max(0, Number($("#job-reward-money").value) || 250);
+  jobs.levelRewards.tokensMultiplier = Math.max(0, Number($("#job-reward-tokens").value) || 5);
+  jobs.levelRewards.talentPointsPerLevel = Math.max(0, Number($("#job-reward-talent").value) || 1);
+
+  setDirty(true);
+  renderJobsCurveSimulation();
+  toast("Récompenses de montée de niveau enregistrées.", "success");
+};
+
+const resetJobsDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser les Métiers",
+    message: "Restaurer l'ensemble des configurations de métiers (actions, courbe et récompenses) par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.jobs = defaultJobsConfig();
+  setDirty(true);
+  renderJobsActions();
+  renderJobsCurve();
+  renderJobsRewards();
+  toast("Métiers réinitialisés par défaut.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : ADMIN SHOP (/shop)
+===================================================================== */
+
+const renderShopTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.adminShop) state.data.configs.adminShop = defaultAdminShopConfig();
+
+  renderShopCategoriesBar();
+  renderShopItems();
+};
+
+const renderShopCategoriesBar = () => {
+  const bar = $("#shop-categories-bar");
+  if (!bar) return;
+  bar.innerHTML = "";
+
+  const cats = state.data.configs.adminShop.categories || {};
+  const catKeys = Object.keys(cats);
+  if (!cats[state.ui.selectedShopCategory] && catKeys.length > 0) {
+    state.ui.selectedShopCategory = catKeys[0];
+  }
+
+  for (const [key, data] of Object.entries(cats)) {
+    const isCurrent = key === state.ui.selectedShopCategory;
+    const pill = h("button", {
+      type: "button",
+      class: "cat-pill" + (isCurrent ? " active" : ""),
+      onclick: () => {
+        state.ui.selectedShopCategory = key;
+        cancelShopEdit();
+        renderShopCategoriesBar();
+        renderShopItems();
+      },
+    });
+
+    const iconImg = h("img", {
+      class: "job-action-icon",
+      src: iconUrl(data.icon || "minecraft:chest"),
+      alt: data.name,
+      style: "width: 18px; height: 18px;",
+    });
+    iconImg.onerror = () => { iconImg.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+
+    pill.append(iconImg, document.createTextNode(data.name || key));
+    bar.append(pill);
+  }
+};
+
+const renderShopItems = () => {
+  const container = $("#shop-items-table");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const catKey = state.ui.selectedShopCategory;
+  const catData = state.data.configs.adminShop.categories?.[catKey];
+  const title = $("#shop-active-cat-title");
+  if (title) title.textContent = "Articles : " + (catData?.name || catKey);
+
+  if (!catData || !Array.isArray(catData.items) || catData.items.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucun article dans cette catégorie pour l’instant."));
+    const countEl = $("#shop-items-count");
+    if (countEl) countEl.textContent = "0 article";
+    return;
+  }
+
+  const filter = ($("#shop-filter")?.value || "").toLowerCase().trim();
+  const filtered = catData.items.filter((it) =>
+    !filter || it.name.toLowerCase().includes(filter) || it.item_id.toLowerCase().includes(filter)
+  );
+
+  const countEl = $("#shop-items-count");
+  if (countEl) countEl.textContent = `${filtered.length} article(s) sur ${catData.items.length}`;
+
+  for (const it of filtered) {
+    const row = h("div", { class: "shop-item-row" });
+
+    const img = h("img", {
+      class: "shop-item-thumb",
+      src: iconUrl(it.item_id),
+      alt: it.name,
+      loading: "lazy",
+    });
+    img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+
+    const details = h("div", { class: "shop-item-details" },
+      h("div", { class: "shop-item-title" }, it.name),
+      h("div", { class: "shop-item-sub" }, it.item_id)
+    );
+
+    const prices = h("div", { class: "shop-item-prices" },
+      h("div", { class: "price-box" },
+        h("span", { class: "price-label" }, "Achat"),
+        h("span", { class: "price-val price-buy" }, it.buy_enabled !== false ? (it.buy_price + " $") : "Désactivé")
+      ),
+      h("div", { class: "price-box" },
+        h("span", { class: "price-label" }, "Vente"),
+        h("span", { class: "price-val price-sell" }, it.sell_enabled !== false ? (it.sell_price + " $") : "Désactivé")
+      )
+    );
+
+    const actions = h("div", { class: "shop-item-actions" },
+      h("button", {
+        type: "button",
+        class: "ghost btn-sm",
+        onclick: () => editShopItem(it),
+      }, "✏️ Modifier"),
+      h("button", {
+        type: "button",
+        class: "danger ghost btn-sm",
+        onclick: () => deleteShopItem(it),
+      }, "✕")
+    );
+
+    row.append(img, details, prices, actions);
+    container.append(row);
+  }
+};
+
+const editShopItem = (item) => {
+  state.ui.editingShopItem = item;
+  $("#shop-item-id").value = item.item_id;
+  $("#shop-item-name").value = item.name;
+  $("#shop-item-buy").value = item.buy_price;
+  $("#shop-item-sell").value = item.sell_price;
+  $("#shop-item-buy-enabled").checked = item.buy_enabled !== false;
+  $("#shop-item-sell-enabled").checked = item.sell_enabled !== false;
+
+  updateShopItemPreview();
+  $("#shop-editor-title").textContent = "✏️ Modifier : " + item.name;
+  $("#shop-submit-btn").textContent = "Enregistrer la modification";
+  $("#shop-cancel-edit-btn").hidden = false;
+  $("#shop-item-name").focus();
+};
+
+const cancelShopEdit = () => {
+  state.ui.editingShopItem = null;
+  $("#shop-item-id").value = "";
+  $("#shop-item-name").value = "";
+  $("#shop-item-buy").value = "10";
+  $("#shop-item-sell").value = "4";
+  $("#shop-item-buy-enabled").checked = true;
+  $("#shop-item-sell-enabled").checked = true;
+  $("#shop-editor-title").textContent = "+ Ajouter un article dans cette catégorie";
+  $("#shop-submit-btn").textContent = "Ajouter au shop";
+  $("#shop-cancel-edit-btn").hidden = true;
+  updateShopItemPreview();
+};
+
+const deleteShopItem = async (item) => {
+  const catKey = state.ui.selectedShopCategory;
+  const catData = state.data.configs.adminShop.categories?.[catKey];
+  if (!catData) return;
+
+  const ok = await confirmDialog({
+    title: "Supprimer l'article",
+    message: `Retirer "${item.name}" (${item.item_id}) de l'Admin Shop ?`,
+    confirmLabel: "Supprimer",
+    danger: true,
+  });
+  if (!ok) return;
+
+  const idx = catData.items.indexOf(item);
+  if (idx >= 0) {
+    catData.items.splice(idx, 1);
+    if (state.ui.editingShopItem === item) cancelShopEdit();
+    setDirty(true);
+    renderShopItems();
+    toast(`"${item.name}" retiré de l'Admin Shop.`, "info");
+  }
+};
+
+const saveShopItem = (event) => {
+  if (event) event.preventDefault();
+  const catKey = state.ui.selectedShopCategory;
+  const catData = state.data.configs.adminShop.categories?.[catKey];
+  if (!catData) return;
+
+  const rawItem = $("#shop-item-id").value.trim().toLowerCase();
+  if (!rawItem) {
+    toast("Identifiant d'item requis.", "error");
+    $("#shop-item-id").focus();
+    return;
+  }
+  const itemId = rawItem.includes(":") ? rawItem : "minecraft:" + rawItem;
+  const name = $("#shop-item-name").value.trim() || itemLabel(itemId);
+  const buy = Math.max(0, Number($("#shop-item-buy").value) || 0);
+  const sell = Math.max(0, Number($("#shop-item-sell").value) || 0);
+  const buyEnabled = $("#shop-item-buy-enabled").checked;
+  const sellEnabled = $("#shop-item-sell-enabled").checked;
+
+  if (state.ui.editingShopItem) {
+    const item = state.ui.editingShopItem;
+    item.item_id = itemId;
+    item.name = name;
+    item.buy_price = buy;
+    item.sell_price = sell;
+    item.buy_enabled = buyEnabled;
+    item.sell_enabled = sellEnabled;
+    toast(`"${name}" modifié dans l'Admin Shop.`, "success");
+  } else {
+    const cleanId = itemId.split(":").pop();
+    if (!catData.items) catData.items = [];
+    catData.items.push({
+      id: cleanId,
+      name,
+      item_id: itemId,
+      buy_price: buy,
+      sell_price: sell,
+      buy_enabled: buyEnabled,
+      sell_enabled: sellEnabled,
+    });
+    toast(`"${name}" ajouté au rayon ${catData.name}.`, "success");
+  }
+
+  cancelShopEdit();
+  setDirty(true);
+  renderShopItems();
+};
+
+const updateShopItemPreview = () => {
+  const preview = $("#shop-item-preview");
+  if (!preview) return;
+  const raw = $("#shop-item-id").value.trim();
+  if (!raw) {
+    preview.innerHTML = "";
+    return;
+  }
+  const itemId = raw.includes(":") ? raw : "minecraft:" + raw;
+  const img = h("img", {
+    class: "shop-item-thumb",
+    src: iconUrl(itemId),
+    alt: itemId,
+  });
+  img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+  preview.innerHTML = "";
+  preview.append(img, h("span", { class: "muted text-sm" }, itemLabel(itemId)));
+};
+
+const createShopCategory = () => {
+  const key = $("#shop-new-cat-key").value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, "_");
+  const name = $("#shop-new-cat-name").value.trim();
+  const icon = $("#shop-new-cat-icon").value.trim() || "minecraft:chest";
+
+  if (!key || !name) {
+    toast("Renseignez le code et le nom de la catégorie.", "error");
+    $("#shop-new-cat-key").focus();
+    return;
+  }
+
+  const shop = state.data.configs.adminShop;
+  if (!shop.categories) shop.categories = {};
+  if (shop.categories[key]) {
+    toast("Une catégorie avec ce code existe déjà.", "error");
+    return;
+  }
+
+  shop.categories[key] = { name, icon, items: [] };
+  state.ui.selectedShopCategory = key;
+
+  $("#shop-new-cat-key").value = "";
+  $("#shop-new-cat-name").value = "";
+  $("#shop-new-cat-icon").value = "";
+
+  setDirty(true);
+  renderShopCategoriesBar();
+  renderShopItems();
+  toast(`Rayon "${name}" créé avec succès !`, "success");
+};
+
+const autoShopSellRule = async () => {
+  const ok = await confirmDialog({
+    title: "Harmoniser les prix de vente",
+    message: "Appliquer la règle standard 'Prix de vente = 40% du prix d'achat' à tous les articles du shop ?",
+    confirmLabel: "Appliquer à tout le shop",
+  });
+  if (!ok) return;
+
+  const cats = state.data.configs.adminShop?.categories || {};
+  let modifiedCount = 0;
+  for (const cat of Object.values(cats)) {
+    for (const it of cat.items || []) {
+      if (it.buy_price > 0) {
+        it.sell_price = Math.max(1, Math.round(it.buy_price * 0.4));
+        modifiedCount++;
+      }
+    }
+  }
+
+  setDirty(true);
+  renderShopItems();
+  toast(`${modifiedCount} prix de vente recalculés à 40%.`, "success");
+};
+
+const resetShopDefaults = async () => {
+  const ok = await confirmDialog({
+    title: "Réinitialiser l'Admin Shop",
+    message: "Restaurer l'Admin Shop avec toutes ses catégories et prix officiels par défaut ?",
+    confirmLabel: "Réinitialiser",
+    danger: true,
+  });
+  if (!ok) return;
+
+  state.data.configs.adminShop = defaultAdminShopConfig();
+  state.ui.selectedShopCategory = "MINERAIS";
+  cancelShopEdit();
+  setDirty(true);
+  renderShopCategoriesBar();
+  renderShopItems();
+  toast("Admin Shop réinitialisé aux valeurs d'origine.", "info");
+};
+
+/* =====================================================================
+   MODULE CONFIGURATION : PARAMÈTRES GÉNÉRAUX SERVEUR
+===================================================================== */
+
+const renderServerConfigTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+
+  const s = state.data.configs.server;
+  $("#server-starting-money").value = s.startingMoney ?? 500;
+  $("#server-ah-fee").value = s.ahFeePercent ?? 5;
+  $("#server-clearlag-interval").value = s.clearLagIntervalSeconds ?? 300;
+  $("#server-broadcast-interval").value = s.broadcastIntervalMinutes ?? 10;
+
+  renderBroadcastsList();
+};
+
+const renderBroadcastsList = () => {
+  const container = $("#server-broadcasts-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const s = state.data.configs.server;
+  const messages = s.broadcastMessages || [];
+
+  if (messages.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucune annonce programmée."));
+    return;
+  }
+
+  messages.forEach((msg, idx) => {
+    const row = h("div", { class: "broadcast-row" });
+    const preview = h("div", { class: "mc-preview" });
+    preview.innerHTML = parseMcColors(msg);
+
+    const delBtn = h("button", {
+      type: "button",
+      class: "danger ghost btn-sm",
+      onclick: () => {
+        messages.splice(idx, 1);
+        setDirty(true);
+        renderBroadcastsList();
+      },
+    }, "✕");
+
+    row.append(preview, delBtn);
+    container.append(row);
+  });
+};
+
+const addBroadcastMessage = () => {
+  const input = $("#server-new-broadcast");
+  const msg = input.value.trim();
+  if (!msg) {
+    toast("Entrez le texte de l'annonce.", "error");
+    input.focus();
+    return;
+  }
+
+  const s = state.data.configs.server;
+  if (!s.broadcastMessages) s.broadcastMessages = [];
+  s.broadcastMessages.push(msg);
+
+  input.value = "";
+  setDirty(true);
+  renderBroadcastsList();
+  toast("Annonce ajoutée à la rotation !", "success");
+};
+
+/* =====================================================================
+   MODULE GUIDE SYNCHRONISATION
+===================================================================== */
+
+const renderSyncGuideTab = () => {
+  const rev = $("#sync-active-revision");
+  if (rev) rev.textContent = "Rev " + (state.revision || 0);
+};
+
+/* =====================================================================
    ÉCOUTEURS D’ÉVÉNEMENTS
 ===================================================================== */
 
@@ -3095,6 +4043,91 @@ on("#texture-dialog-url", "input", (event) => {
   $("#texture-dialog-select").value = "";
   refreshTexturePreview();
   $("#texture-dialog-status").textContent = "URL d’image sélectionnée.";
+});
+
+/* --- Menu latéral (Mobile) ------------------------------------------- */
+
+on("#mobile-menu-btn", "click", () => {
+  const sidebar = $("#sidebar");
+  const backdrop = $("#sidebar-backdrop");
+  if (sidebar) sidebar.classList.add("open");
+  if (backdrop) backdrop.classList.add("active");
+});
+
+on("#sidebar-close-btn", "click", () => {
+  const sidebar = $("#sidebar");
+  const backdrop = $("#sidebar-backdrop");
+  if (sidebar) sidebar.classList.remove("open");
+  if (backdrop) backdrop.classList.remove("active");
+});
+
+on("#sidebar-backdrop", "click", () => {
+  const sidebar = $("#sidebar");
+  const backdrop = $("#sidebar-backdrop");
+  if (sidebar) sidebar.classList.remove("open");
+  if (backdrop) backdrop.classList.remove("active");
+});
+
+/* --- Calendrier (Daily Rewards) ------------------------------------- */
+
+on("#daily-form", "submit", saveDailyDayForm);
+on("#daily-add-item-btn", "click", addDailyItem);
+on("#daily-copy-next", "click", copyDailyNext);
+on("#daily-auto-money-btn", "click", autoDailyMoney);
+on("#daily-reset-defaults-btn", "click", resetDailyDefaults);
+
+/* --- Métiers & Jobs ------------------------------------------------- */
+
+document.querySelectorAll(".jobs-subtab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".jobs-subtab").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const target = btn.dataset.jobTab;
+    state.ui.activeJobsTab = target;
+    document.querySelectorAll(".jobs-subpanel").forEach((panel) => {
+      panel.hidden = panel.id !== "jobs-panel-" + target;
+    });
+    if (target === "curve") renderJobsCurveSimulation();
+  });
+});
+
+on("#job-add-action-btn", "click", addJobCustomAction);
+on("#job-curve-apply-btn", "click", applyJobsCurve);
+on("#job-rewards-apply-btn", "click", applyJobsRewards);
+on("#jobs-reset-defaults-btn", "click", resetJobsDefaults);
+
+/* --- Admin Shop ----------------------------------------------------- */
+
+on("#shop-item-form", "submit", saveShopItem);
+on("#shop-item-id", "input", debounce(updateShopItemPreview, 80));
+on("#shop-filter", "input", debounce(renderShopItems, 100));
+on("#shop-cancel-edit-btn", "click", cancelShopEdit);
+on("#shop-create-cat-btn", "click", createShopCategory);
+on("#shop-auto-sell-btn", "click", autoShopSellRule);
+on("#shop-reset-defaults-btn", "click", resetShopDefaults);
+
+/* --- Paramètres Généraux Serveur ------------------------------------ */
+
+on("#server-add-broadcast-btn", "click", addBroadcastMessage);
+on("#server-starting-money", "change", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.startingMoney = Math.max(0, Number(e.target.value) || 0);
+  setDirty(true);
+});
+on("#server-ah-fee", "change", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.ahFeePercent = Math.max(0, Math.min(50, Number(e.target.value) || 0));
+  setDirty(true);
+});
+on("#server-clearlag-interval", "change", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.clearLagIntervalSeconds = Math.max(60, Number(e.target.value) || 300);
+  setDirty(true);
+});
+on("#server-broadcast-interval", "change", (e) => {
+  if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
+  state.data.configs.server.broadcastIntervalMinutes = Math.max(1, Number(e.target.value) || 10);
+  setDirty(true);
 });
 
 /* --- Raccourcis ------------------------------------------------------ */

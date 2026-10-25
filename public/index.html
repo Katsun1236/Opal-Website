@@ -35,29 +35,96 @@
     </div>
   </div>
 
-  <header>
-    <h1>Opal Heaven · Studio</h1>
-    <div class="actions">
-      <span id="status" aria-live="polite">Synchronisé</span>
-      <button id="save" type="button">Enregistrer</button>
-      <button id="logout" type="button" class="ghost">Déconnexion</button>
-    </div>
-  </header>
+  <div class="app-layout">
+    <!-- MENU LATÉRAL (SIDEBAR) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">💎</div>
+        <div class="brand-text">
+          <span class="brand-title">Opal Heaven</span>
+          <span class="brand-sub">Studio & Configuration</span>
+        </div>
+        <button type="button" id="sidebar-close-btn" class="sidebar-close-btn ghost" aria-label="Fermer le menu">✕</button>
+      </div>
 
-  <div id="draft-banner" class="draft-banner" role="status" hidden>
-    <span id="draft-text"></span>
-    <div class="row">
-      <button type="button" id="draft-restore">Restaurer le brouillon</button>
-      <button type="button" id="draft-discard" class="ghost">Ignorer</button>
-    </div>
-  </div>
+      <nav class="sidebar-nav" role="tablist" aria-label="Sections du studio">
+        <div class="nav-group-title">Studio & Texturing</div>
+        <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="true" data-tab="library" class="nav-item active" tabindex="0">
+          <span class="nav-icon">🎨</span>
+          <span class="nav-label">Catalogue & Textures</span>
+        </button>
+        <button type="button" role="tab" id="nav-entries" aria-controls="tab-entries" aria-selected="false" data-tab="entries" class="nav-item" tabindex="-1">
+          <span class="nav-icon">📦</span>
+          <span class="nav-label">Contenus Custom</span>
+        </button>
+        <button type="button" role="tab" id="nav-recipes" aria-controls="tab-recipes" aria-selected="false" data-tab="recipes" class="nav-item" tabindex="-1">
+          <span class="nav-icon">🔨</span>
+          <span class="nav-label">Crafts & Recettes</span>
+        </button>
 
-  <nav role="tablist" aria-label="Sections du studio">
-    <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="true" data-tab="library" class="active" tabindex="0">Contenu existant</button>
-    <button type="button" role="tab" id="nav-entries" aria-controls="tab-entries" aria-selected="false" data-tab="entries" tabindex="-1">Contenus</button>
-    <button type="button" role="tab" id="nav-recipes" aria-controls="tab-recipes" aria-selected="false" data-tab="recipes" tabindex="-1">Crafts</button>
-    <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" tabindex="-1">Données</button>
-  </nav>
+        <div class="nav-group-title">Configuration Serveur</div>
+        <button type="button" role="tab" id="nav-config-daily" aria-controls="tab-config-daily" aria-selected="false" data-tab="config-daily" class="nav-item" tabindex="-1">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Calendrier (Daily)</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-jobs" aria-controls="tab-config-jobs" aria-selected="false" data-tab="config-jobs" class="nav-item" tabindex="-1">
+          <span class="nav-icon">⚒️</span>
+          <span class="nav-label">Métiers & XP</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-shop" aria-controls="tab-config-shop" aria-selected="false" data-tab="config-shop" class="nav-item" tabindex="-1">
+          <span class="nav-icon">🏪</span>
+          <span class="nav-label">Admin Shop</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-server" aria-controls="tab-config-server" aria-selected="false" data-tab="config-server" class="nav-item" tabindex="-1">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Paramètres Généraux</span>
+        </button>
+
+        <div class="nav-group-title">Système</div>
+        <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" class="nav-item" tabindex="-1">
+          <span class="nav-icon">💾</span>
+          <span class="nav-label">Données & Versions</span>
+        </button>
+        <button type="button" role="tab" id="nav-sync-guide" aria-controls="tab-sync-guide" aria-selected="false" data-tab="sync-guide" class="nav-item" tabindex="-1">
+          <span class="nav-icon">🔄</span>
+          <span class="nav-label">Synchronisation</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-status-box">
+          <span class="user-pill">Admin</span>
+          <span id="sidebar-revision-label" class="revision-pill">Rev 0</span>
+        </div>
+        <button id="logout" type="button" class="ghost btn-sm btn-logout">Déconnexion</button>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" id="mobile-menu-btn" class="mobile-menu-btn ghost" aria-label="Ouvrir le menu">☰</button>
+          <div class="page-title-area">
+            <h1 id="current-section-title">Catalogue & Textures</h1>
+            <span id="current-section-sub" class="section-sub">Consultez et modifiez les textures vanilla et personnalisées</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span id="status" aria-live="polite">Synchronisé</span>
+          <button id="save" type="button" class="btn-save">💾 Enregistrer</button>
+        </div>
+      </header>
+
+      <div id="draft-banner" class="draft-banner" role="status" hidden>
+        <span id="draft-text"></span>
+        <div class="row">
+          <button type="button" id="draft-restore">Restaurer le brouillon</button>
+          <button type="button" id="draft-discard" class="ghost">Ignorer</button>
+        </div>
+      </div>
 
   <section id="tab-entries" class="tab" role="tabpanel" aria-labelledby="nav-entries" tabindex="0" hidden>
     <div class="split">
@@ -248,6 +315,396 @@
       </div>
     </div>
   </section>
+
+  <!-- NOUVEAU TAB : CALENDRIER (DAILY) -->
+  <section id="tab-config-daily" class="tab" role="tabpanel" aria-labelledby="nav-config-daily" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>📅 Calendrier de Récompenses Quotidiennes (/daily)</h2>
+        <p class="muted">Définissez les récompenses des 30 jours du cycle de connexion. Les séries consécutives récompensent les joueurs chaque jour avec de l'argent, des tokens de métier, des clés de box et des items rares.</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="daily-auto-money-btn" class="ghost btn-sm">⚡ Progression auto d’argent</button>
+        <button type="button" id="daily-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="daily-layout">
+      <!-- Grille des 30 jours -->
+      <div class="card daily-grid-card">
+        <div class="daily-grid-header">
+          <h3>Cycle des 30 jours</h3>
+          <span class="muted text-sm" id="daily-total-summary">Total : 0 $ • 0 tokens</span>
+        </div>
+        <div id="daily-grid" class="daily-grid"></div>
+      </div>
+
+      <!-- Formulaire d'édition du jour sélectionné -->
+      <form id="daily-form" class="card daily-editor-card">
+        <div class="daily-editor-header">
+          <h3 id="daily-editor-title">Édition du Jour 1</h3>
+          <span id="daily-editor-badge" class="badge badge-custom">Jour normal</span>
+        </div>
+
+        <div class="row">
+          <label for="daily-money">Récompense en argent ($)
+            <input type="number" id="daily-money" min="0" max="10000000" step="50" required>
+          </label>
+          <label for="daily-tokens">Jetons de métier (Tokens)
+            <input type="number" id="daily-tokens" min="0" max="100000" step="5" value="0">
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="daily-key">Clé de Box / Caisse
+            <select id="daily-key">
+              <option value="">Aucune clé</option>
+              <option value="commune">🔑 Clé Commune</option>
+              <option value="rare">🗝️ Clé Rare</option>
+              <option value="epique">💎 Clé Épique</option>
+              <option value="legendaire">⭐ Clé Légendaire</option>
+            </select>
+          </label>
+          <label for="daily-shard">Tessons d’Opale
+            <input type="number" id="daily-shard" min="0" max="1000" step="1" value="0">
+          </label>
+        </div>
+
+        <div class="daily-items-section">
+          <h4>Items offerts ce jour</h4>
+          <div id="daily-items-list" class="daily-items-list"></div>
+
+          <div class="daily-add-item-box">
+            <h5>+ Ajouter un item</h5>
+            <div class="row">
+              <label for="daily-new-item-id">Item Minecraft ou Opal
+                <input type="text" id="daily-new-item-id" list="ingredients" placeholder="ex: minecraft:bread ou opal:gemme_opale">
+              </label>
+              <label for="daily-new-item-count">Quantité
+                <input type="number" id="daily-new-item-count" min="1" max="64" value="1">
+              </label>
+              <label for="daily-new-item-name">Nom d’affichage (optionnel)
+                <input type="text" id="daily-new-item-name" placeholder="ex: Pain frais">
+              </label>
+            </div>
+            <button type="button" id="daily-add-item-btn" class="ghost btn-sm">+ Ajouter cet item</button>
+          </div>
+        </div>
+
+        <div class="row modal-actions">
+          <button type="submit">Valider ce jour</button>
+          <button type="button" id="daily-copy-next" class="ghost">Dupliquer vers le jour suivant (J+1)</button>
+        </div>
+        <p id="daily-status" class="field-hint" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- NOUVEAU TAB : MÉTIERS & JOBS -->
+  <section id="tab-config-jobs" class="tab" role="tabpanel" aria-labelledby="nav-config-jobs" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>⚒️ Configuration des Métiers & Système d’XP</h2>
+        <p class="muted">Ajustez l’expérience accordée par chaque action (minage, agriculture, combat), réglez la courbe d’XP par niveau (1 à 50) et les gains en monnaie et jetons.</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="jobs-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser par défaut</button>
+      </div>
+    </div>
+
+    <div class="jobs-tabs-bar">
+      <button type="button" class="jobs-subtab active" data-job-tab="actions">⚒️ Actions & Gains d’XP</button>
+      <button type="button" class="jobs-subtab" data-job-tab="curve">📈 Courbe & Paliers (1–50)</button>
+      <button type="button" class="jobs-subtab" data-job-tab="rewards">🎁 Récompenses de niveau</button>
+    </div>
+
+    <!-- Sous-onglet 1 : Actions & Gains d'XP -->
+    <div id="jobs-panel-actions" class="jobs-subpanel">
+      <div class="jobs-actions-grid">
+        <!-- Voie des Abysses -->
+        <div class="card job-card-vocation">
+          <div class="job-card-header vocation-abysses">
+            <h3>⛏️ Voie des Abysses (Minage)</h3>
+            <span class="muted text-sm">Gains d'XP par bloc miné</span>
+          </div>
+          <div id="jobs-actions-abysses" class="job-actions-table"></div>
+        </div>
+
+        <!-- Voie de la Terre -->
+        <div class="card job-card-vocation">
+          <div class="job-card-header vocation-terre">
+            <h3>🌾 Voie de la Terre (Agriculture)</h3>
+            <span class="muted text-sm">Gains d'XP par récolte et semis</span>
+          </div>
+          <div id="jobs-actions-terre" class="job-actions-table"></div>
+        </div>
+
+        <!-- Voie de la Guerre -->
+        <div class="card job-card-vocation">
+          <div class="job-card-header vocation-guerre">
+            <h3>⚔️ Voie de la Guerre (Combat)</h3>
+            <span class="muted text-sm">Gains d'XP par élimination</span>
+          </div>
+          <div id="jobs-actions-guerre" class="job-actions-table"></div>
+        </div>
+      </div>
+
+      <!-- Ajout d'action custom -->
+      <div class="card jobs-custom-action-card">
+        <h3>+ Ajouter une action ou minerai personnalisé</h3>
+        <div class="row">
+          <label for="job-new-vocation">Voie
+            <select id="job-new-vocation">
+              <option value="abysses">Voie des Abysses (Minage)</option>
+              <option value="terre">Voie de la Terre (Agriculture)</option>
+              <option value="guerre">Voie de la Guerre (Combat)</option>
+            </select>
+          </label>
+          <label for="job-new-action-id">Identifiant technique
+            <input type="text" id="job-new-action-id" placeholder="ex: deepslate_emerald_ore">
+          </label>
+          <label for="job-new-action-name">Nom affiché
+            <input type="text" id="job-new-action-name" placeholder="ex: Minerai d’émeraude des abîmes">
+          </label>
+          <label for="job-new-action-xp">XP accordée
+            <input type="number" id="job-new-action-xp" min="1" max="10000" value="15">
+          </label>
+          <label for="job-new-action-icon">Icône / Item
+            <input type="text" id="job-new-action-icon" list="ingredients" placeholder="ex: minecraft:emerald">
+          </label>
+          <button type="button" id="job-add-action-btn" class="ghost">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sous-onglet 2 : Courbe d'XP & Paliers -->
+    <div id="jobs-panel-curve" class="jobs-subpanel" hidden>
+      <div class="split">
+        <div class="card">
+          <h3>Paramètres de la Formule d'XP</h3>
+          <p class="field-hint">Formule : <code>round(Base + (Niveau ^ Exposant) * Multiplicateur)</code></p>
+          <label for="job-curve-base">XP de base (BaseXp)
+            <input type="number" id="job-curve-base" min="10" max="10000" step="10" value="100">
+          </label>
+          <label for="job-curve-exp">Exposant de progression
+            <input type="number" id="job-curve-exp" min="1.0" max="3.0" step="0.05" value="1.75">
+          </label>
+          <label for="job-curve-mult">Multiplicateur
+            <input type="number" id="job-curve-mult" min="1" max="1000" step="1" value="55">
+          </label>
+          <label for="job-curve-max">Niveau Maximum
+            <input type="number" id="job-curve-max" min="10" max="100" step="1" value="50">
+          </label>
+          <label for="job-curve-bonus-main">Bonus Voie Principale (%)
+            <input type="number" id="job-curve-bonus-main" min="0" max="100" step="5" value="25">
+          </label>
+          <label for="job-curve-bonus-prestige">Bonus Prestige par rang (%)
+            <input type="number" id="job-curve-bonus-prestige" min="0" max="50" step="1" value="5">
+          </label>
+          <button type="button" id="job-curve-apply-btn">Recalculer la simulation</button>
+        </div>
+
+        <div class="card">
+          <h3>Simulation des Niveaux (1 à 50)</h3>
+          <div id="jobs-curve-simulation" class="jobs-simulation-table-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sous-onglet 3 : Récompenses de niveau -->
+    <div id="jobs-panel-rewards" class="jobs-subpanel" hidden>
+      <div class="card narrow-card">
+        <h3>Gains automatiques lors d'un Level Up</h3>
+        <p class="muted">Lorsqu'un joueur monte d'un niveau dans un métier, il reçoit de l'argent et des jetons proportionnels à son nouveau niveau.</p>
+
+        <label for="job-reward-money">Multiplicateur d’argent ($ par niveau)
+          <input type="number" id="job-reward-money" min="0" max="100000" step="25" value="250">
+          <span class="field-hint">Ex: à 250 $, le niveau 10 donne 2 500 $, le niveau 50 donne 12 500 $.</span>
+        </label>
+
+        <label for="job-reward-tokens">Multiplicateur de Jetons (tokens par niveau)
+          <input type="number" id="job-reward-tokens" min="0" max="1000" step="1" value="5">
+          <span class="field-hint">Ex: à 5 tokens, le niveau 10 donne 50 tokens, le niveau 50 donne 250 tokens.</span>
+        </label>
+
+        <label for="job-reward-talent">Points de talent par niveau
+          <input type="number" id="job-reward-talent" min="0" max="10" step="1" value="1">
+          <span class="field-hint">Points attribués pour l'arbre de talents du métier.</span>
+        </label>
+
+        <button type="button" id="job-rewards-apply-btn">Enregistrer les réglages de niveau</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOUVEAU TAB : ADMIN SHOP -->
+  <section id="tab-config-shop" class="tab" role="tabpanel" aria-labelledby="nav-config-shop" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>🏪 Configuration de l’Admin Shop (/shop)</h2>
+        <p class="muted">Configurez les rayons de l'Admin Shop : gérez les catégories, ajoutez ou retirez des articles, ajustez les prix d’achat (illimité pour les joueurs) et de rachat (vente des récoltes/minerais au serveur).</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="shop-auto-sell-btn" class="ghost btn-sm">⚖️ Règle auto (Vente = 40% de l’achat)</button>
+        <button type="button" id="shop-reset-defaults-btn" class="danger ghost btn-sm">↺ Réinitialiser l’Admin Shop</button>
+      </div>
+    </div>
+
+    <div class="shop-categories-nav" id="shop-categories-bar"></div>
+
+    <div class="split">
+      <!-- Liste des articles de la catégorie active -->
+      <div class="card shop-items-card">
+        <div class="shop-list-header">
+          <h3 id="shop-active-cat-title">Articles</h3>
+          <input type="text" id="shop-filter" placeholder="Filtrer un article…" maxlength="40">
+        </div>
+        <div id="shop-items-table" class="shop-items-table"></div>
+        <p id="shop-items-count" class="muted text-sm"></p>
+      </div>
+
+      <!-- Formulaire d'ajout / édition rapide -->
+      <div class="card shop-editor-card">
+        <h3 id="shop-editor-title">+ Ajouter un article dans cette catégorie</h3>
+        <form id="shop-item-form">
+          <label for="shop-item-id">Item Minecraft ou Opal
+            <input type="text" id="shop-item-id" list="ingredients" required placeholder="ex: minecraft:diamond ou opal:pioche_opale">
+          </label>
+          <div id="shop-item-preview" class="shop-item-preview"></div>
+          <label for="shop-item-name">Nom affiché
+            <input type="text" id="shop-item-name" required placeholder="ex: Diamant Pur">
+          </label>
+          <div class="row">
+            <label for="shop-item-buy">Prix d’achat joueur ($)
+              <input type="number" id="shop-item-buy" min="0" max="10000000" step="1" required value="10">
+            </label>
+            <label for="shop-item-sell">Prix de vente serveur ($)
+              <input type="number" id="shop-item-sell" min="0" max="10000000" step="1" required value="4">
+            </label>
+          </div>
+          <div class="row row-tight">
+            <label class="checkbox-label"><input type="checkbox" id="shop-item-buy-enabled" checked> Achat activé</label>
+            <label class="checkbox-label"><input type="checkbox" id="shop-item-sell-enabled" checked> Vente activée</label>
+          </div>
+          <div class="row modal-actions">
+            <button type="submit" id="shop-submit-btn">Ajouter au shop</button>
+            <button type="button" id="shop-cancel-edit-btn" class="ghost" hidden>Annuler l'édition</button>
+          </div>
+        </form>
+
+        <hr class="separator">
+
+        <!-- Gestion des catégories -->
+        <div class="shop-cat-manager">
+          <h4>+ Créer une nouvelle catégorie</h4>
+          <div class="row">
+            <label for="shop-new-cat-key">Code identifiant (A-Z)
+              <input type="text" id="shop-new-cat-key" placeholder="ex: POTIONS">
+            </label>
+            <label for="shop-new-cat-name">Nom affiché
+              <input type="text" id="shop-new-cat-name" placeholder="ex: Alchimie & Potions">
+            </label>
+            <label for="shop-new-cat-icon">Icône item
+              <input type="text" id="shop-new-cat-icon" list="ingredients" placeholder="ex: minecraft:potion">
+            </label>
+          </div>
+          <button type="button" id="shop-create-cat-btn" class="ghost btn-sm">+ Créer la catégorie</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOUVEAU TAB : PARAMÈTRES GÉNÉRAUX -->
+  <section id="tab-config-server" class="tab" role="tabpanel" aria-labelledby="nav-config-server" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>⚙️ Paramètres Généraux du Serveur</h2>
+        <p class="muted">Gérez l’économie de base, la fréquence et les messages des annonces automatiques dans le chat, ainsi que les règles d’antilag.</p>
+      </div>
+    </div>
+
+    <div class="server-config-grid">
+      <!-- Économie -->
+      <div class="card">
+        <h3>💰 Économie & Marché</h3>
+        <label for="server-starting-money">Solde de départ des nouveaux joueurs ($)
+          <input type="number" id="server-starting-money" min="0" max="1000000" step="50" value="500">
+        </label>
+        <label for="server-ah-fee">Taxe de mise en vente à l’Hôtel des Ventes (AH %)
+          <input type="number" id="server-ah-fee" min="0" max="50" step="1" value="5">
+        </label>
+      </div>
+
+      <!-- Optimisation Antilag -->
+      <div class="card">
+        <h3>🧹 Anti-Lag & Nettoyage Sol</h3>
+        <label for="server-clearlag-interval">Intervalle de purge des items au sol (secondes)
+          <input type="number" id="server-clearlag-interval" min="60" max="3600" step="30" value="300">
+        </label>
+        <p class="field-hint">Valeur recommandée : 300 secondes (5 minutes). Les alertes sont diffusées à 60s, 30s et 10s.</p>
+      </div>
+
+      <!-- Annonces automatiques -->
+      <div class="card server-broadcast-card">
+        <h3>📢 Annonces Automatiques dans le Chat</h3>
+        <label for="server-broadcast-interval">Intervalle de diffusion (minutes)
+          <input type="number" id="server-broadcast-interval" min="1" max="120" step="1" value="10">
+        </label>
+
+        <h4>Messages programmés</h4>
+        <p class="field-hint">Supporte les codes couleur Minecraft Bedrock : <code>§6</code> (or), <code>§e</code> (jaune), <code>§a</code> (vert), <code>§b</code> (aqua), <code>§c</code> (rouge), <code>§l</code> (gras), <code>§r</code> (reset).</p>
+        <div id="server-broadcasts-list" class="broadcasts-list"></div>
+
+        <div class="row row-tight">
+          <label for="server-new-broadcast" style="flex: 2;">Nouveau message d’annonce
+            <input type="text" id="server-new-broadcast" placeholder="§l§6Opal Heaven §r§7• Votre message ici..." maxlength="200">
+          </label>
+          <button type="button" id="server-add-broadcast-btn" class="ghost btn-sm">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOUVEAU TAB : GUIDE SYNCHRONISATION -->
+  <section id="tab-sync-guide" class="tab" role="tabpanel" aria-labelledby="nav-sync-guide" tabindex="0" hidden>
+    <div class="card">
+      <h2>🔄 Guide & Statut de Synchronisation Serveur</h2>
+      <p class="muted">Comment les modifications apportées sur ce studio sont appliquées sur votre serveur Minecraft Opal Heaven.</p>
+
+      <div class="sync-steps-grid">
+        <div class="sync-step-box">
+          <div class="step-num">1</div>
+          <h4>Modifiez sur le studio</h4>
+          <p>Ajustez les récompenses daily, l'Admin Shop, les métiers, créez des items ou changez des textures. Tout est sauvegardé en cliquant sur <b>💾 Enregistrer</b>.</p>
+        </div>
+
+        <div class="sync-step-box">
+          <div class="step-num">2</div>
+          <h4>Synchronisez sur le serveur</h4>
+          <p>En jeu (avec les permissions op) ou dans la console de votre serveur WinHeberge, tapez simplement :</p>
+          <pre><code>/opalcontent sync</code></pre>
+          <p>Le serveur télécharge instantanément la dernière révision, applique les nouveaux crafts, les récompenses du calendrier, l'Admin Shop et les réglages de métiers.</p>
+        </div>
+
+        <div class="sync-step-box">
+          <div class="step-num">3</div>
+          <h4>Pack de textures (si modifié)</h4>
+          <p>Si vous avez ajouté ou modifié des textures PNG d'items, lancez simplement le script de synchronisation ou redémarrez : le pack de ressources <code>OpalPack.zip</code> est automatiquement regénéré avec les textures.</p>
+        </div>
+      </div>
+
+      <hr class="separator">
+
+      <h3>Informations de connexion</h3>
+      <div class="sync-info-box">
+        <p><b>URL API Netlify :</b> <code>https://opalheaven.netlify.app/api/plugin/content</code></p>
+        <p><b>Statut Serveur :</b> <span class="badge badge-override">Opérationnel</span></p>
+        <p><b>Révision active :</b> <span id="sync-active-revision">Rev 0</span></p>
+      </div>
+    </div>
+  </section>
+    </div> <!-- .main-content -->
+  </div> <!-- .app-layout -->
 </main>
 
 <dialog id="texture-dialog" class="card modal-dialog">
