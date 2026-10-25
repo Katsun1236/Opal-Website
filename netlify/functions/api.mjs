@@ -130,12 +130,28 @@ const withMeta = (value) => {
 };
 
 const readContent = async (store) => {
-  let stored;
+  let stored = null;
   try {
     stored = await store.get("content", { type: "json" });
   } catch (error) {
-    console.error("Lecture du contenu impossible", error);
-    throw new HttpError("contenu stocké illisible", 500);
+    console.warn("Échec lecture JSON pour content, tentative textuelle", error);
+    try {
+      const text = await store.get("content", { type: "text" });
+      if (text) stored = JSON.parse(text);
+    } catch (e2) {
+      console.warn("Échec lecture textuelle, tentative depuis l'historique", e2);
+      try {
+        const { blobs } = await store.list({ prefix: "history/" });
+        if (blobs && blobs.length > 0) {
+          const latestKey = blobs.map((b) => b.key).sort().pop();
+          if (latestKey) {
+            stored = await store.get(latestKey, { type: "json" });
+          }
+        }
+      } catch (e3) {
+        console.error("Aucun historique récupérable", e3);
+      }
+    }
   }
   return stored ? withMeta(stored) : emptyContent();
 };

@@ -765,8 +765,13 @@ const applyContent = (serverData, { dirty = false } = {}) => {
 };
 
 const load = async () => {
-  const data = await api("/content");
-  applyContent(data);
+  try {
+    const data = await api("/content");
+    applyContent(data);
+  } catch (err) {
+    console.warn("Échec chargement content distant, fallback sur le contenu par défaut", err);
+    applyContent(emptyContent());
+  }
 };
 
 /* =====================================================================
