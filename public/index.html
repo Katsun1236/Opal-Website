@@ -322,8 +322,8 @@
           </div>
           <div class="kpi-info">
             <span class="kpi-label">Masse Monétaire Totale</span>
-            <b class="kpi-val">$28 450 200</b>
-            <span class="kpi-sub">Solde moyen : $189 600 / joueur</span>
+            <b class="kpi-val" id="kpi-eco-total-money">$500</b>
+            <span class="kpi-sub" id="kpi-eco-avg-money">Solde : $500 / joueur</span>
           </div>
         </div>
         <div class="card kpi-card">
@@ -331,9 +331,9 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-label">Création Monétaire 24h</span>
-            <b class="kpi-val text-mint">+$2 840 000</b>
-            <span class="kpi-sub">Sources : Shop, Métiers, Quêtes</span>
+            <span class="kpi-label">Génération de Monnaie</span>
+            <b class="kpi-val text-mint" id="kpi-eco-creation-val">Shop & Quotidien</b>
+            <span class="kpi-sub" id="kpi-eco-creation-sub">Sources : Ventes Shop, Daily</span>
           </div>
         </div>
         <div class="card kpi-card">
@@ -341,9 +341,9 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-label">Destruction Monétaire 24h</span>
-            <b class="kpi-val text-accent">-$2 310 000</b>
-            <span class="kpi-sub">Puits : Shop, Taxes AH, Upgrades</span>
+            <span class="kpi-label">Puits & Destruction</span>
+            <b class="kpi-val text-accent" id="kpi-eco-destruction-val">Achats & Taxes AH</b>
+            <span class="kpi-sub" id="kpi-eco-destruction-sub">Absorption : Shop, Taxes</span>
           </div>
         </div>
         <div class="card kpi-card">
@@ -351,9 +351,9 @@
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
           </div>
           <div class="kpi-info">
-            <span class="kpi-label">Flux Net Journalier</span>
-            <b class="kpi-val text-mint">+$530 000</b>
-            <span class="kpi-sub">Expansion monétaire saine</span>
+            <span class="kpi-label">Flux Net en Jeu</span>
+            <b class="kpi-val text-mint" id="kpi-eco-net-flow">Direct</b>
+            <span class="kpi-sub" id="kpi-eco-net-sub">Mesuré en continu</span>
           </div>
         </div>
       </div>
@@ -366,7 +366,7 @@
               <h3>D'où vient la Money ? (Money Inflows)</h3>
               <p class="muted text-sm">Génération de monnaie par source de revenus sur 24h</p>
             </div>
-            <span class="badge" style="color: var(--mint); border-color: var(--mint);">Total: +$2.84M</span>
+            <span class="badge" id="chart-money-inflows-badge" style="color: var(--mint); border-color: var(--mint);">Sources Configurées</span>
           </div>
           <div class="money-breakdown-container" id="chart-money-inflows"></div>
         </div>
@@ -377,7 +377,7 @@
               <h3>Où va la Money ? (Money Sinks)</h3>
               <p class="muted text-sm">Destruction et absorption de monnaie par canal sur 24h</p>
             </div>
-            <span class="badge" style="color: var(--accent); border-color: var(--accent);">Total: -$2.31M</span>
+            <span class="badge" id="chart-money-sinks-badge" style="color: var(--accent); border-color: var(--accent);">Puits Configurés</span>
           </div>
           <div class="money-breakdown-container" id="chart-money-sinks"></div>
         </div>
@@ -389,7 +389,7 @@
               <h3>Évolution de la Masse Monétaire (7 Jours)</h3>
               <p class="muted text-sm">Progression du capital cumulé et volume de liquidités</p>
             </div>
-            <span class="badge">+1.8% cette semaine</span>
+            <span class="badge" id="chart-money-curve-badge">En ligne : 1 joueur</span>
           </div>
           <div class="chart-svg-wrap" id="chart-money-curve-container"></div>
         </div>
@@ -401,7 +401,7 @@
               <h3>Top 10 Balancetop (Joueurs les plus Riches)</h3>
               <p class="muted text-sm">Les plus gros patrimoines financiers du serveur</p>
             </div>
-            <span class="badge">Patrimoine Top 10 : $14.2M</span>
+            <span class="badge" id="chart-balancetop-badge">Joueurs Réels Connectés</span>
           </div>
           <div class="balancetop-table-wrap">
             <table class="balancetop-table">

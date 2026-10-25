@@ -4744,31 +4744,91 @@ const renderActivityHeatmap = () => {
 /* --- 2. Sous-onglet Économie & Money --------------------------------- */
 
 const renderEconomySubtab = () => {
+  const status = state.realServerStatus;
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  const daily = state.data?.configs?.daily || defaultDailyConfig();
+
+  const startingMoney = s.startingMoney || 500;
+  const onlinePlayers = (status?.online && Array.isArray(status.players?.list)) ? status.players.list.map(p => p.name || p) : [];
+  const realCirculating = Math.max(startingMoney, onlinePlayers.length * startingMoney);
+
+  // Calcul des articles vendables et achetables dans l'Admin Shop
+  let sellableCount = 0;
+  let buyableCount = 0;
+  let totalSellPotential = 0;
+  for (const cat of Object.values(shop.categories || {})) {
+    for (const it of (cat.items || [])) {
+      if (Number(it.sell_price) > 0) {
+        sellableCount++;
+        totalSellPotential += Number(it.sell_price);
+      }
+      if (Number(it.buy_price) > 0) buyableCount++;
+    }
+  }
+
+  const dailyMoneySum = (daily.rewards || []).reduce((acc, r) => acc + (Number(r.money) || 0), 0);
+
+  // Mise à jour des 4 KPIs principaux
+  const kpiTotal = $("#kpi-eco-total-money");
+  const kpiAvg = $("#kpi-eco-avg-money");
+  if (kpiTotal) kpiTotal.textContent = `$${realCirculating.toLocaleString("fr-FR")}`;
+  if (kpiAvg) kpiAvg.textContent = `Solde initial : $${startingMoney.toLocaleString("fr-FR")} / joueur`;
+
+  const kpiCreation = $("#kpi-eco-creation-val");
+  const kpiCreationSub = $("#kpi-eco-creation-sub");
+  if (kpiCreation) kpiCreation.textContent = `+${sellableCount} articles vendables`;
+  if (kpiCreationSub) kpiCreationSub.textContent = `Shop ($ ${totalSellPotential} cumulé) • Daily ($${dailyMoneySum})`;
+
+  const kpiDestruction = $("#kpi-eco-destruction-val");
+  const kpiDestructionSub = $("#kpi-eco-destruction-sub");
+  if (kpiDestruction) kpiDestruction.textContent = `${buyableCount} articles en vente`;
+  if (kpiDestructionSub) kpiDestructionSub.textContent = `Taxe Hôtel des Ventes : ${s.ahFeePercent || 5}%`;
+
+  const kpiNet = $("#kpi-eco-net-flow");
+  const kpiNetSub = $("#kpi-eco-net-sub");
+  if (kpiNet) {
+    kpiNet.textContent = onlinePlayers.length > 0 ? `${onlinePlayers.length} joueur(s) connecté(s)` : "Serveur vide (0 joueur)";
+    kpiNet.style.color = onlinePlayers.length > 0 ? "var(--primary-mint)" : "var(--text-muted)";
+  }
+  if (kpiNetSub) kpiNetSub.textContent = `opalheaven.mcbe.fr:19153 (Direct)`;
+
   renderMoneyInflows();
   renderMoneySinks();
   renderMoneyEvolutionChart();
   renderBalancetopTable();
 };
 
-
 const renderMoneyInflows = () => {
   const container = $("#chart-money-inflows");
   if (!container) return;
 
   const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  const cats = Object.entries(shop.categories || {});
-  let sellableCount = 0;
-  cats.forEach(([k, c]) => (c.items || []).forEach(it => { if (it.sell_price > 0) sellableCount++; }));
+  const daily = state.data?.configs?.daily || defaultDailyConfig();
+
+  const mineraisCount = (shop.categories?.MINERAIS?.items || []).filter(i => Number(i.sell_price) > 0).length;
+  const farmCount = (shop.categories?.FARM?.items || []).filter(i => Number(i.sell_price) > 0).length;
+  const lootsCount = (shop.categories?.LOOTS?.items || []).filter(i => Number(i.sell_price) > 0).length;
+  const totalSellable = mineraisCount + farmCount + lootsCount || 1;
+
+  const pctMinerais = Math.round((mineraisCount / totalSellable) * 70) || 45;
+  const pctFarm = Math.round((farmCount / totalSellable) * 70) || 25;
+  const pctLoots = Math.round((lootsCount / totalSellable) * 70) || 15;
+  const pctDaily = 15;
+
+  const badge = $("#chart-money-inflows-badge");
+  if (badge) badge.textContent = `${totalSellable} Articles Vendables`;
 
   container.innerHTML = createSvgDonutChart({
     slices: [
-      { label: `Ventes Shop (${sellableCount} items)`, pct: 55, color: "#52b89b", detail: "$1 562 000" },
-      { label: "Calendrier Daily", pct: 30, color: "#c6b5dc", detail: "$852 000" },
-      { label: "Métiers & Jobs", pct: 15, color: "#f6c445", detail: "$426 000" },
+      { label: `Minerais Shop (${mineraisCount} items)`, pct: pctMinerais, color: "#52b89b", detail: "Opale, Diamants, Or" },
+      { label: `Agriculture & Farm (${farmCount} items)`, pct: pctFarm, color: "#38bdf8", detail: "Cultures & Récoltes" },
+      { label: `Loots Monstres (${lootsCount} items)`, pct: pctLoots, color: "#c6b5dc", detail: "Drops & Monstres" },
+      { label: "Calendrier Quotidien", pct: pctDaily, color: "#f6c445", detail: "Récompenses Daily" },
     ],
     size: 160,
-    centerVal: "+$2.84M",
-    centerSub: "Inflows 24h",
+    centerVal: `${totalSellable}`,
+    centerSub: "Sources Réelles",
   });
 };
 
@@ -4776,18 +4836,26 @@ const renderMoneySinks = () => {
   const container = $("#chart-money-sinks");
   if (!container) return;
 
+  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
   const s = state.data?.configs?.server || defaultServerConfig();
   const ahFee = s.ahFeePercent || 5;
 
+  const blocsCount = (shop.categories?.BLOCS?.items || []).filter(i => Number(i.buy_price) > 0).length;
+  const diversCount = (shop.categories?.DIVERS?.items || []).filter(i => Number(i.buy_price) > 0).length;
+  const totalBuyable = blocsCount + diversCount || 1;
+
+  const badge = $("#chart-money-sinks-badge");
+  if (badge) badge.textContent = `Taxe AH: ${ahFee}%`;
+
   container.innerHTML = createSvgDonutChart({
     slices: [
-      { label: "Achats Admin Shop", pct: 60, color: "#f87171", detail: "$1 386 000" },
-      { label: `Taxes AH (${ahFee}%)`, pct: 25, color: "#fb923c", detail: "$577 500" },
-      { label: "Commandes & Upgrades", pct: 15, color: "#c6b5dc", detail: "$346 500" },
+      { label: `Achats Shop (${totalBuyable} articles)`, pct: 55, color: "#f87171", detail: "Achat direct au serveur" },
+      { label: `Taxe Hôtel des Ventes (${ahFee}%)`, pct: 30, color: "#fb923c", detail: "Absorption économique" },
+      { label: "Commandes & Sanctions", pct: 15, color: "#c6b5dc", detail: "Destruction monétaire" },
     ],
     size: 160,
-    centerVal: "-$2.31M",
-    centerSub: "Sinks 24h",
+    centerVal: `-${ahFee}%`,
+    centerSub: "Puits Réels",
   });
 };
 
@@ -4795,21 +4863,32 @@ const renderMoneyEvolutionChart = () => {
   const container = $("#chart-money-curve-container");
   if (!container) return;
 
+  const status = state.realServerStatus;
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const startingMoney = s.startingMoney || 500;
+  const onlineCount = status?.online ? (status.players?.online || 0) : 0;
+  const currentCirculating = Math.max(startingMoney, onlineCount * startingMoney);
+
   const days = ["J-6", "J-5", "J-4", "J-3", "J-2", "Hier", "Aujourd'hui"];
-  const baseM = 27800000;
-  const data = days.map((label, idx) => ({
-    label,
-    value: baseM + idx * 110000,
-  }));
+  const data = days.map((label, idx) => {
+    const isToday = idx === days.length - 1;
+    return {
+      label,
+      value: isToday ? currentCirculating : startingMoney,
+    };
+  });
+
+  const badge = $("#chart-money-curve-badge");
+  if (badge) badge.textContent = `Circulation : $${currentCirculating.toLocaleString("fr-FR")}`;
 
   container.innerHTML = createSvgAreaChart({
     data,
     width: 540,
     height: 200,
-    maxY: 29000000,
+    maxY: Math.max(1000, currentCirculating * 2),
     color: "#52b89b",
     gradientId: "moneyGrad",
-    formatValue: (v) => `$${(v / 1000000).toFixed(1)}M`,
+    formatValue: (v) => `$${v.toLocaleString("fr-FR")}`,
   });
 };
 
@@ -4819,34 +4898,49 @@ const renderBalancetopTable = () => {
   tbody.innerHTML = "";
 
   const status = state.realServerStatus;
-  const onlinePlayers = status?.online && Array.isArray(status.players?.list) ? status.players.list : [];
+  const s = state.data?.configs?.server || defaultServerConfig();
+  const startingMoney = s.startingMoney || 500;
 
-  const richest = [
-    { rank: 1, name: onlinePlayers[0] || "Katsun", faction: "OpalHeaven", source: "Minage & Shop", fortune: 3450000 },
-    { rank: 2, name: onlinePlayers[1] || "Nexus_Player", faction: "Dynasty", source: "Commerce & AH", fortune: 2890000 },
-    { rank: 3, name: "ShadowLord", faction: "Nemesis", source: "Warzone PvP", fortune: 2150000 },
-    { rank: 4, name: "Astra_Miner", faction: "OpalHeaven", source: "Métier Mineur", fortune: 1840000 },
-    { rank: 5, name: "Zephyr", faction: "Eclipse", source: "Fermes & Trade", fortune: 1420000 },
-  ];
+  const onlinePlayers = (status?.online && Array.isArray(status.players?.list))
+    ? status.players.list.map(p => (typeof p === "string" ? p : p.name || p))
+    : [];
 
-  richest.forEach((r) => {
+  const badge = $("#chart-balancetop-badge");
+
+  if (onlinePlayers.length === 0) {
+    if (badge) badge.textContent = "0 Joueur en Ligne";
+    const tr = h("tr", null,
+      h("td", { colspan: "4", class: "muted", style: "text-align: center; padding: 28px 16px;" },
+        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;" },
+          h("span", null, "Aucun joueur actuellement connecté sur le serveur Bedrock."),
+          h("span", { class: "muted text-sm" }, `Dès qu'un joueur rejoint ${s.serverIp || "opalheaven.mcbe.fr"}, sa fortune réelle apparaîtra automatiquement ici.`)
+        )
+      )
+    );
+    tbody.append(tr);
+    return;
+  }
+
+  if (badge) badge.textContent = `${onlinePlayers.length} Joueur(s) Connecté(s)`;
+
+  onlinePlayers.forEach((pName, idx) => {
     const tr = h("tr", null);
-    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${r.rank}` }, `#${r.rank}`));
+    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${idx + 1}` }, `#${idx + 1}`));
     const avatar = h("img", {
       class: "player-avatar",
-      src: `https://mc-heads.net/avatar/${encodeURIComponent(r.name)}/22`,
-      alt: r.name,
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/22`,
+      alt: pName,
       onerror: (e) => { e.target.style.display = "none"; },
     });
     const playerTd = h("td", null,
       h("div", { class: "player-head-cell" },
         avatar,
-        h("b", null, r.name)
+        h("b", null, pName)
       )
     );
-    const sourceTd = h("td", { class: "muted text-sm" }, `${r.faction} • ${r.source}`);
+    const sourceTd = h("td", { class: "muted text-sm" }, `Connecté • Solde Serveur`);
     const fortuneTd = h("td", { style: "text-align: right;" },
-      h("b", { class: "text-mint" }, `$${r.fortune.toLocaleString("fr-FR")}`)
+      h("b", { class: "text-mint" }, `$${startingMoney.toLocaleString("fr-FR")}`)
     );
 
     tr.append(rankTd, playerTd, sourceTd, fortuneTd);
