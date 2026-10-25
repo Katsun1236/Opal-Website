@@ -1096,10 +1096,10 @@
         <p class="muted text-sm">Renseignez l'adresse IP et le port de votre serveur hébergé (ex: WinHeberge) pour relier en direct les statistiques de connexion, la télémétrie des joueurs et l'état du serveur.</p>
         <div class="row">
           <label for="server-ip" style="flex: 2;">Adresse IP / Nom d'hôte du serveur
-            <input type="text" id="server-ip" placeholder="ex: play.opalheaven.fr ou 51.77.x.x">
+            <input type="text" id="server-ip" placeholder="ex: opalheaven.mcbe.fr">
           </label>
-          <label for="server-port" style="flex: 1;">Port Bedrock (défaut : 19132)
-            <input type="number" id="server-port" min="1" max="65535" value="19132">
+          <label for="server-port" style="flex: 1;">Port Bedrock (défaut : 19153)
+            <input type="number" id="server-port" min="1" max="65535" value="19153">
           </label>
         </div>
         <div class="row row-tight" style="margin-top: 10px;">
@@ -1545,7 +1545,7 @@
       </div>
       <div class="log-stat-item">
         <span class="log-stat-label">Fréquence du flux</span>
-        <b class="log-stat-val text-accent">~20 évènements / min</b>
+        <b class="log-stat-val text-accent" id="log-stat-rate">Direct (Temps réel)</b>
       </div>
     </div>
 
@@ -1569,11 +1569,8 @@
         <div class="logs-inputs-bar">
           <select id="logs-server-filter" class="logs-server-select" title="Filtrer par serveur">
             <option value="all">Tous les serveurs</option>
-            <option value="Faction Alpha">Faction Alpha</option>
-            <option value="Minage 1">Minage 1</option>
-            <option value="Minage 2">Minage 2 (Nether)</option>
-            <option value="Warzone PvP">Warzone PvP</option>
-            <option value="Hub Central">Hub Central</option>
+            <option value="opalheaven.mcbe.fr:19153">opalheaven.mcbe.fr:19153</option>
+            <option value="Studio">Studio Opal</option>
           </select>
 
           <input type="search" id="logs-player-filter" placeholder="Filtrer par pseudo (ex: Katsun)..." class="logs-player-input">

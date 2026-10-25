@@ -3768,8 +3768,8 @@ const renderServerConfigTab = () => {
   const s = state.data.configs.server;
   const ipInput = $("#server-ip");
   const portInput = $("#server-port");
-  if (ipInput) ipInput.value = s.serverIp || "play.opalheaven.fr";
-  if (portInput) portInput.value = s.serverPort || 19132;
+  if (ipInput) ipInput.value = s.serverIp || "opalheaven.mcbe.fr";
+  if (portInput) portInput.value = s.serverPort || 19153;
 
   $("#server-starting-money").value = s.startingMoney ?? 500;
   $("#server-ah-fee").value = s.ahFeePercent ?? 5;
@@ -3844,7 +3844,12 @@ const renderSyncGuideTab = () => {
    JOURNAL D'ACTIVITÉ & LOGS SYSTÈME
 ===================================================================== */
 
-const LOGS_STORAGE_KEY = "opal_studio_activity_logs";
+// Purge immédiate de tout ancien log fictif ou de simulation issu des versions précédentes
+try {
+  localStorage.removeItem("opal_studio_activity_logs");
+} catch {}
+
+const LOGS_STORAGE_KEY = "opal_studio_real_logs_v2";
 
 state.realServerStatus = {
   checked: false,
@@ -3855,20 +3860,7 @@ state.realServerStatus = {
 };
 state.serverTelemetry = null;
 
-const defaultServerLogs = () => {
-  return [
-    {
-      id: "log_init",
-      time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-      type: "SYNC",
-      server: "Système",
-      player: "Admin",
-      faction: "Staff",
-      message: "Connexion du studio Opal Heaven",
-      details: "Version active : Révision " + (state.revision || 0) + " • En attente de synchronisation du serveur PocketMine-MP",
-    },
-  ];
-};
+const defaultServerLogs = () => [];
 
 const getStoredLogs = () => {
   let localLogs = [];
@@ -3880,11 +3872,7 @@ const getStoredLogs = () => {
     }
   } catch {}
 
-  if (localLogs.length === 0) {
-    localLogs = defaultServerLogs();
-  }
-
-  // Fusionner avec les logs réels transmis par le plugin OpalCore s'il y en a
+  // Logs réels transmis par le plugin OpalCore s'il y en a
   const remoteLogs = state.serverTelemetry?.serverLogs || [];
   const combined = [...remoteLogs, ...localLogs];
   return combined.slice(0, 350);
@@ -3903,13 +3891,17 @@ const logActivity = (type, message, details = "", extra = {}) => {
     if (raw) logs = JSON.parse(raw) || [];
   } catch {}
 
+  const s = state.data?.configs?.server;
+  const host = s?.serverIp || "opalheaven.mcbe.fr";
+  const port = s?.serverPort || 19153;
+
   const entry = {
     id: "log_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     type: String(type || "INFO").toUpperCase(),
-    server: extra.server || "Studio",
+    server: extra.server || `${host}:${port}`,
     player: extra.player || "Admin",
-    faction: extra.faction || "Staff",
+    faction: extra.faction || "",
     message,
     details,
     item: extra.item || null,
@@ -3927,8 +3919,8 @@ const logActivity = (type, message, details = "", extra = {}) => {
 
 const fetchRealServerStatus = async () => {
   const s = state.data?.configs?.server || defaultServerConfig();
-  const host = (s.serverIp || "play.opalheaven.fr").trim();
-  const port = Number(s.serverPort) || 19132;
+  const host = (s.serverIp || "opalheaven.mcbe.fr").trim();
+  const port = Number(s.serverPort) || 19153;
 
   try {
     const res = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`);
@@ -3944,9 +3936,10 @@ const fetchRealServerStatus = async () => {
         max: data.players?.max || 0,
         list: Array.isArray(data.players?.list) ? data.players.list.map((p) => p.name || p) : [],
       },
-      version: data.version || "PocketMine-MP 5",
+      version: data.version || "1.26.50",
       motd: Array.isArray(data.motd?.clean) ? data.motd.clean.join(" ") : (data.motd?.clean || ""),
-      software: data.software || "PocketMine-MP",
+      software: data.software || "Axolotl-PM",
+      plugins: Array.isArray(data.plugins) ? data.plugins : [],
     };
   } catch {
     state.realServerStatus = {
@@ -3958,6 +3951,7 @@ const fetchRealServerStatus = async () => {
       version: "Serveur non joignable",
       motd: "",
       software: "",
+      plugins: [],
     };
   }
   return state.realServerStatus;
@@ -4032,15 +4026,37 @@ const renderLogsTab = () => {
 
   // Mise à jour des compteurs globaux
   const statCount = $("#log-stat-count");
-  if (statCount) statCount.textContent = `${logs.length} tracés`;
+  if (statCount) statCount.textContent = `${logs.length} ${logs.length > 1 ? "événements" : "événement"}`;
 
   const uniquePlayers = new Set(logs.map((l) => l.player).filter(Boolean));
   const statPlayers = $("#log-stat-players");
-  if (statPlayers) statPlayers.textContent = `${uniquePlayers.size} joueurs`;
+  if (statPlayers) {
+    if (state.realServerStatus.online) {
+      statPlayers.textContent = `${state.realServerStatus.players.online} / ${state.realServerStatus.players.max} en ligne`;
+    } else if (uniquePlayers.size > 0) {
+      statPlayers.textContent = `${uniquePlayers.size} joueur${uniquePlayers.size > 1 ? "s" : ""}`;
+    } else {
+      statPlayers.textContent = "0 joueur";
+    }
+  }
 
   const totalMoney = logs.reduce((sum, l) => sum + (Number(l.amount) || 0), 0);
   const statMoney = $("#log-stat-money");
   if (statMoney) statMoney.textContent = `$${totalMoney.toLocaleString("fr-FR")}`;
+
+  const statRate = $("#log-stat-rate");
+  if (statRate) {
+    if (state.serverTelemetry?.connected) {
+      statRate.textContent = "Connecté (OpalCore)";
+      statRate.style.color = "var(--primary-mint)";
+    } else if (state.realServerStatus.online) {
+      statRate.textContent = "Direct (opalheaven.mcbe.fr)";
+      statRate.style.color = "var(--primary-mint)";
+    } else {
+      statRate.textContent = "Inaccessible";
+      statRate.style.color = "#ef4444";
+    }
+  }
 
   // Mise à jour des badges de compteurs sur les filtres
   document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
@@ -4067,18 +4083,25 @@ const renderLogsTab = () => {
   });
 
   if (filtered.length === 0) {
+    const isOnline = state.realServerStatus.online;
+    const serverHost = state.data?.configs?.server?.serverIp || "opalheaven.mcbe.fr";
+    const serverPort = state.data?.configs?.server?.serverPort || 19153;
     const tr = h(
       "tr",
       null,
       h(
         "td",
-        { colspan: "5", class: "muted", style: "text-align: center; padding: 36px 16px;" },
-        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;" },
-          h("svg", { width: "32", height: "32", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "1.5" },
-            h("circle", { cx: "11", cy: "11", r: "8" }),
-            h("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })
+        { colspan: "5", class: "muted", style: "text-align: center; padding: 40px 16px;" },
+        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 540px; margin: 0 auto;" },
+          h("div", { style: "display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: " + (isOnline ? "var(--primary-mint)" : "var(--text-muted)") },
+            h("span", { class: "crate-color-dot", style: "background: " + (isOnline ? "var(--primary-mint)" : "#ef4444") }),
+            isOnline ? `Serveur ${serverHost}:${serverPort} connecté en direct` : `Serveur ${serverHost}:${serverPort} hors-ligne`
           ),
-          h("span", null, "Aucun événement correspondant aux critères de recherche.")
+          h("p", { class: "muted text-sm", style: "margin: 0; line-height: 1.5;" },
+            isOnline
+              ? `Le serveur Minecraft Bedrock (${state.realServerStatus.software || "Axolotl-PM"} - ${state.realServerStatus.players.online}/${state.realServerStatus.players.max} joueurs) est actif. Les événements in-game (chat, achats shop, minage, commandes) s'afficheront en temps réel dès qu'ils se produisent en jeu.`
+              : "Le serveur Bedrock est actuellement injoignable ou en cours de démarrage."
+          )
         )
       )
     );
@@ -4099,7 +4122,7 @@ const renderLogsTab = () => {
 
     // 3. Serveur
     const serverTd = h("td", { class: "text-sm", style: "color: var(--muted);" },
-      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px;" }, l.server || "Faction Alpha")
+      h("span", { class: "badge", style: "font-size: 11px; padding: 2px 7px;" }, l.server || (state.data?.configs?.server?.serverIp || "opalheaven.mcbe.fr:19153"))
     );
 
     // 4. Joueur
@@ -4271,7 +4294,7 @@ const renderOverviewSubtab = () => {
     }
   }
   if (kpiPeak) {
-    kpiPeak.textContent = status.online ? `Version : ${status.version}` : `Serveur : ${s.serverIp || "play.opalheaven.fr"}:${s.serverPort || 19132}`;
+    kpiPeak.textContent = status.online ? `Version : ${status.version}` : `Serveur : ${s.serverIp || "opalheaven.mcbe.fr"}:${s.serverPort || 19153}`;
   }
 
   // 2. Masse monétaire (si reçue par télémétrie, sinon solde de départ)
@@ -4440,7 +4463,7 @@ const renderServerDistributionBars = () => {
   const info = h("div", { class: "server-dist-info" },
     h("span", { style: "display: flex; align-items: center; gap: 8px;" },
       h("span", { class: "crate-color-dot", style: `background: ${status.online ? "var(--mint)" : "var(--danger)"};` }),
-      h("b", null, `${s.serverIp || "play.opalheaven.fr"}:${s.serverPort || 19132}`)
+      h("b", null, `${s.serverIp || "opalheaven.mcbe.fr"}:${s.serverPort || 19153}`)
     ),
     h("span", { class: "muted" },
       status.online ? `${status.players.online} / ${status.players.max} joueurs (${Math.round((status.players.online / Math.max(1, status.players.max)) * 100)}%)` : "Hors-ligne"
@@ -4769,8 +4792,8 @@ const renderServerNodes = () => {
   const card = h("div", { class: "server-node-card", style: "grid-column: 1 / -1;" });
   const head = h("div", { class: "server-node-head" },
     h("div", null,
-      h("b", { style: "font-size: 16px;" }, s.serverIp || "play.opalheaven.fr"),
-      h("div", { class: "muted text-sm" }, `Port Bedrock : ${s.serverPort || 19132} • Logiciel : ${status.software || "PocketMine-MP"}`)
+      h("b", { style: "font-size: 16px;" }, s.serverIp || "opalheaven.mcbe.fr"),
+      h("div", { class: "muted text-sm" }, `Port Bedrock : ${s.serverPort || 19153} • Logiciel : ${status.software || "Axolotl-PM"}`)
     ),
     h("span", {
       class: "badge",
@@ -6415,7 +6438,7 @@ on("#server-ip", "input", (e) => {
 });
 on("#server-port", "change", (e) => {
   if (!state.data.configs.server) state.data.configs.server = defaultServerConfig();
-  state.data.configs.server.serverPort = Math.max(1, Math.min(65535, Number(e.target.value) || 19132));
+  state.data.configs.server.serverPort = Math.max(1, Math.min(65535, Number(e.target.value) || 19153));
   setDirty(true);
 });
 on("#server-test-ping-btn", "click", async () => {
@@ -6430,7 +6453,7 @@ on("#server-test-ping-btn", "click", async () => {
     const res = await fetchRealServerStatus();
     if (statusEl) {
       if (res.online) {
-        statusEl.textContent = `🟢 En ligne (${res.players.online}/${res.players.max} joueurs) - ${res.version || res.software || "PocketMine-MP"}`;
+        statusEl.textContent = `🟢 En ligne (${res.players.online}/${res.players.max} joueurs) - ${res.software || res.version || "Axolotl-PM"}`;
         statusEl.style.color = "var(--primary-mint)";
       } else {
         statusEl.textContent = `🔴 Inaccessible (${res.host}:${res.port})`;
