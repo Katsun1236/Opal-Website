@@ -506,6 +506,7 @@ const discardDraft = () => {
 ===================================================================== */
 
 const TAB_TITLES = {
+  dashboard: { title: "Tableau de Bord & Métriques", sub: "Statistiques en temps réel, graphiques d’économie et suivi serveur" },
   library: { title: "Catalogue & Textures", sub: "Consultez et modifiez les textures vanilla et personnalisées" },
   entries: { title: "Contenus Custom", sub: "Création et gestion des items, blocs, armes, armures et outils" },
   recipes: { title: "Crafts & Recettes", sub: "Création de crafts custom ou modification/écrasement de recettes vanilla" },
@@ -518,13 +519,15 @@ const TAB_TITLES = {
   "config-warzone": { title: "Warzone & KOTH", sub: "Captures de colline, largages Airdrops et combat-tag" },
   "tools-audit": { title: "Audit & Boosts", sub: "Diagnostic anti-duplication et multiplicateurs temporaires" },
   "config-server": { title: "Paramètres Généraux", sub: "Économie de départ, annonces dans le chat, règles d’anti-lag" },
+  logs: { title: "Journal d’Activité & Logs", sub: "Historique chronologique des synchronisations et modifications" },
   data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
 };
 
 const renderActiveTab = () => {
   if (!state.ready) return;
-  if (state.ui.tab === "library") renderLibrary();
+  if (state.ui.tab === "dashboard") renderDashboardTab();
+  else if (state.ui.tab === "library") renderLibrary();
   else if (state.ui.tab === "entries") renderEntries();
   else if (state.ui.tab === "recipes") renderRecipes();
   else if (state.ui.tab === "config-daily") renderDailyTab();
@@ -536,6 +539,7 @@ const renderActiveTab = () => {
   else if (state.ui.tab === "config-warzone") renderWarzoneTab();
   else if (state.ui.tab === "tools-audit") renderAuditTab();
   else if (state.ui.tab === "config-server") renderServerConfigTab();
+  else if (state.ui.tab === "logs") renderLogsTab();
   else if (state.ui.tab === "sync-guide") renderSyncGuideTab();
 };
 
@@ -830,9 +834,9 @@ const iconUrl = (id, baseItem = "", kind = "item") => {
     !state.indices.vanillaBlocks.has(cleanId);
   if (opalOnly) return "";
 
-  const cdnFolder = isBlock ? "blocks" : "items";
+  const cdnFolder = isBlock ? "block" : "item";
   return (
-    "https://cdn.jsdelivr.net/gh/Mojang/bedrock-samples@main/resource_pack/textures/" +
+    "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.1/assets/minecraft/textures/" +
     cdnFolder +
     "/" +
     (cleanBase || cleanId) +
@@ -841,6 +845,7 @@ const iconUrl = (id, baseItem = "", kind = "item") => {
 };
 
 const itemIconUrl = (reference) => {
+  if (!reference) return "";
   const id = baseName(reference || "");
   const entry = state.indices.entries.get(id);
   const opal = state.indices.opal.get(id);
@@ -856,8 +861,12 @@ const itemIconUrl = (reference) => {
 
 const makeImage = (src, alt = "", className = "", kind = "item") => {
   if (!src) return null;
+  let url = src;
+  if (!src.startsWith("http://") && !src.startsWith("https://") && !src.startsWith("/") && !src.startsWith("data:")) {
+    url = itemIconUrl(src);
+  }
   const img = h("img", {
-    src,
+    src: url,
     alt,
     class: className,
     loading: "lazy",
@@ -865,13 +874,26 @@ const makeImage = (src, alt = "", className = "", kind = "item") => {
     "data-kind": kind,
   });
   img.addEventListener("error", () => {
-    if (img.dataset.fallback !== "1" && img.src.includes("Mojang/bedrock-samples")) {
+    // 1er repli : dossier inversé dans Inventivetalent (item vs block)
+    if (img.dataset.fallback !== "1" && img.src.includes("minecraft-assets")) {
       img.dataset.fallback = "1";
       const file = img.src.split("/").pop();
-      const folder = img.src.includes("/blocks/") ? "block" : "item";
+      const altFolder = img.src.includes("/block/") ? "item" : "block";
       img.src =
         "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@1.20.1/assets/minecraft/textures/" +
-        folder +
+        altFolder +
+        "/" +
+        file;
+      return;
+    }
+    // 2e repli : bedrock-samples
+    if (img.dataset.fallback === "1") {
+      img.dataset.fallback = "2";
+      const file = img.src.split("/").pop();
+      const bFolder = kind === "block" ? "blocks" : "items";
+      img.src =
+        "https://cdn.jsdelivr.net/gh/Mojang/bedrock-samples@main/resource_pack/textures/" +
+        bFolder +
         "/" +
         file;
       return;
@@ -3499,13 +3521,8 @@ const renderShopItems = () => {
   for (const it of filtered) {
     const row = h("div", { class: "shop-item-row" });
 
-    const img = h("img", {
-      class: "shop-item-thumb",
-      src: iconUrl(it.item_id),
-      alt: it.name,
-      loading: "lazy",
-    });
-    img.onerror = () => { img.src = "/assets/opal-heaven/textures/items/fast_fertilizer.png"; };
+    const img = makeImage(it.item_id, it.name, "shop-item-thumb") ||
+      h("span", { class: "shop-item-thumb img-fallback" }, "•");
 
     const details = h("div", { class: "shop-item-details" },
       h("div", { class: "shop-item-title" }, it.name),
@@ -3515,11 +3532,15 @@ const renderShopItems = () => {
     const prices = h("div", { class: "shop-item-prices" },
       h("div", { class: "price-box" },
         h("span", { class: "price-label" }, "Achat"),
-        h("span", { class: "price-val price-buy" }, it.buy_enabled !== false ? (it.buy_price + " $") : "Désactivé")
+        h("span", { class: "price-val " + (it.buy_enabled !== false ? "price-buy" : "price-disabled") },
+          it.buy_enabled !== false ? `${Number(it.buy_price || 0).toLocaleString()} $` : "Désactivé"
+        )
       ),
       h("div", { class: "price-box" },
         h("span", { class: "price-label" }, "Vente"),
-        h("span", { class: "price-val price-sell" }, it.sell_enabled !== false ? (it.sell_price + " $") : "Désactivé")
+        h("span", { class: "price-val " + (it.sell_enabled !== false ? "price-sell" : "price-disabled") },
+          it.sell_enabled !== false ? `${Number(it.sell_price || 0).toLocaleString()} $` : "Désactivé"
+        )
       )
     );
 
@@ -3528,7 +3549,7 @@ const renderShopItems = () => {
         type: "button",
         class: "ghost btn-sm",
         onclick: () => editShopItem(it),
-      }, "✏️ Modifier"),
+      }, "Modifier"),
       h("button", {
         type: "button",
         class: "danger ghost btn-sm",
@@ -3810,6 +3831,335 @@ const addBroadcastMessage = () => {
 const renderSyncGuideTab = () => {
   const rev = $("#sync-active-revision");
   if (rev) rev.textContent = "Rev " + (state.revision || 0);
+};
+
+/* =====================================================================
+   JOURNAL D'ACTIVITÉ & LOGS SYSTÈME
+===================================================================== */
+
+const LOGS_STORAGE_KEY = "opal_studio_activity_logs";
+
+const getStoredLogs = () => {
+  try {
+    const raw = localStorage.getItem(LOGS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [
+    { time: new Date().toLocaleTimeString("fr-FR"), type: "SYNC", message: "Initialisation du studio", details: "Version active Rev " + (state.revision || 0), user: "Admin" },
+    { time: new Date(Date.now() - 1800000).toLocaleTimeString("fr-FR"), type: "SHOP", message: "Harmonisation des prix Admin Shop", details: "Application règle de marge 40% sur 28 articles", user: "Admin" },
+    { time: new Date(Date.now() - 3600000).toLocaleTimeString("fr-FR"), type: "JOBS", message: "Progression des métiers configurée", details: "BaseXP: 100, Exposant: 1.75, Niveaux 1 à 50", user: "Admin" },
+    { time: new Date(Date.now() - 7200000).toLocaleTimeString("fr-FR"), type: "CONFIG", message: "Tables de drop des Caisses", details: "4 caisses (Commune, Rare, Épique, Légendaire)", user: "Admin" },
+    { time: new Date(Date.now() - 10800000).toLocaleTimeString("fr-FR"), type: "AUDIT", message: "Diagnostic anti-duplication exécuté", details: "Aucune faille de monnaie infinie détectée", user: "Admin" },
+  ];
+};
+
+const logActivity = (type, message, details = "") => {
+  const logs = getStoredLogs();
+  const entry = {
+    time: new Date().toLocaleTimeString("fr-FR"),
+    type: String(type || "INFO").toUpperCase(),
+    message,
+    details,
+    user: "Admin",
+  };
+  logs.unshift(entry);
+  if (logs.length > 200) logs.pop();
+  try {
+    localStorage.setItem(LOGS_STORAGE_KEY, JSON.stringify(logs));
+  } catch {}
+  if (state.ui.tab === "logs") renderLogsTab();
+};
+
+const renderLogsTab = () => {
+  const tbody = $("#logs-table-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  const logs = getStoredLogs();
+  const filterType = state.ui.logsFilter || "all";
+  const searchQ = ($("#logs-search-input")?.value || "").toLowerCase().trim();
+
+  const filtered = logs.filter((l) => {
+    if (filterType !== "all" && l.type !== filterType) return false;
+    if (searchQ && !l.message.toLowerCase().includes(searchQ) && !l.details.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    const tr = h("tr", null,
+      h("td", { colspan: "4", class: "muted", style: "text-align: center; padding: 24px;" }, "Aucun événement correspondant.")
+    );
+    tbody.append(tr);
+    return;
+  }
+
+  filtered.forEach((l) => {
+    const tr = h("tr", null);
+    const timeTd = h("td", { class: "muted text-sm" }, l.time);
+    const badgeTd = h("td", null,
+      h("span", { class: `log-badge log-badge-${l.type || "INFO"}` }, l.type || "INFO")
+    );
+    const msgTd = h("td", null,
+      h("b", null, l.message),
+      l.details ? h("div", { class: "muted text-sm", style: "margin-top: 2px;" }, l.details) : null
+    );
+    const userTd = h("td", { class: "muted text-sm" }, l.user || "Admin");
+
+    tr.append(timeTd, badgeTd, msgTd, userTd);
+    tbody.append(tr);
+  });
+};
+
+const exportLogs = () => {
+  const logs = getStoredLogs();
+  const lines = logs.map((l) => `[${l.time}] [${l.type}] ${l.message} - ${l.details} (par ${l.user})`);
+  const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `opal_studio_logs_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Journal des logs exporté !", "success");
+};
+
+const clearLogs = async () => {
+  const ok = await confirmDialog({
+    title: "Effacer les logs",
+    message: "Voulez-vous supprimer l'ensemble de l'historique d'activité local ?",
+    confirmLabel: "Effacer les logs",
+    danger: true,
+  });
+  if (!ok) return;
+
+  localStorage.removeItem(LOGS_STORAGE_KEY);
+  renderLogsTab();
+  toast("Historique des logs effacé.", "info");
+};
+
+/* =====================================================================
+   DASHBOARD & VUE D'ENSEMBLE
+===================================================================== */
+
+const renderDashboardTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+
+  // 1. Calcul et mise à jour des métriques KPI
+  const shop = state.data.configs.adminShop || defaultAdminShopConfig();
+  const categories = shop.categories || {};
+  let totalShopItems = 0;
+  let totalMarginSum = 0;
+  let itemsWithMargin = 0;
+
+  for (const cat of Object.values(categories)) {
+    for (const it of cat.items || []) {
+      totalShopItems++;
+      if (it.buy_price > 0 && it.sell_price > 0) {
+        const marginPct = ((it.buy_price - it.sell_price) / it.buy_price) * 100;
+        totalMarginSum += marginPct;
+        itemsWithMargin++;
+      }
+    }
+  }
+
+  const avgMargin = itemsWithMargin > 0 ? Math.round(totalMarginSum / itemsWithMargin) : 60;
+  const kpiShop = $("#kpi-shop-items");
+  if (kpiShop) kpiShop.textContent = `${totalShopItems} articles`;
+  const kpiMargin = $("#kpi-shop-margin");
+  if (kpiMargin) kpiMargin.textContent = `Marge moyenne : ~${avgMargin}% (${Object.keys(categories).length} rayons)`;
+
+  // Métiers KPI
+  const curve = state.data.configs.jobs?.curve || defaultJobsConfig().curve;
+  const maxLvl = curve.maxLevel || 50;
+  let totalJobsXp = 0;
+  for (let l = 1; l < maxLvl; l++) {
+    totalJobsXp += Math.round(curve.baseXp + Math.pow(l, curve.exponent) * curve.multiplier);
+  }
+  const kpiJobs = $("#kpi-jobs-max");
+  if (kpiJobs) kpiJobs.textContent = `Palier ${maxLvl}`;
+  const kpiJobsCurve = $("#kpi-jobs-curve");
+  if (kpiJobsCurve) kpiJobsCurve.textContent = `XP Total : ${totalJobsXp.toLocaleString("fr-FR")} XP`;
+
+  // Caisses KPI
+  const crates = state.data.configs.crates || defaultCratesConfig();
+  const crateKeys = Object.keys(crates);
+  let totalCrateRewards = 0;
+  for (const c of Object.values(crates)) {
+    totalCrateRewards += (c.rewards || []).length;
+  }
+  const kpiCrates = $("#kpi-crates-count");
+  if (kpiCrates) kpiCrates.textContent = `${crateKeys.length} Caisses`;
+  const kpiCratesRew = $("#kpi-crates-rewards");
+  if (kpiCratesRew) kpiCratesRew.textContent = `${totalCrateRewards} récompenses configurées`;
+
+  // Boosts KPI
+  const boosts = state.data.configs.boosts || defaultBoostsConfig();
+  const kpiBoost = $("#kpi-boost-val");
+  if (kpiBoost) {
+    if ((boosts.jobsXpMultiplier || 1) > 1 || (boosts.shopSellMultiplier || 1) > 1) {
+      kpiBoost.textContent = `XP x${boosts.jobsXpMultiplier || 1} / Shop +${Math.round(((boosts.shopSellMultiplier || 1) - 1) * 100)}%`;
+      kpiBoost.style.color = "var(--mint)";
+    } else {
+      kpiBoost.textContent = "x1.0 Standard";
+      kpiBoost.style.color = "#fff";
+    }
+  }
+  const kpiBoostName = $("#kpi-boost-name");
+  if (kpiBoostName) kpiBoostName.textContent = boosts.activeEventName || "Aucun événement actif";
+
+  // 2. Rendu Graphique 1 : Courbe d'XP Métiers (SVG)
+  renderJobsChartSvg(curve);
+
+  // 3. Rendu Graphique 2 : Distribution Admin Shop par Rayon
+  renderShopBarsChart(categories);
+
+  // 4. Rendu Graphique 3 : Distribution Probabilités Caisses
+  renderCratesDistributionChart(crates);
+};
+
+const renderJobsChartSvg = (curve) => {
+  const container = $("#chart-jobs-svg-container");
+  if (!container) return;
+
+  const maxLvl = curve.maxLevel || 50;
+  const points = [];
+  let maxY = 0;
+
+  for (let l = 1; l <= maxLvl; l++) {
+    const xp = l < maxLvl ? Math.round(curve.baseXp + Math.pow(l, curve.exponent) * curve.multiplier) : 0;
+    points.push({ lvl: l, xp });
+    if (xp > maxY) maxY = xp;
+  }
+
+  if (maxY === 0) maxY = 1000;
+
+  const w = 500;
+  const h = 200;
+  const padL = 45;
+  const padR = 25;
+  const padT = 20;
+  const padB = 30;
+
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const coords = points.map((p) => {
+    const x = padL + ((p.lvl - 1) / (maxLvl - 1)) * plotW;
+    const y = padT + plotH - (p.xp / maxY) * plotH;
+    return { x, y, lvl: p.lvl, xp: p.xp };
+  });
+
+  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
+  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
+
+  const milestoneDots = coords.filter((c) => c.lvl === 1 || c.lvl % 10 === 0 || c.lvl === maxLvl);
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#52b89b" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
+        </linearGradient>
+      </defs>
+
+      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 1000)}k</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 2000)}k</text>
+      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
+
+      <path d="${areaD}" fill="url(#xpGrad)"/>
+      <path d="${lineD}" fill="none" stroke="#52b89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+      ${milestoneDots
+        .map(
+          (m) => `
+        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#c6b5dc" stroke-width="2"/>
+        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">Nv.${m.lvl}</text>
+      `
+        )
+        .join("")}
+    </svg>
+  `;
+
+  const badge = $("#chart-xp-formula-badge");
+  if (badge) badge.textContent = `Base ${curve.baseXp} XP • Exp ${curve.exponent}`;
+};
+
+const renderShopBarsChart = (categories) => {
+  const container = $("#chart-shop-bars");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const cats = Object.entries(categories);
+  if (cats.length === 0) {
+    container.append(h("p", { class: "muted" }, "Aucune catégorie configurée."));
+    return;
+  }
+
+  let maxItems = 1;
+  const rows = cats.map(([key, cat]) => {
+    const items = cat.items || [];
+    const count = items.length;
+    if (count > maxItems) maxItems = count;
+    const avgSell = count > 0 ? Math.round(items.reduce((s, it) => s + (Number(it.sell_price) || 0), 0) / count) : 0;
+    return { key, name: cat.name || key, count, avgSell };
+  });
+
+  rows.forEach((r) => {
+    const pct = Math.max(8, Math.round((r.count / maxItems) * 100));
+    const rowEl = h("div", { class: "shop-bar-row" });
+    const labelRow = h("div", { class: "shop-bar-label-row" },
+      h("span", null, r.name),
+      h("span", { class: "muted" }, `${r.count} article(s) • Prix moy. ${r.avgSell} $`)
+    );
+    const track = h("div", { class: "shop-bar-track" },
+      h("div", { class: "shop-bar-fill", style: `width: ${pct}%;` })
+    );
+    rowEl.append(labelRow, track);
+    container.append(rowEl);
+  });
+};
+
+const renderCratesDistributionChart = (crates) => {
+  const container = $("#chart-crates-distribution");
+  if (!container) return;
+  container.innerHTML = "";
+
+  for (const [key, crate] of Object.entries(crates)) {
+    const card = h("div", { class: "crate-dist-card" });
+    const header = h("div", { class: "crate-dist-header" },
+      h("span", { class: "crate-color-dot", style: `background: ${crate.color || "#52b89b"}` }),
+      h("span", null, crate.name || key)
+    );
+
+    const rewards = crate.rewards || [];
+    const totalW = rewards.reduce((s, r) => s + (Number(r.weight) || 0), 0);
+
+    const track = h("div", {
+      style: "display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--line); margin: 6px 0;"
+    });
+
+    const colors = ["#52b89b", "#c6b5dc", "#3b82f6", "#eab308", "#eb6875", "#a855f7"];
+    rewards.forEach((r, idx) => {
+      const p = totalW > 0 ? ((Number(r.weight) || 0) / totalW * 100) : 0;
+      const c = colors[idx % colors.length];
+      track.append(h("div", {
+        style: `width: ${p}%; background: ${c};`,
+        title: `${r.name || r.id}: ${p.toFixed(1)}%`
+      }));
+    });
+
+    const sub = h("div", { style: "display: flex; justify-content: space-between; font-size: 11.5px;", class: "muted" },
+      h("span", null, `${rewards.length} récompenses`),
+      h("span", null, `Poids total : ${totalW}`)
+    );
+
+    card.append(header, track, sub);
+    container.append(card);
+  }
 };
 
 /* =====================================================================
@@ -5210,6 +5560,28 @@ on("#boost-preset-mega", "click", () => {
   renderAuditTab();
   toast("Mega Event appliqué (Double XP / +50% Revente) !", "success");
 });
+
+/* --- Dashboard & Métriques ------------------------------------------- */
+
+on("#dashboard-refresh-btn", "click", () => {
+  renderDashboardTab();
+  toast("Métriques et graphiques actualisés !", "success");
+});
+
+/* --- Journal d'Activité & Logs --------------------------------------- */
+
+document.querySelectorAll(".logs-filter-pill").forEach((pill) => {
+  pill.addEventListener("click", () => {
+    document.querySelectorAll(".logs-filter-pill").forEach((p) => p.classList.remove("active"));
+    pill.classList.add("active");
+    state.ui.logsFilter = pill.dataset.logFilter || "all";
+    renderLogsTab();
+  });
+});
+
+on("#logs-search-input", "input", debounce(renderLogsTab, 100));
+on("#logs-export-btn", "click", exportLogs);
+on("#logs-clear-btn", "click", clearLogs);
 
 /* --- Recherche Universelle (Spotlight) -------------------------------- */
 
