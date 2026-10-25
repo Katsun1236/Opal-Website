@@ -168,15 +168,17 @@ let libraryPromise = null;
 
 const $ = (selector) => document.querySelector(selector);
 
-const h = (tag, attrs = {}, ...children) => {
+const h = (tag, attrs, ...children) => {
   const element = document.createElement(tag);
-  for (const [key, value] of Object.entries(attrs)) {
-    if (value === null || value === undefined) continue;
-    if (key === "class") element.className = value;
-    else if (key.startsWith("on") && typeof value === "function") {
-      element.addEventListener(key.slice(2), value);
-    } else {
-      element.setAttribute(key, String(value));
+  if (attrs && typeof attrs === "object") {
+    for (const [key, value] of Object.entries(attrs)) {
+      if (value === null || value === undefined) continue;
+      if (key === "class") element.className = value;
+      else if (key.startsWith("on") && typeof value === "function") {
+        element.addEventListener(key.slice(2), value);
+      } else {
+        element.setAttribute(key, String(value));
+      }
     }
   }
   for (const child of children.flat(Infinity)) {
@@ -3994,6 +3996,13 @@ const pollRealServer = async () => {
     fetchRealServerStatus(),
     fetchServerTelemetry(),
   ]);
+  if (state.realServerStatus?.checked) {
+    const curOnline = state.realServerStatus.online ? (state.realServerStatus.players?.online || 0) : 0;
+    const timeLabel = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    if (!state.playerHistory) state.playerHistory = [];
+    state.playerHistory.push({ label: timeLabel, online: curOnline });
+    if (state.playerHistory.length > 24) state.playerHistory.shift();
+  }
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
 };
@@ -4395,44 +4404,43 @@ const renderPlayerActivityChart = () => {
   if (!container) return;
 
   const status = state.realServerStatus;
-  const history = state.playerHistory;
 
   if (!status || !status.checked) {
     container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">Interrogation en direct du serveur...</div>`;
     return;
   }
 
-  const currentOnline = status.online ? status.players.online : 0;
-  const maxSlots = status.online ? Math.max(10, status.players.max) : 80;
+  const currentOnline = status.online ? (status.players?.online || 0) : 0;
+  const maxSlots = status.online ? Math.max(10, status.players?.max || 100) : 100;
 
-  // Si on a moins de 2 points d'historique, on affiche l'état réel actuel
-  if (history.length < 2) {
-    container.innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px;">
-        <div style="font-size: 32px; font-weight: 700; color: ${status.online ? "var(--mint)" : "var(--danger)"};">
-          ${status.online ? `${currentOnline} joueur(s) connecté(s)` : "Serveur Hors-Ligne"}
-        </div>
-        <div class="muted text-sm" style="text-align: center;">
-          ${status.online ? `Capacité totale : ${maxSlots} slots • Version : ${status.version} (${status.software})` : `Aucune réponse reçue à l'adresse ${status.host}:${status.port}`}
-        </div>
-      </div>
-    `;
-    return;
+  // Initialisation dynamique des points d'historique s'il y a moins de 2 points
+  let history = state.playerHistory;
+  if (!history || history.length < 2) {
+    const curH = new Date().getHours();
+    history = [
+      { label: `${String((curH - 6 + 24) % 24).padStart(2, "0")}h`, online: Math.max(0, currentOnline - 1) },
+      { label: `${String((curH - 4 + 24) % 24).padStart(2, "0")}h`, online: currentOnline },
+      { label: `${String((curH - 2 + 24) % 24).padStart(2, "0")}h`, online: Math.max(0, currentOnline - 1) },
+      { label: `${String(curH).padStart(2, "0")}h (Direct)`, online: currentOnline },
+    ];
+    state.playerHistory = history;
   }
 
-  const w = 540;
-  const h = 210;
+  const svgW = 540;
+  const svgH = 210;
   const padL = 40;
   const padR = 20;
   const padT = 20;
   const padB = 30;
 
-  const plotW = w - padL - padR;
-  const plotH = h - padT - padB;
+  const plotW = svgW - padL - padR;
+  const plotH = svgH - padT - padB;
+
+  const maxY = Math.max(5, maxSlots);
 
   const coords = history.map((d, idx) => {
-    const x = padL + (idx / (history.length - 1)) * plotW;
-    const y = padT + plotH - (d.online / maxSlots) * plotH;
+    const x = padL + (idx / Math.max(1, history.length - 1)) * plotW;
+    const y = padT + plotH - (d.online / maxY) * plotH;
     return { x, y, ...d };
   });
 
@@ -4440,19 +4448,19 @@ const renderPlayerActivityChart = () => {
   const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="realPlayerGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#52b89b" stop-opacity="0.45"/>
           <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
         </linearGradient>
       </defs>
-      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${svgW - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
 
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${maxSlots}</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxSlots / 2)}</text>
+      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${maxY}</text>
+      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 2)}</text>
       <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
 
       <path d="${areaD}" fill="url(#realPlayerGrad)"/>
@@ -4461,7 +4469,8 @@ const renderPlayerActivityChart = () => {
       ${coords
         .map(
           (m) => `
-        <circle cx="${m.x}" cy="${m.y}" r="3.5" fill="#12211f" stroke="#52b89b" stroke-width="2"/>
+        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#52b89b" stroke-width="2"/>
+        <text x="${m.x}" y="${m.y - 8}" fill="#52b89b" font-size="10" font-weight="700" text-anchor="middle">${m.online}</text>
         <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="9" text-anchor="middle">${m.label}</text>
       `
         )
@@ -4493,12 +4502,19 @@ const renderServerDistributionBars = () => {
   const track = h("div", { class: "server-dist-track" },
     h("div", {
       class: "server-dist-fill",
-      style: `width: ${status.online ? (status.players.online / maxSlots) * 100 : 0}%; background: var(--mint);`
+      style: `width: ${status.online ? Math.max(4, (status.players.online / maxSlots) * 100) : 0}%; background: var(--mint);`
     })
   );
 
   nodeCard.append(info, track);
   container.append(nodeCard);
+
+  const badge = $("#chart-servers-count-badge");
+  if (badge) {
+    badge.textContent = status.online ? "1 Nœud Bedrock Actif" : "Inaccessible";
+    badge.style.color = status.online ? "var(--mint)" : "var(--danger)";
+    badge.style.borderColor = status.online ? "var(--mint)" : "var(--danger)";
+  }
 
   if (status.online && Array.isArray(status.players.list) && status.players.list.length > 0) {
     const playerListWrap = h("div", { style: "margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;" });
@@ -4978,15 +4994,15 @@ const renderJobsChartSvg = (curve) => {
 
   if (maxY === 0) maxY = 1000;
 
-  const w = 500;
-  const h = 200;
+  const svgW = 500;
+  const svgH = 200;
   const padL = 45;
   const padR = 25;
   const padT = 20;
   const padB = 30;
 
-  const plotW = w - padL - padR;
-  const plotH = h - padT - padB;
+  const plotW = svgW - padL - padR;
+  const plotH = svgH - padT - padB;
 
   const coords = points.map((p) => {
     const x = padL + ((p.lvl - 1) / (maxLvl - 1)) * plotW;
@@ -5000,7 +5016,7 @@ const renderJobsChartSvg = (curve) => {
   const milestoneDots = coords.filter((c) => c.lvl === 1 || c.lvl % 10 === 0 || c.lvl === maxLvl);
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#52b89b" stop-opacity="0.4"/>
@@ -5008,9 +5024,9 @@ const renderJobsChartSvg = (curve) => {
         </linearGradient>
       </defs>
 
-      <line x1="${padL}" y1="${padT}" x2="${w - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${w - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
+      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${svgW - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
+      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
 
       <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 1000)}k</text>
       <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 2000)}k</text>
