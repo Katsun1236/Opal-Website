@@ -366,16 +366,40 @@ const routeRequest = async (req, url, context, store) => {
   if (route === "/server-ping" && req.method === "GET") {
     const host = (url.searchParams.get("host") || "opalheaven.mcbe.fr").trim();
     const port = Number(url.searchParams.get("port")) || 19153;
+    let data = null;
     try {
       const pingRes = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`, {
         headers: { "User-Agent": "OpalStudio/1.0" },
       });
-      if (!pingRes.ok) throw new Error("mcsrvstat status " + pingRes.status);
-      const data = await pingRes.json();
-      return json(data, 200, { "cache-control": "public, max-age=15" });
-    } catch (err) {
-      return json({ online: false, error: err.message }, 200, { "cache-control": "no-cache" });
+      if (pingRes.ok) {
+        data = await pingRes.json();
+      }
+    } catch {}
+
+    // Si mcsrvstat n'arrive pas à joindre le port UDP (filtrage anti-DDoS WinHeberge),
+    // bascule automatique sur le heartbeat direct d'OpalCore reçu dans les 5 dernières minutes !
+    if (!data || !data.online) {
+      try {
+        const telem = await store.get("telemetry", { type: "json" });
+        if (telem && (Date.now() - new Date(telem.receivedAt).getTime() < 300000)) {
+          data = {
+            online: true,
+            ip: host,
+            port,
+            version: telem.server || "Axolotl-PM",
+            players: telem.players || { online: 0, max: 100, list: [] },
+            motd: { clean: ["OPAL HEAVEN » Direct OpalCore"] },
+            software: "Axolotl-PM",
+            tps: telem.tps,
+          };
+        }
+      } catch {}
     }
+
+    if (data) {
+      return json(data, 200, { "cache-control": "no-cache" });
+    }
+    return json({ online: false, host, port }, 200, { "cache-control": "no-cache" });
   }
 
   if (route === "/plugin/telemetry" && req.method === "POST") {

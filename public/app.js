@@ -4002,6 +4002,24 @@ const pollRealServer = async () => {
     fetchRealServerStatus(),
     fetchServerTelemetry(),
   ]);
+
+  // Si la télémétrie en direct d'OpalCore est active, priorité absolue sur le statut
+  if (state.serverTelemetry?.connected && state.serverTelemetry?.telemetry) {
+    const t = state.serverTelemetry.telemetry;
+    state.realServerStatus = {
+      checked: true,
+      host: "opalheaven.mcbe.fr",
+      port: 19153,
+      online: true,
+      players: t.players || { online: 0, max: 100, list: [] },
+      version: t.server || "Axolotl-PM",
+      motd: `OPAL HEAVEN » Direct OpalCore (${t.tps || 20} TPS)`,
+      software: "Axolotl-PM",
+      plugins: [],
+      tps: t.tps || 20,
+    };
+  }
+
   if (state.realServerStatus?.checked) {
     const curOnline = state.realServerStatus.online ? (state.realServerStatus.players?.online || 0) : 0;
     const timeLabel = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
