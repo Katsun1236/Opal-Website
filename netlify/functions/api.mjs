@@ -433,13 +433,31 @@ const routeRequest = async (req, url, context, store) => {
         try {
           existingLogs = (await store.get("server_logs", { type: "json" })) || [];
         } catch {}
-        const merged = [...telemetry.logs, ...existingLogs].slice(0, 300);
-        await store.setJSON("server_logs", merged);
+        
+        // Déduplication stricte par clé unique
+        const seen = new Set();
+        const merged = [];
+        for (const log of [...telemetry.logs, ...existingLogs]) {
+          const key = (log.time || "") + "|" + (log.type || "") + "|" + (log.player || "") + "|" + (log.message || "");
+          if (!seen.has(key)) {
+            seen.add(key);
+            merged.push(log);
+          }
+        }
+        await store.setJSON("server_logs", merged.slice(0, 300));
       }
     } catch (e) {
       return reply({ ok: false, error: e.message, stack: e.stack });
     }
     return reply({ ok: true, timestamp: Date.now() });
+  }
+
+  if (route === "/logs/clear" && req.method === "POST") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    try {
+      await store.delete("server_logs");
+    } catch {}
+    return reply({ ok: true });
   }
 
   if (route === "/telemetry" && req.method === "GET") {

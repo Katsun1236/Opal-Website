@@ -3981,7 +3981,16 @@ const getStoredLogs = () => {
   });
 
   const combined = [...remoteLogs, ...localLogs];
-  return combined.slice(0, 350);
+  const seen = new Set();
+  const deduped = [];
+  for (const log of combined) {
+    const key = (log.time || "") + "|" + (log.type || "") + "|" + (log.player || "") + "|" + (log.message || "");
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(log);
+    }
+  }
+  return deduped.slice(0, 350);
 };
 
 const saveStoredLogs = (logs) => {
@@ -4136,7 +4145,7 @@ const startServerPolling = () => {
     if (state.ui.logsLive) {
       pollRealServer();
     }
-  }, 10000);
+  }, 3000);
 };
 
 const toggleLogsLive = () => {
@@ -4378,8 +4387,19 @@ const clearLogs = async () => {
   if (!ok) return;
 
   saveStoredLogs([]);
+  if (state.serverTelemetry) {
+    state.serverTelemetry.serverLogs = [];
+  }
+  if (state.token) {
+    try {
+      await fetch("/api/logs/clear", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${state.token}` }
+      });
+    } catch {}
+  }
   renderLogsTab();
-  toast("Historique des logs réinitialisé.", "info");
+  toast("Historique des logs réinitialisé sur le serveur et le studio.", "info");
 };
 
 
