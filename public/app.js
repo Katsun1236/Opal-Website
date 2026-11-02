@@ -4194,6 +4194,7 @@ const pollRealServer = async (forcePing = false) => {
   }
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
+  if (state.ui.tab === "players") renderPlayersTab();
   if (state.ui.tab === "moderation") renderModerationTab();
   updateGlobalServerStatus();
 };
@@ -7837,7 +7838,19 @@ const renderModerationTab = async () => {
   state.moderationSanctions = sanctions;
 
   // 2. Joueurs en direct
-  const onlinePlayers = state.serverTelemetry?.telemetry?.playersDetails || [];
+  const telem = state.serverTelemetry?.telemetry;
+  const rawDetails = telem?.players?.details || state.realServerStatus?.players?.details || [];
+  const rawList = telem?.players?.list || state.realServerStatus?.players?.list || [];
+  const onlinePlayers = rawDetails.length > 0
+    ? rawDetails
+    : rawList.map((name) => ({
+        name: typeof name === "string" ? name : (name.name || "Joueur"),
+        rank: "Joueur",
+        world: "world",
+        ping: 0,
+        money: 1000,
+        faction: "Sans Faction"
+      }));
   const onlineNames = onlinePlayers.map((p) => p.name || "").filter(Boolean);
 
   // 3. Calcul des métriques
@@ -8393,7 +8406,26 @@ const renderPlayersTab = async () => {
             h(
               "div",
               { class: "player-profile-names" },
-              h("div", { class: "player-card-username" }, pName),
+              h(
+                "div",
+                { style: "display: flex; align-items: center; gap: 6px;" },
+                h("div", { class: "player-card-username" }, pName),
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    class: "ghost",
+                    style: "padding: 1px 5px; font-size: 11px; opacity: 0.7; cursor: pointer; border-radius: 4px;",
+                    title: "Copier le pseudo",
+                    onclick: (e) => {
+                      e.stopPropagation();
+                      navigator.clipboard?.writeText(pName);
+                      toast(`Pseudo ${pName} copié !`, "info");
+                    }
+                  },
+                  "📋"
+                )
+              ),
               h(
                 "div",
                 { class: "player-card-badges" },
@@ -8406,7 +8438,7 @@ const renderPlayersTab = async () => {
                   role
                 ),
                 isOnline
-                  ? h("span", { class: "status-badge-active", style: "font-size: 10.5px;" }, "🟢 En jeu")
+                  ? h("span", { class: "status-badge-active", style: "font-size: 10.5px;" }, `🟢 En jeu (${p.ping ?? 0} ms)`)
                   : h("span", { class: "status-badge-expired", style: "font-size: 10.5px;" }, "⚪ Hors ligne")
               )
             )
@@ -8425,18 +8457,24 @@ const renderPlayersTab = async () => {
             "div",
             { class: "player-card-stat-item" },
             h("span", { class: "player-card-stat-label" }, "Faction"),
-            h("span", { class: "player-card-stat-val" }, faction)
+            h("span", { class: "player-card-stat-val", style: "color: #60a5fa;" }, faction)
           ),
           h(
             "div",
             { class: "player-card-stat-item" },
-            h("span", { class: "player-card-stat-label" }, "Monde actuel"),
-            h("span", { class: "player-card-stat-val" }, p.world || "world")
+            h("span", { class: "player-card-stat-label" }, isOnline ? "Monde & Coordonnées" : "Dernière Connexion"),
+            h(
+              "span",
+              { class: "player-card-stat-val", style: isOnline ? "color: var(--mint); font-family: monospace;" : "" },
+              isOnline
+                ? `${p.world || "world"} (X:${p.x ?? "?"} Z:${p.z ?? "?"})`
+                : (p.last_join ? String(p.last_join).slice(0, 16) : "N/A")
+            )
           ),
           h(
             "div",
             { class: "player-card-stat-item" },
-            h("span", { class: "player-card-stat-label" }, "Modération"),
+            h("span", { class: "player-card-stat-label" }, isOnline ? "Statut Modération" : "Sanction"),
             h(
               "span",
               { class: "player-card-stat-val" },
