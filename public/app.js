@@ -533,11 +533,13 @@ const TAB_TITLES = {
   data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
   "config-roles": { title: "Grades & Permissions", sub: "Configuration des rangs, multiplicateurs et hiérarchie de permissions" },
+  moderation: { title: "Modération & Sécurité", sub: "Pilotage des sanctions, surveillance des joueurs connectés et registre d’audit" },
 };
 
 const renderActiveTab = () => {
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
+  if (state.ui.tab === "moderation") renderModerationTab();
   if (!state.ready) return;
   if (state.ui.tab === "library") renderLibrary();
   else if (state.ui.tab === "entries") renderEntries();
@@ -4152,6 +4154,7 @@ const pollRealServer = async (forcePing = false) => {
   }
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
+  if (state.ui.tab === "moderation") renderModerationTab();
 };
 
 const startServerPolling = () => {
@@ -7559,3 +7562,430 @@ on("#mod-action-form", "submit", async (e) => {
   if (!player) return;
   await submitModerationAction(player, action, reason, duration);
 });
+
+/* =====================================================================
+   MODULE MODÉRATION DÉDIÉ (ONGLET MODÉRATION)
+===================================================================== */
+
+let modAuditFilter = "all";
+let modAuditSearch = "";
+
+const selectModDirectType = (type) => {
+  document.querySelectorAll("#mod-direct-type-chips .chip-btn").forEach((c) => {
+    c.classList.toggle("active", c.dataset.modType === type);
+  });
+  const durationField = $("#mod-direct-duration-field");
+  if (durationField) {
+    durationField.style.display = ["MUTE", "BAN"].includes(type) ? "block" : "none";
+  }
+};
+
+const revokeSanction = async (sanctionId, target, action) => {
+  if (!confirm(`Voulez-vous vraiment lever la sanction [${action}] pour ${target} ?`)) return;
+  try {
+    const res = await fetch("/api/moderation/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: sanctionId, target, action })
+    });
+    if (res.ok) {
+      toast(`Sanction [${action}] levée avec succès pour ${target} !`, "success");
+      await renderModerationTab();
+    } else {
+      toast("Erreur lors de la révocation de la sanction.", "error");
+    }
+  } catch {
+    toast("Erreur réseau.", "error");
+  }
+};
+
+const renderModerationTab = async () => {
+  // 1. Récupération des sanctions depuis l'API
+  let sanctions = [];
+  try {
+    const res = await fetch("/api/moderation/sanctions");
+    if (res.ok) {
+      const data = await res.json();
+      sanctions = data.sanctions || [];
+    }
+  } catch {}
+  state.moderationSanctions = sanctions;
+
+  // 2. Joueurs en direct
+  const onlinePlayers = state.serverTelemetry?.telemetry?.playersDetails || [];
+  const onlineNames = onlinePlayers.map((p) => p.name || "").filter(Boolean);
+
+  // 3. Calcul des métriques
+  const totalSanctions = sanctions.length;
+  const activeBans = sanctions.filter((s) => s.action === "BAN" && s.active !== false).length;
+  const activeMutes = sanctions.filter((s) => s.action === "MUTE" && s.active !== false).length;
+  const totalOnline = onlinePlayers.length;
+
+  const statTotal = $("#mod-stat-total");
+  const statBans = $("#mod-stat-bans");
+  const statMutes = $("#mod-stat-mutes");
+  const statOnline = $("#mod-stat-online");
+  const onlineBadge = $("#mod-online-count-badge");
+  const navModBadge = $("#nav-moderation-badge");
+
+  if (statTotal) statTotal.textContent = String(totalSanctions);
+  if (statBans) statBans.textContent = String(activeBans);
+  if (statMutes) statMutes.textContent = String(activeMutes);
+  if (statOnline) statOnline.textContent = String(totalOnline);
+  if (onlineBadge) onlineBadge.textContent = `${totalOnline} en jeu`;
+  if (navModBadge) {
+    navModBadge.textContent = activeBans + activeMutes > 0 ? `${activeBans + activeMutes} actifs` : "Actif";
+  }
+
+  // 4. Suggestions de joueurs rapides sous l'input
+  const quickChipsContainer = $("#mod-quick-players-chips");
+  if (quickChipsContainer) {
+    quickChipsContainer.replaceChildren();
+    if (onlineNames.length > 0) {
+      onlineNames.forEach((name) => {
+        const chip = h(
+          "button",
+          {
+            type: "button",
+            class: "chip-btn",
+            style: "font-size: 11px; padding: 2px 8px; border-color: rgba(82,184,155,0.4);",
+            onclick: () => {
+              const inp = $("#mod-direct-target");
+              if (inp) {
+                inp.value = name;
+                inp.focus();
+              }
+            }
+          },
+          `🟢 ${name}`
+        );
+        quickChipsContainer.appendChild(chip);
+      });
+    }
+  }
+
+  // 5. Rendu des cartes de joueurs en ligne dans la colonne de droite
+  const liveContainer = $("#mod-live-players-container");
+  if (liveContainer) {
+    liveContainer.replaceChildren();
+    if (onlinePlayers.length === 0) {
+      liveContainer.appendChild(
+        h(
+          "div",
+          { class: "card", style: "background: rgba(255,255,255,0.02); text-align: center; padding: 32px 16px; border: 1px dashed var(--line);" },
+          h("div", { style: "font-size: 28px; margin-bottom: 8px;" }, "👥"),
+          h("p", { class: "muted text-sm", style: "margin: 0;" }, "0 joueur connecté pour le moment."),
+          h("p", { class: "muted text-sm", style: "margin: 4px 0 0 0; font-size: 11.5px;" }, "Dès qu'un joueur rejoint le serveur Axolotl-PM, sa fiche en direct et ses actions apparaîtront ici.")
+        )
+      );
+    } else {
+      onlinePlayers.forEach((p) => {
+        const pName = p.name || "Joueur";
+        const rank = p.rank || "Joueur";
+        const ping = p.ping ?? 0;
+        const world = p.world || "world";
+        const money = p.money ?? 0;
+
+        const avatarImg = h("img", {
+          class: "mod-player-avatar",
+          src: `https://api.creepernation.net/avatar/${encodeURIComponent(pName)}?fallback=steve&size=40`,
+          alt: pName,
+          onerror: (e) => {
+            e.target.src = "/assets/icon.png";
+          }
+        });
+
+        const card = h(
+          "div",
+          { class: "mod-player-card" },
+          h(
+            "div",
+            { class: "mod-player-info" },
+            avatarImg,
+            h(
+              "div",
+              { class: "mod-player-details" },
+              h(
+                "div",
+                { class: "mod-player-name-row" },
+                h("strong", { style: "font-size: 13.5px; color: var(--text);" }, pName),
+                h("span", { class: "subnav-badge", style: "font-size: 10px; padding: 2px 6px;" }, rank)
+              ),
+              h(
+                "div",
+                { class: "mod-player-meta-row" },
+                h("span", null, `🌐 ${world}`),
+                h("span", null, `⚡ ${ping}ms`),
+                h("span", { style: "color: var(--mint);" }, `$${money}`)
+              )
+            )
+          ),
+          h(
+            "div",
+            { class: "mod-player-actions" },
+            h(
+              "button",
+              {
+                type: "button",
+                class: "btn-xs",
+                title: "Consulter le dossier joueur complet",
+                onclick: () => openPlayerInspector(pName)
+              },
+              "🔍 Dossier"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                class: "btn-xs",
+                title: "Avertir le joueur",
+                onclick: () => {
+                  const targetInput = $("#mod-direct-target");
+                  if (targetInput) targetInput.value = pName;
+                  selectModDirectType("WARN");
+                  $("#mod-direct-reason")?.focus();
+                }
+              },
+              "⚠️ Warn"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                class: "btn-xs",
+                title: "Réduire au silence",
+                onclick: () => {
+                  const targetInput = $("#mod-direct-target");
+                  if (targetInput) targetInput.value = pName;
+                  selectModDirectType("MUTE");
+                  $("#mod-direct-reason")?.focus();
+                }
+              },
+              "🔇 Mute"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                class: "btn-xs",
+                title: "Figer le joueur pour vérification",
+                onclick: async () => {
+                  await submitModerationAction(pName, "FREEZE", "Contrôle staff / Freeze", null);
+                  renderModerationTab();
+                }
+              },
+              "❄️ Freeze"
+            ),
+            h(
+              "button",
+              {
+                type: "button",
+                class: "btn-xs danger-ghost",
+                title: "Bannir le joueur",
+                onclick: () => {
+                  const targetInput = $("#mod-direct-target");
+                  if (targetInput) targetInput.value = pName;
+                  selectModDirectType("BAN");
+                  $("#mod-direct-reason")?.focus();
+                }
+              },
+              "🔨 Ban"
+            )
+          )
+        );
+        liveContainer.appendChild(card);
+      });
+    }
+  }
+
+  // 6. Rendu du registre d'audit des sanctions
+  const tbody = $("#mod-sanctions-table-body");
+  if (tbody) {
+    tbody.replaceChildren();
+
+    const q = (modAuditSearch || "").toLowerCase().trim();
+    const filtered = sanctions.filter((s) => {
+      if (modAuditFilter === "active" && s.active === false) return false;
+      if (["BAN", "MUTE", "WARN", "FREEZE", "KICK"].includes(modAuditFilter) && s.action !== modAuditFilter) return false;
+      if (q) {
+        const tMatch = (s.target || "").toLowerCase().includes(q);
+        const rMatch = (s.reason || "").toLowerCase().includes(q);
+        const sMatch = (s.staff || "").toLowerCase().includes(q);
+        if (!tMatch && !rMatch && !sMatch) return false;
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      const emptyRow = h(
+        "tr",
+        null,
+        h(
+          "td",
+          { colspan: "8", class: "muted text-sm", style: "text-align: center; padding: 24px;" },
+          "Aucune sanction enregistrée correspondant à ces critères."
+        )
+      );
+      tbody.appendChild(emptyRow);
+    } else {
+      filtered.forEach((s) => {
+        const act = (s.action || "WARN").toUpperCase();
+        let badgeClass = "badge-warn";
+        let actIcon = "⚠️";
+        if (act === "BAN") {
+          badgeClass = "badge-ban";
+          actIcon = "🔨";
+        } else if (act === "MUTE") {
+          badgeClass = "badge-mute";
+          actIcon = "🔇";
+        } else if (act === "KICK") {
+          badgeClass = "badge-kick";
+          actIcon = "👢";
+        } else if (act === "FREEZE") {
+          badgeClass = "badge-freeze";
+          actIcon = "❄️";
+        }
+
+        const dateFormatted = s.date
+          ? new Date(s.date).toLocaleString("fr-FR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "-";
+
+        const isRevocable = ["BAN", "MUTE", "FREEZE"].includes(act) && s.active !== false;
+
+        const row = h(
+          "tr",
+          null,
+          h("td", { class: "muted text-sm", style: "font-family: monospace; font-size: 11.5px;" }, dateFormatted),
+          h("td", null, h("span", { class: `mod-action-badge ${badgeClass}` }, `${actIcon} ${act}`)),
+          h(
+            "td",
+            null,
+            h(
+              "div",
+              { style: "display: flex; align-items: center; gap: 8px;" },
+              h("img", {
+                src: `https://api.creepernation.net/avatar/${encodeURIComponent(s.target)}?fallback=steve&size=20`,
+                alt: s.target,
+                style: "width: 18px; height: 18px; border-radius: 3px; image-rendering: pixelated;",
+                onerror: (e) => {
+                  e.target.src = "/assets/icon.png";
+                }
+              }),
+              h(
+                "button",
+                {
+                  type: "button",
+                  class: "ghost",
+                  style: "font-weight: 600; padding: 0; color: var(--mint); text-decoration: underline;",
+                  onclick: () => openPlayerInspector(s.target)
+                },
+                s.target
+              )
+            )
+          ),
+          h("td", { class: "muted text-sm" }, s.staff || "WebAdmin"),
+          h("td", { style: "font-size: 12.5px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" }, s.reason || "N/A"),
+          h("td", { class: "muted text-sm" }, s.duration ? s.duration : "-"),
+          h(
+            "td",
+            null,
+            s.active !== false && !["KICK", "WARN"].includes(act)
+              ? h("span", { class: "status-badge-active" }, "🟢 En cours")
+              : s.revokedAt
+                ? h("span", { class: "status-badge-revoked" }, "🛑 Révoqué")
+                : h("span", { class: "status-badge-expired" }, "⚪ Clôturé")
+          ),
+          h(
+            "td",
+            { style: "text-align: right;" },
+            isRevocable
+              ? h(
+                  "button",
+                  {
+                    type: "button",
+                    class: "btn-xs danger-ghost",
+                    onclick: () => revokeSanction(s.id, s.target, act)
+                  },
+                  "Lever la sanction"
+                )
+              : h("span", { class: "muted text-sm" }, "-")
+          )
+        );
+        tbody.appendChild(row);
+      });
+    }
+  }
+};
+
+/* --- EVENT LISTENERS MODERATION TAB ---------------------------------- */
+
+document.querySelectorAll("#mod-direct-type-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    selectModDirectType(chip.dataset.modType);
+  });
+});
+
+document.querySelectorAll("#mod-direct-duration-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#mod-direct-duration-chips .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+});
+
+document.querySelectorAll("#mod-direct-reason-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#mod-direct-reason-chips .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    const inp = $("#mod-direct-reason");
+    if (inp) inp.value = chip.dataset.reason;
+  });
+});
+
+on("#mod-direct-form", "submit", async (e) => {
+  e.preventDefault();
+  const target = $("#mod-direct-target")?.value.trim();
+  const activeTypeChip = $("#mod-direct-type-chips .chip-btn.active");
+  const action = activeTypeChip?.dataset.modType || "WARN";
+  const reason = $("#mod-direct-reason")?.value.trim() || "Sanction administrative";
+  const durationChip = $("#mod-direct-duration-chips .chip-btn.active");
+  const duration = durationChip?.dataset.duration || "30m";
+
+  if (!target) return;
+  const submitBtn = $("#mod-direct-submit-btn");
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    await submitModerationAction(target, action, reason, duration);
+    const reasonInput = $("#mod-direct-reason");
+    if (reasonInput) reasonInput.value = "";
+    await renderModerationTab();
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+});
+
+document.querySelectorAll("#mod-audit-filters .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#mod-audit-filters .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    modAuditFilter = chip.dataset.modFilter || "all";
+    renderModerationTab();
+  });
+});
+
+on("#mod-audit-search", "input", (e) => {
+  modAuditSearch = e.target.value;
+  renderModerationTab();
+});
+
+on("#mod-tab-refresh-btn", "click", async () => {
+  toast("Actualisation des données de modération...", "info");
+  await renderModerationTab();
+});
+

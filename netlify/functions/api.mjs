@@ -521,6 +521,51 @@ const routeRequest = async (req, url, context, store) => {
     return reply({ ok: true, sanctions });
   }
 
+  if (route === "/moderation/revoke" && req.method === "POST") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    const body = parseJson(await readBody(req));
+    const { id, target, action } = body || {};
+    if (!id && !target) return fail("paramètres manquants", 400);
+
+    let unCmd = "";
+    const act = (action || "").toUpperCase();
+    if (act === "BAN") unCmd = `unban ${target}`;
+    else if (act === "MUTE") unCmd = `unmute ${target}`;
+    else if (act === "FREEZE") unCmd = `unfreeze ${target}`;
+    else unCmd = `pardon ${target}`;
+
+    try {
+      const sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
+      const updated = sanctions.map(s => {
+        if (s.id === id || (s.target.toLowerCase() === target.toLowerCase() && s.action === act)) {
+          return { ...s, active: false, revokedAt: new Date().toISOString() };
+        }
+        return s;
+      });
+      await store.setJSON("moderation_sanctions", updated);
+
+      if (unCmd) {
+        const pending = (await store.get("pending_commands", { type: "json" })) || [];
+        pending.push(unCmd);
+        await store.setJSON("pending_commands", pending);
+      }
+
+      const logs = (await store.get("server_logs", { type: "json" })) || [];
+      logs.unshift({
+        time: new Date().toISOString().replace("T", " [").slice(0, 19) + "]",
+        type: "CMD",
+        player: "WebAdmin",
+        message: `Révocation sanction [${act}] pour ${target}`,
+        details: `Commande exécutée : /${unCmd}`,
+        server: "opalheaven.mcbe.fr",
+        world: "world"
+      });
+      await store.setJSON("server_logs", logs.slice(0, 300));
+    } catch {}
+
+    return reply({ ok: true, message: `Sanction ${act} levée pour ${target}`, command: unCmd });
+  }
+
   if (route === "/logs/clear" && req.method === "POST") {
     if (!validSession(req)) return fail("non autorisé", 401);
     try {

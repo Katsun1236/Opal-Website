@@ -3557,3 +3557,152 @@ dialog[open].player-inspector-dialog {
   color: var(--mint);
   font-weight: 600;
 }
+
+/* --- Modération & Sécurité ------------------------------------------- */
+.grid-2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .grid-2-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mod-player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--card-soft, #13171a);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  gap: 12px;
+  transition: border-color 0.15s ease;
+}
+.mod-player-card:hover {
+  border-color: var(--mint, #52b89b);
+}
+
+.mod-player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.mod-player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.mod-player-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mod-player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mod-player-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted, #8e9ca6);
+}
+
+.mod-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-xs {
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  line-height: 1.4;
+  cursor: pointer;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+  background: var(--card-soft, #161a1d);
+  color: var(--text, #e2e8f0);
+  transition: all 0.12s ease;
+}
+.btn-xs:hover {
+  border-color: var(--mint, #52b89b);
+  color: var(--mint, #52b89b);
+}
+
+.btn-xs.danger-ghost {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+.btn-xs.danger-ghost:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+.mod-action-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.mod-action-badge.badge-ban {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.mod-action-badge.badge-mute {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.mod-action-badge.badge-warn {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+.mod-action-badge.badge-kick {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+.mod-action-badge.badge-freeze {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.status-badge-active {
+  color: #10b981;
+  font-size: 11.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.status-badge-revoked {
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 500;
+  text-decoration: line-through;
+}
+.status-badge-expired {
+  color: #64748b;
+  font-size: 11.5px;
+}
