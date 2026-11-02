@@ -88,7 +88,7 @@ const validPluginToken = (req) => {
 
 let cachedStore = null;
 const contentStore = () =>
-  cachedStore || (cachedStore = getStore({ name: "opal-content", consistency: "strong" }));
+  cachedStore || (cachedStore = getStore({ name: "opal-content" }));
 
 const readBody = async (req) => {
   const length = Number(req.headers.get("content-length") || 0);
@@ -375,8 +375,10 @@ const routeRequest = async (req, url, context, store) => {
 
     // 1. Priorité absolue : télémétrie en direct envoyée par OpalCore (NetherNet / Axolotl-PM)
     try {
-      const telem = await store.get("telemetry", { type: "json" });
-      const recentLogs = (await store.get("server_logs", { type: "json" })) || [];
+      const [telem, recentLogs] = await Promise.all([
+        store.get("telemetry", { type: "json" }).catch(() => null),
+        store.get("server_logs", { type: "json" }).catch(() => []),
+      ]);
       const isRecent = telem && (Date.now() - new Date(telem.receivedAt).getTime() < 1800000);
       
       if (telem && (isRecent || recentLogs.length > 0)) {
@@ -604,14 +606,16 @@ const routeRequest = async (req, url, context, store) => {
     let telemetry = null;
     let serverLogs = [];
     try {
-      telemetry = await store.get("telemetry", { type: "json" });
-      serverLogs = (await store.get("server_logs", { type: "json" })) || [];
+      [telemetry, serverLogs] = await Promise.all([
+        store.get("telemetry", { type: "json" }).catch(() => null),
+        store.get("server_logs", { type: "json" }).catch(() => []),
+      ]);
     } catch {}
-    const telemConnected = Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 1800000 || serverLogs.length > 0));
+    const telemConnected = Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 1800000 || (serverLogs && serverLogs.length > 0)));
     return reply({
       connected: telemConnected,
       telemetry: telemetry || null,
-      serverLogs,
+      serverLogs: serverLogs || [],
     });
   }
 
@@ -622,10 +626,12 @@ const routeRequest = async (req, url, context, store) => {
     let sanctions = [];
     let telem = null;
     try {
-      registered = (await store.get("registered_players", { type: "json" })) || [];
-      serverLogs = (await store.get("server_logs", { type: "json" })) || [];
-      sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
-      telem = await store.get("telemetry", { type: "json" });
+      [registered, serverLogs, sanctions, telem] = await Promise.all([
+        store.get("registered_players", { type: "json" }).catch(() => []),
+        store.get("server_logs", { type: "json" }).catch(() => []),
+        store.get("moderation_sanctions", { type: "json" }).catch(() => []),
+        store.get("telemetry", { type: "json" }).catch(() => null),
+      ]);
     } catch {}
 
     const playersMap = new Map();

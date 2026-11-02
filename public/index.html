@@ -8,7 +8,7 @@
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
 <title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css?v=3.7">
+<link rel="stylesheet" href="/style.css?v=3.8">
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -60,12 +60,14 @@
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           <span class="nav-label">Activité & Logs</span>
         </button>
-                <button type="button" role="tab" id="nav-players" aria-controls="tab-players" aria-selected="false" data-tab="players" class="nav-item" tabindex="-1">
+
+        <div class="nav-group-title">Joueurs &amp; Modération</div>
+        <button type="button" role="tab" id="nav-players" aria-controls="tab-players" aria-selected="false" data-tab="players" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span class="nav-label">Joueurs</span>
           <span class="subnav-badge" id="nav-players-badge">0</span>
         </button>
-<button type="button" role="tab" id="nav-moderation" aria-controls="tab-moderation" aria-selected="false" data-tab="moderation" class="nav-item" tabindex="-1">
+        <button type="button" role="tab" id="nav-moderation" aria-controls="tab-moderation" aria-selected="false" data-tab="moderation" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span class="nav-label">Modération</span>
           <span class="subnav-badge" id="nav-moderation-badge">Actif</span>
@@ -2300,7 +2302,7 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=3.7"></script>
+<script type="module" src="/app.js?v=3.8"></script>
 
 <!-- DIALOG : DOSSIER & INSPECTEUR JOUEUR COMPLET -->
 <dialog id="player-inspector-modal" class="card modal-dialog player-inspector-dialog">

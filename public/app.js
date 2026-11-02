@@ -4107,6 +4107,7 @@ const fetchServerTelemetry = async () => {
   try {
     const res = await fetch("/api/telemetry", {
       headers: { Authorization: `Bearer ${state.token}` },
+      signal: AbortSignal.timeout(6000),
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -8023,9 +8024,6 @@ const renderModerationTab = async () => {
     }
   }
 
-  // 5bis. Rendu de l'annuaire des joueurs enregistrés
-  await renderRegisteredPlayers();
-
   // 6. Rendu du registre d'audit des sanctions
   const tbody = $("#mod-sanctions-table-body");
   if (tbody) {
@@ -8244,14 +8242,18 @@ let playersSort = "recent";
 let playersView = "grid";
 
 const renderPlayersTab = async () => {
-  let players = [];
+  let players = state.cachedPlayers || [];
   try {
     const res = await fetch("/api/players", {
-      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) }
+      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) },
+      signal: AbortSignal.timeout(6000)
     });
     if (res.ok) {
       const data = await res.json();
-      players = data.players || [];
+      if (Array.isArray(data.players) && data.players.length > 0) {
+        players = data.players;
+        state.cachedPlayers = players;
+      }
     }
   } catch {}
 
