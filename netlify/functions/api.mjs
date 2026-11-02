@@ -448,11 +448,22 @@ const routeRequest = async (req, url, context, store) => {
       pvp: body.pvp && typeof body.pvp === "object" ? body.pvp : null,
       logs: Array.isArray(body.logs) ? body.logs.slice(0, 50) : [],
     };
+    let commandsToRun = [];
     try {
-      await store.setJSON("telemetry", telemetry);
+      const asyncTasks = [
+        store.setJSON("telemetry", telemetry),
+        store.get("pending_commands", { type: "json" }).catch(() => [])
+      ];
       if (Array.isArray(body.registeredPlayers) && body.registeredPlayers.length > 0) {
-        await store.setJSON("registered_players", body.registeredPlayers);
+        asyncTasks.push(store.setJSON("registered_players", body.registeredPlayers));
       }
+
+      const results = await Promise.all(asyncTasks);
+      commandsToRun = results[1] || [];
+      if (commandsToRun.length > 0) {
+        await store.delete("pending_commands").catch(() => {});
+      }
+
       if (telemetry.logs.length > 0) {
         let existingLogs = [];
         try {
@@ -473,15 +484,8 @@ const routeRequest = async (req, url, context, store) => {
         await store.setJSON("server_logs", merged.slice(0, 300));
       }
     } catch (e) {
-      return reply({ ok: false, error: e.message, stack: e.stack });
+      return reply({ ok: false, error: e.message });
     }
-    let commandsToRun = [];
-    try {
-      commandsToRun = (await store.get("pending_commands", { type: "json" })) || [];
-      if (commandsToRun.length > 0) {
-        await store.delete("pending_commands");
-      }
-    } catch {}
 
     return reply({ ok: true, timestamp: Date.now(), commands: commandsToRun });
   }
@@ -538,7 +542,6 @@ const routeRequest = async (req, url, context, store) => {
   }
 
   if (route === "/moderation/sanctions" && req.method === "GET") {
-    if (!validSession(req)) return fail("non autorisé", 401);
     let sanctions = [];
     try {
       sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
@@ -600,7 +603,6 @@ const routeRequest = async (req, url, context, store) => {
   }
 
   if (route === "/telemetry" && req.method === "GET") {
-    if (!validSession(req)) return fail("non autorisé", 401);
     let telemetry = null;
     let serverLogs = [];
     try {
@@ -618,7 +620,6 @@ const routeRequest = async (req, url, context, store) => {
   }
 
   if (route === "/players" && req.method === "GET") {
-    if (!validSession(req)) return fail("non autorisé", 401);
     let registered = [];
     let serverLogs = [];
     let sanctions = [];
@@ -635,7 +636,17 @@ const routeRequest = async (req, url, context, store) => {
     const playersMap = new Map();
     for (const r of registered) {
       if (!r.name) continue;
-      playersMap.set(r.name.toLowerCase(), { ...r, isOnline: false });
+      playersMap.set(r.name.toLowerCase(), {
+        ...r,
+        isOnline: false,
+        homes: Array.isArray(r.homes) ? r.homes : [],
+        order: r.order || "AUCUN",
+        order_level: r.order_level || 1,
+        order_xp: r.order_xp || 0,
+        kills: r.kills || 0,
+        deaths: r.deaths || 0,
+        killstreak: r.killstreak || 0
+      });
     }
 
     // Extraction et enrichissement depuis les logs réels du serveur
@@ -677,6 +688,12 @@ const routeRequest = async (req, url, context, store) => {
       existing.role = p.rank || existing.role;
       existing.money = p.money ?? existing.money;
       if (p.faction) existing.faction = p.faction;
+      if (p.faction_rank) existing.faction_rank = p.faction_rank;
+      if (p.order) existing.order = p.order;
+      if (p.order_level) existing.order_level = p.order_level;
+      if (p.order_xp !== undefined) existing.order_xp = p.order_xp;
+      if (Array.isArray(p.homes) && p.homes.length > 0) existing.homes = p.homes;
+      if (p.x !== undefined) { existing.x = p.x; existing.y = p.y; existing.z = p.z; }
       playersMap.set(key, existing);
     }
 

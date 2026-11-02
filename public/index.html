@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" translate="no" class="notranslate">
 <head>
 <meta charset="utf-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0f1020">
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
 <title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css?v=4.0">
+<link rel="stylesheet" href="/style.css?v=4.2">
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -1887,7 +1888,7 @@
     </div>
 
     <!-- METRIQUES JOUEURS -->
-    <div class="stat-grid" style="margin-bottom: 20px;">
+    <div class="stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
       <div class="card stat-card">
         <span class="muted text-sm">Joueurs Enregistr&eacute;s</span>
         <strong id="players-stat-total" class="stat-value">0</strong>
@@ -1943,6 +1944,229 @@
     </div>
   </section>
 
+  <!-- TAB : FICHE JOUEUR DEDIEE (DOSSIER COMPLET) -->
+  <section id="tab-player-profile" class="tab" role="tabpanel" tabindex="0" hidden>
+    <div class="tab-header-banner card" style="margin-bottom: 20px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button type="button" id="pp-back-btn" class="ghost" style="font-weight: 600; padding: 8px 14px; border: 1px solid var(--line);">
+          &larr; Retour &agrave; l'annuaire des joueurs
+        </button>
+        <div>
+          <h2 style="margin: 0; font-size: 18px;">Dossier Individuel &amp; Fiche Compl&egrave;te</h2>
+          <p class="muted text-sm" style="margin: 3px 0 0 0;">Vue exhaustive en temps r&eacute;el : homes, all&eacute;geance d'ordre, statistiques, casier et actions instantan&eacute;es.</p>
+        </div>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="pp-refresh-btn" class="ghost">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    <!-- HERO CARD JOUEUR -->
+    <div class="card" style="padding: 24px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(82, 184, 155, 0.1) 0%, rgba(13, 20, 19, 0.95) 100%); border: 1px solid rgba(82, 184, 155, 0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <img id="pp-avatar" src="https://mc-heads.net/avatar/Steve/64" alt="Skin Avatar" style="width: 64px; height: 64px; border-radius: 12px; image-rendering: pixelated; box-shadow: 0 4px 16px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);" />
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h1 id="pp-name" style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Steve</h1>
+              <button type="button" id="pp-copy-pseudo-btn" class="ghost" style="padding: 2px 7px; font-size: 12px; border-radius: 6px;" title="Copier le pseudo">📋 Copier</button>
+              <span id="pp-live-status-pill" class="status-badge-active" style="font-size: 12px;">🟢 En jeu</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+              <span id="pp-rank-badge" class="subnav-badge" style="font-size: 11.5px; padding: 3px 8px;">Joueur</span>
+              <span id="pp-order-badge" class="badge" style="font-size: 11.5px; border-color: rgba(168, 85, 247, 0.5); color: #c084fc;">Ordre : Inconnu</span>
+              <span id="pp-faction-badge" class="badge" style="font-size: 11.5px; border-color: rgba(96, 165, 250, 0.5); color: #60a5fa;">Sans Faction</span>
+              <span id="pp-mod-status-badge" class="badge" style="font-size: 11.5px; color: var(--mint); border-color: rgba(82, 184, 155, 0.4);">🟢 En règle</span>
+            </div>
+            <div id="pp-live-coords-bar" class="muted text-sm" style="margin-top: 8px; font-family: monospace; font-size: 12px; color: #a1a1aa;">
+              Monde: world &bull; X: -- &bull; Y: -- &bull; Z: -- &bull; Ping: -- ms
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIONS DIRECTES EN 1 SECONDE -->
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="muted text-sm" style="font-size: 11.5px; font-weight: 600;">Grade en jeu :</span>
+            <select id="pp-rank-select" style="padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 6px; background: #0f172a; border: 1px solid var(--line); color: var(--text);">
+              <!-- Options dynamiques -->
+            </select>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" id="pp-act-freeze" class="btn-xs" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">❄️ Freeze</button>
+            <button type="button" id="pp-act-warn" class="btn-xs" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">⚠️ Warn</button>
+            <button type="button" id="pp-act-mute" class="btn-xs" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);">🔇 Mute</button>
+            <button type="button" id="pp-act-kick" class="btn-xs" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">👢 Kick</button>
+            <button type="button" id="pp-act-ban" class="btn-xs danger" style="padding: 4px 10px; font-weight: 700;">🔨 Ban</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOUS-ONGLETS INTERNES DU DOSSIER -->
+    <div class="chips-row" id="pp-tabs-bar" style="margin-bottom: 20px;">
+      <button type="button" class="chip-btn active" data-pp-tab="stats">&#128202; Vue d'Ensemble &amp; Statistiques</button>
+      <button type="button" class="chip-btn" data-pp-tab="homes">&#127968; Homes Enregistr&eacute;s (<span id="pp-homes-count">0</span>)</button>
+      <button type="button" class="chip-btn" data-pp-tab="order">&#9876;&#65039; Ordres &amp; Faction</button>
+      <button type="button" class="chip-btn" data-pp-tab="sanctions">&#9878;&#65039; Casier &amp; Sanctions (<span id="pp-sanctions-count">0</span>)</button>
+      <button type="button" class="chip-btn" data-pp-tab="logs">&#128220; Journal d'Activit&eacute; (<span id="pp-logs-count">0</span>)</button>
+    </div>
+
+    <!-- SECTION 1 : VUE D'ENSEMBLE & STATISTIQUES -->
+    <div id="pp-section-stats" class="pp-section">
+      <div class="stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <div class="card stat-card">
+          <span class="muted text-sm">Solde Monnaie Cash</span>
+          <strong id="pp-stat-money" class="stat-value" style="color: var(--mint);">$0</strong>
+          <span class="stat-delta">&Eacute;conomie personnelle</span>
+        </div>
+        <div class="card stat-card">
+          <span class="muted text-sm">Kills PvP (Victoires)</span>
+          <strong id="pp-stat-kills" class="stat-value" style="color: #ef4444;">0</strong>
+          <span class="stat-delta" id="pp-stat-deaths-ratio">0 morts &bull; Ratio: 0.00</span>
+        </div>
+        <div class="card stat-card">
+          <span class="muted text-sm">Niveau Paragon</span>
+          <strong id="pp-stat-paragon" class="stat-value" style="color: #f59e0b;">Niv. 0</strong>
+          <span class="stat-delta">Prestige &amp; bonus XP</span>
+        </div>
+        <div class="card stat-card">
+          <span class="muted text-sm">Killstreak (S&eacute;rie)</span>
+          <strong id="pp-stat-killstreak" class="stat-value" style="color: #a855f7;">0</strong>
+          <span class="stat-delta" id="pp-stat-first-join">Premi&egrave;re vue : N/A</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 : HOMES ENREGISTRES -->
+    <div id="pp-section-homes" class="pp-section" style="display: none;">
+      <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+          <div>
+            <h3 style="margin: 0; font-size: 16px;">&#127968; Points de T&eacute;l&eacute;portation (/sethome)</h3>
+            <p class="muted text-sm" style="margin: 3px 0 0 0;">Liste de tous les homes d&eacute;clar&eacute;s par ce joueur sur les diff&eacute;rents mondes.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table-compact">
+            <thead>
+              <tr>
+                <th style="width: 180px;">Nom du Home</th>
+                <th style="width: 160px;">Dimension / Monde</th>
+                <th style="width: 220px;">Coordonn&eacute;es (X, Y, Z)</th>
+                <th>Date d'Enregistrement</th>
+                <th style="width: 140px; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="pp-homes-tbody">
+              <!-- Rempli dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3 : ORDRES & FACTION -->
+    <div id="pp-section-order" class="pp-section" style="display: none;">
+      <div class="grid-2-cols" style="gap: 20px;">
+        <div class="card">
+          <div class="card-header" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px;">&#9876;&#65039; All&eacute;geance d'Ordre</h3>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="muted text-sm">Ordre Actif :</span>
+              <strong id="pp-order-name-val" style="font-size: 16px; color: #c084fc;">Ordre des Abysses</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="muted text-sm">Niveau d'Ordre :</span>
+              <strong id="pp-order-level-val" style="font-size: 16px; color: #f59e0b;">Niveau 1</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="muted text-sm">Progression XP :</span>
+              <span id="pp-order-xp-val" style="font-family: monospace; font-size: 13px;">0 XP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 16px;">&#128737;&#65039; Guilde &amp; Faction</h3>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="muted text-sm">Nom de la Faction :</span>
+              <strong id="pp-faction-name-val" style="font-size: 16px; color: #60a5fa;">Sans Faction</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="muted text-sm">R&ocirc;le / Rang :</span>
+              <span id="pp-faction-rank-val" class="subnav-badge">Membre</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 : SANCTIONS & CASIER -->
+    <div id="pp-section-sanctions" class="pp-section" style="display: none;">
+      <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+          <div>
+            <h3 style="margin: 0; font-size: 16px;">&#9878;&#65039; Historique Disciplinaire &amp; Sanctions</h3>
+            <p class="muted text-sm" style="margin: 3px 0 0 0;">Tous les avertissements, mutes, gels et exclusions li&eacute;s &agrave; ce joueur.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table-compact">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Date</th>
+                <th style="width: 110px;">Sanction</th>
+                <th style="width: 120px;">Dur&eacute;e</th>
+                <th>Motif</th>
+                <th style="width: 130px;">Auteur Staff</th>
+                <th style="width: 110px;">Statut</th>
+                <th style="width: 120px; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="pp-sanctions-tbody">
+              <!-- Rempli dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5 : LOGS DU JOUEUR -->
+    <div id="pp-section-logs" class="pp-section" style="display: none;">
+      <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 16px;">
+          <div>
+            <h3 style="margin: 0; font-size: 16px;">&#128220; Historique Chronologique des Logs</h3>
+            <p class="muted text-sm" style="margin: 3px 0 0 0;">Journal des &eacute;v&eacute;nements r&eacute;els enregistr&eacute;s pour ce joueur.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table-compact">
+            <thead>
+              <tr>
+                <th style="width: 160px;">Date &amp; Heure</th>
+                <th style="width: 110px;">Type</th>
+                <th>Action &amp; D&eacute;tails</th>
+              </tr>
+            </thead>
+            <tbody id="pp-logs-tbody">
+              <!-- Rempli dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- TAB : MODERATION & SECURITE -->
   <section id="tab-moderation" class="tab" role="tabpanel" aria-labelledby="nav-moderation" tabindex="0" hidden>
     <div class="tab-header-banner card">
@@ -1959,7 +2183,7 @@
     </div>
 
     <!-- METRIQUES DE MODERATION -->
-    <div class="stat-grid" style="margin-bottom: 20px;">
+    <div class="stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
       <div class="card stat-card">
         <span class="muted text-sm">Sanctions Totales</span>
         <strong id="mod-stat-total" class="stat-value">0</strong>
@@ -2302,7 +2526,7 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=4.0"></script>
+<script type="module" src="/app.js?v=4.2"></script>
 
 <!-- DIALOG : DOSSIER & INSPECTEUR JOUEUR COMPLET -->
 <dialog id="player-inspector-modal" class="card modal-dialog player-inspector-dialog">

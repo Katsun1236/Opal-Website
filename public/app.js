@@ -534,6 +534,7 @@ const TAB_TITLES = {
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
   "config-roles": { title: "Grades & Permissions", sub: "Configuration des rangs, multiplicateurs et hiérarchie de permissions" },
   players: { title: "Base Joueurs & Profils", sub: "Annuaire exhaustif de tous les joueurs enregistr\u00e9s sur OpalCore" },
+  "player-profile": { title: "Dossier & Profil Joueur", sub: "Vue exhaustive en temps réel : homes, allégeance d'ordre, statistiques et casier" },
   moderation: { title: "Modération & Sécurité", sub: "Pilotage des sanctions, surveillance des joueurs connectés et registre d’audit" },
 };
 
@@ -541,6 +542,7 @@ const renderActiveTab = () => {
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
   if (state.ui.tab === "players") renderPlayersTab();
+  if (state.ui.tab === "player-profile") renderPlayerProfileTab();
   if (state.ui.tab === "moderation") renderModerationTab();
   if (!state.ready) return;
   if (state.ui.tab === "library") renderLibrary();
@@ -4195,6 +4197,7 @@ const pollRealServer = async (forcePing = false) => {
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
   if (state.ui.tab === "players") renderPlayersTab();
+  if (state.ui.tab === "player-profile") renderPlayerProfileTab();
   if (state.ui.tab === "moderation") renderModerationTab();
   updateGlobalServerStatus();
 };
@@ -7218,107 +7221,305 @@ const renderSelectedRole = () => {
 
 /* --- INSPECTEUR JOUEUR & MODERATION ---------------------------------- */
 
-const openPlayerInspector = async (playerName) => {
+const openPlayerProfile = (playerName) => {
   if (!playerName) return;
-  state.ui.inspectorPlayer = playerName;
-  state.ui.inspectorTab = "stats";
+  state.ui.profilePlayer = playerName;
+  state.ui.profileSubTab = state.ui.profileSubTab || "stats";
+  openTab("player-profile");
+  renderPlayerProfileTab();
+};
 
-  const modal = $("#player-inspector-modal");
-  if (!modal) return;
+const renderPlayerProfileTab = async () => {
+  const playerName = state.ui.profilePlayer || (state.cachedPlayers?.[0]?.name) || "Steve";
+  state.ui.profilePlayer = playerName;
 
-  // 1. Extraire les données en direct de télémétrie
+  // 1. Recherche dans le cache des joueurs enregistrés
+  const regPlayer = (state.cachedPlayers || []).find(
+    (p) => (p.name || "").toLowerCase() === playerName.toLowerCase()
+  );
+
+  // 2. Recherche dans la télémétrie en direct
   const onlineList = state.serverTelemetry?.telemetry?.players?.details || [];
-  const liveData = onlineList.find((p) => (p.name || "").toLowerCase() === playerName.toLowerCase());
-  const isOnline = Boolean(liveData);
+  const livePlayer = onlineList.find(
+    (p) => (p.name || "").toLowerCase() === playerName.toLowerCase()
+  );
+  const isOnline = Boolean(livePlayer);
 
-  // 2. Extraire tous les logs du joueur
+  // 3. Extraction des données
+  const role = livePlayer?.rank || regPlayer?.role || "Joueur";
+  const rankId = livePlayer?.rank_id || (regPlayer?.role ? regPlayer.role.toLowerCase() : "joueur");
+  const order = livePlayer?.order || regPlayer?.order || "AUCUN";
+  const orderLevel = livePlayer?.order_level || regPlayer?.order_level || 1;
+  const orderXp = livePlayer?.order_xp !== undefined ? livePlayer.order_xp : (regPlayer?.order_xp || 0);
+  const faction = livePlayer?.faction || regPlayer?.faction || "Sans Faction";
+  const factionRank = livePlayer?.faction_rank || regPlayer?.faction_rank || "Membre";
+  const money = livePlayer?.money !== undefined ? livePlayer.money : (regPlayer?.money ?? 1000);
+  const kills = regPlayer?.kills ?? 0;
+  const deaths = regPlayer?.deaths ?? 0;
+  const killstreak = regPlayer?.killstreak ?? 0;
+  const paragon = regPlayer?.paragon_level ?? 0;
+  const firstJoin = regPlayer?.first_join ? new Date(regPlayer.first_join).toLocaleString("fr-FR") : "N/A";
+  const lastJoin = regPlayer?.last_join ? new Date(regPlayer.last_join).toLocaleString("fr-FR") : (isOnline ? "En jeu actuellement" : "N/A");
+  const homes = (livePlayer?.homes && livePlayer.homes.length > 0) ? livePlayer.homes : (regPlayer?.homes || []);
+
+  // 4. Logs du joueur
   const allLogs = getStoredLogs();
   const playerLogs = allLogs.filter((l) => (l.player || "").toLowerCase() === playerName.toLowerCase());
 
-  // 3. Calculer les statistiques
-  const kills = playerLogs.filter((l) => l.type === "COMBAT" && (l.opponent || l.details?.includes("face à"))).length;
-  const deaths = playerLogs.filter((l) => l.type === "COMBAT" && !l.opponent).length;
-  const kd = deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2);
-  const money = liveData?.money ?? playerLogs.filter((l) => l.amount).reduce((sum, l) => sum + (Number(l.amount) || 0), 1000);
+  // 5. Peuplement Hero Card
+  const elName = $("#pp-name");
+  if (elName) elName.textContent = playerName;
 
-  // 4. Remplir les champs d'en-tête
-  const avatar = $("#pi-avatar");
-  if (avatar) avatar.src = "https://mc-heads.net/avatar/" + encodeURIComponent(playerName) + "/64";
-
-  const nameSpan = $("#pi-player-name span");
-  if (nameSpan) nameSpan.textContent = playerName;
-
-  const statusDot = $("#pi-online-status");
-  if (statusDot) {
-    statusDot.className = "player-online-dot " + (isOnline ? "online" : "offline");
-    statusDot.title = isOnline ? "En ligne actuellement" : "Hors ligne";
+  const elAvatar = $("#pp-avatar");
+  if (elAvatar) {
+    elAvatar.src = "https://mc-heads.net/avatar/" + encodeURIComponent(playerName) + "/64";
+    elAvatar.onerror = (e) => { e.target.onerror = null; e.target.src = "/assets/icon.png"; };
   }
 
-  const worldBadge = $("#pi-world-badge");
-  if (worldBadge) worldBadge.textContent = liveData?.world || playerLogs[0]?.world || "world";
+  const elStatusPill = $("#pp-live-status-pill");
+  if (elStatusPill) {
+    elStatusPill.className = isOnline ? "status-badge-active" : "status-badge-expired";
+    elStatusPill.textContent = isOnline ? "🟢 En jeu" : "⚪ Hors ligne";
+  }
 
-  const coordsPill = $("#pi-coords-pill");
-  if (coordsPill) {
-    if (liveData?.x !== undefined) {
-      coordsPill.textContent = "X: " + liveData.x + " Y: " + liveData.y + " Z: " + liveData.z;
+  const elRankBadge = $("#pp-rank-badge");
+  if (elRankBadge) elRankBadge.textContent = role;
+
+  const elOrderBadge = $("#pp-order-badge");
+  if (elOrderBadge) elOrderBadge.textContent = "Ordre : " + (order === "AUCUN" ? "Sans Ordre" : order);
+
+  const elFactionBadge = $("#pp-faction-badge");
+  if (elFactionBadge) elFactionBadge.textContent = faction !== "Sans Faction" ? `Faction : ${faction} (${factionRank})` : "Sans Faction";
+
+  const elCoordsBar = $("#pp-live-coords-bar");
+  if (elCoordsBar) {
+    if (isOnline && livePlayer) {
+      elCoordsBar.textContent = `Monde: ${livePlayer.world || "world"} • X: ${livePlayer.x ?? 0} • Y: ${livePlayer.y ?? 0} • Z: ${livePlayer.z ?? 0} • Ping: ${livePlayer.ping ?? 0} ms`;
+      elCoordsBar.style.color = "var(--mint)";
     } else {
-      coordsPill.textContent = "Coords: N/A";
+      elCoordsBar.textContent = `Dernière connexion : ${lastJoin} • Hors ligne`;
+      elCoordsBar.style.color = "#a1a1aa";
     }
   }
 
-  const pingBadge = $("#pi-ping-badge");
-  if (pingBadge) pingBadge.textContent = liveData?.ping ? (liveData.ping + " ms") : "Ping: --";
-
-  // Remplir le sélecteur de grade
-  const rankSelect = $("#pi-rank-select");
-  if (rankSelect) {
-    rankSelect.innerHTML = "";
+  // Sélecteur de grade en direct (1 seconde)
+  const elRankSelect = $("#pp-rank-select");
+  if (elRankSelect) {
+    elRankSelect.innerHTML = "";
     const roles = state.data.configs?.roles || defaultRolesConfig();
-    const curRankId = liveData?.rank_id || "joueur";
     Object.entries(roles).forEach(([rId, r]) => {
-      rankSelect.appendChild(h("option", { value: rId, selected: rId === curRankId }, r.name || rId));
+      elRankSelect.appendChild(h("option", { value: rId, selected: rId.toLowerCase() === rankId.toLowerCase() }, r.name || rId));
     });
-    rankSelect.onchange = async (e) => {
+    elRankSelect.onchange = async (e) => {
       const newRank = e.target.value;
       await dispatchModerationCommand("setrank " + playerName + " " + newRank);
-      toast("Grade de " + playerName + " défini sur " + newRank + " !", "success");
+      toast(`Grade de ${playerName} défini sur ${newRank} ! Application en jeu sous 1s.`, "success");
     };
   }
 
-  // 5. Remplir l'onglet Stats
-  const statFaction = $("#pi-stat-faction");
-  if (statFaction) statFaction.textContent = liveData?.faction || "Sans Faction";
+  // Copier le pseudo
+  const copyBtn = $("#pp-copy-pseudo-btn");
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(playerName);
+      toast(`Pseudo "${playerName}" copié dans le presse-papier !`, "success");
+    };
+  }
 
-  const statMoney = $("#pi-stat-money");
-  if (statMoney) statMoney.textContent = "$" + Math.max(0, money).toLocaleString("fr-FR");
+  // Actions directes
+  const btnFreeze = $("#pp-act-freeze");
+  if (btnFreeze) {
+    btnFreeze.onclick = async () => {
+      await dispatchModerationCommand("freeze " + playerName);
+      toast(`❄️ Commande freeze envoyée pour ${playerName} (exécution sous 1s)`, "info");
+    };
+  }
+  const btnWarn = $("#pp-act-warn");
+  if (btnWarn) {
+    btnWarn.onclick = () => { state.ui.inspectorPlayer = playerName; openModerationModal("WARN"); };
+  }
+  const btnMute = $("#pp-act-mute");
+  if (btnMute) {
+    btnMute.onclick = () => { state.ui.inspectorPlayer = playerName; openModerationModal("MUTE"); };
+  }
+  const btnKick = $("#pp-act-kick");
+  if (btnKick) {
+    btnKick.onclick = () => { state.ui.inspectorPlayer = playerName; openModerationModal("KICK"); };
+  }
+  const btnBan = $("#pp-act-ban");
+  if (btnBan) {
+    btnBan.onclick = () => { state.ui.inspectorPlayer = playerName; openModerationModal("BAN"); };
+  }
 
-  const statKills = $("#pi-stat-kills");
+  // Bouton retour
+  const backBtn = $("#pp-back-btn");
+  if (backBtn) {
+    backBtn.onclick = () => openTab("players");
+  }
+  const refreshBtn = $("#pp-refresh-btn");
+  if (refreshBtn) {
+    refreshBtn.onclick = async () => {
+      toast("Actualisation du dossier…", "info");
+      await pollRealServer(true);
+      renderPlayerProfileTab();
+      toast("Dossier actualisé en direct !", "success");
+    };
+  }
+
+  // 6. Navigation des sous-onglets du profil
+  const activeSubTab = state.ui.profileSubTab || "stats";
+  document.querySelectorAll("#pp-tabs-bar button[data-pp-tab]").forEach((btn) => {
+    const tabKey = btn.dataset.ppTab;
+    btn.classList.toggle("active", tabKey === activeSubTab);
+    btn.onclick = () => {
+      state.ui.profileSubTab = tabKey;
+      renderPlayerProfileTab();
+    };
+  });
+  document.querySelectorAll(".pp-section").forEach((sec) => {
+    sec.style.display = sec.id === `pp-section-${activeSubTab}` ? "block" : "none";
+  });
+
+  // 7. Remplir Sous-onglet Stats
+  const statMoney = $("#pp-stat-money");
+  if (statMoney) statMoney.textContent = "$" + Number(money).toLocaleString("fr-FR");
+
+  const statKills = $("#pp-stat-kills");
   if (statKills) statKills.textContent = kills;
 
-  const statDeaths = $("#pi-stat-deaths");
-  if (statDeaths) statDeaths.textContent = deaths;
+  const statDeathsRatio = $("#pp-stat-deaths-ratio");
+  if (statDeathsRatio) {
+    const ratio = deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2);
+    statDeathsRatio.textContent = `${deaths} morts • Ratio K/D: ${ratio}`;
+  }
 
-  const statKd = $("#pi-stat-kd");
-  if (statKd) statKd.textContent = kd;
+  const statParagon = $("#pp-stat-paragon");
+  if (statParagon) statParagon.textContent = "Niv. " + paragon;
 
-  // 6. Remplir les logs du joueur
-  const logsBadge = $("#pi-logs-badge");
-  if (logsBadge) logsBadge.textContent = "(" + playerLogs.length + ")";
+  const statKillstreak = $("#pp-stat-killstreak");
+  if (statKillstreak) statKillstreak.textContent = killstreak;
 
-  const logsTbody = $("#pi-logs-tbody");
+  const statFirstJoin = $("#pp-stat-first-join");
+  if (statFirstJoin) statFirstJoin.textContent = `Première vue : ${firstJoin}`;
+
+  // 8. Remplir Sous-onglet Homes
+  const homesBadge = $("#pp-homes-count");
+  if (homesBadge) homesBadge.textContent = homes.length;
+
+  const homesTbody = $("#pp-homes-tbody");
+  if (homesTbody) {
+    homesTbody.innerHTML = "";
+    if (homes.length === 0) {
+      homesTbody.innerHTML = "<tr><td colspan='5' class='muted' style='text-align: center; padding: 24px;'>Aucun point de téléportation (/sethome) enregistré pour ce joueur.</td></tr>";
+    } else {
+      homes.forEach((hItem) => {
+        const tr = h("tr", null,
+          h("td", null, h("strong", { style: "color: var(--mint);" }, "🏠 " + (hItem.name || "home"))),
+          h("td", null, h("span", { class: "subnav-badge" }, hItem.world || "world")),
+          h("td", null, h("code", { style: "font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 4px;" }, `X: ${hItem.x} Y: ${hItem.y} Z: ${hItem.z}`)),
+          h("td", { class: "muted text-sm" }, hItem.created_at || "Non daté"),
+          h("td", { style: "text-align: right;" },
+            h("button", {
+              type: "button",
+              class: "btn-xs ghost",
+              onclick: async () => {
+                await dispatchModerationCommand(`tp ${playerName} ${hItem.x} ${hItem.y} ${hItem.z}`);
+                toast(`Téléportation envoyée vers ${hItem.name} pour ${playerName} !`, "info");
+              }
+            }, "⚡ TP Joueur")
+          )
+        );
+        homesTbody.appendChild(tr);
+      });
+    }
+  }
+
+  // 9. Remplir Sous-onglet Ordres & Faction
+  const orderNameVal = $("#pp-order-name-val");
+  if (orderNameVal) orderNameVal.textContent = "Ordre " + (order === "AUCUN" ? "Sans Allégeance" : `des ${order}`);
+
+  const orderLevelVal = $("#pp-order-level-val");
+  if (orderLevelVal) orderLevelVal.textContent = "Niveau " + orderLevel;
+
+  const orderXpVal = $("#pp-order-xp-val");
+  if (orderXpVal) orderXpVal.textContent = Number(orderXp).toLocaleString("fr-FR") + " XP";
+
+  const factionNameVal = $("#pp-faction-name-val");
+  if (factionNameVal) factionNameVal.textContent = faction;
+
+  const factionRankVal = $("#pp-faction-rank-val");
+  if (factionRankVal) factionRankVal.textContent = factionRank;
+
+  // 10. Remplir Sous-onglet Casier & Sanctions
+  let sanctions = [];
+  try {
+    const res = await fetch("/api/moderation/sanctions");
+    if (res.ok) {
+      const data = await res.json();
+      sanctions = (data.sanctions || []).filter((s) => (s.target || "").toLowerCase() === playerName.toLowerCase());
+    }
+  } catch {}
+
+  const sanctionsBadge = $("#pp-sanctions-count");
+  if (sanctionsBadge) sanctionsBadge.textContent = sanctions.length;
+
+  const sanctionsTbody = $("#pp-sanctions-tbody");
+  if (sanctionsTbody) {
+    sanctionsTbody.innerHTML = "";
+    if (sanctions.length === 0) {
+      sanctionsTbody.innerHTML = "<tr><td colspan='7' class='muted' style='text-align: center; padding: 24px;'>Casier disciplinaire vierge : aucune sanction enregistrée.</td></tr>";
+    } else {
+      sanctions.forEach((s) => {
+        const tr = h("tr", null,
+          h("td", { class: "muted text-sm", style: "font-family: monospace;" }, new Date(s.date).toLocaleDateString("fr-FR")),
+          h("td", null, h("span", { class: "log-badge", style: "background: rgba(239, 68, 68, 0.2); color: #f87171;" }, s.action)),
+          h("td", { class: "muted text-sm" }, s.duration || "Permanent"),
+          h("td", null, h("b", null, s.reason || "Sans motif")),
+          h("td", { class: "muted text-sm" }, s.staff || "WebAdmin"),
+          h("td", null, s.active ? h("span", { class: "status-badge-active" }, "En cours") : h("span", { class: "status-badge-expired" }, "Levée")),
+          h("td", { style: "text-align: right;" },
+            s.active ? h("button", {
+              type: "button",
+              class: "btn-xs danger-ghost",
+              onclick: async () => {
+                const res = await fetch("/api/moderation/revoke", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", ...(state.token ? { Authorization: "Bearer " + state.token } : {}) },
+                  body: JSON.stringify({ id: s.id, target: playerName, action: s.action })
+                });
+                if (res.ok) {
+                  toast(`Sanction ${s.action} levée pour ${playerName} ! (Appliqué en jeu sous 1s)`, "success");
+                  renderPlayerProfileTab();
+                } else {
+                  toast("Erreur lors de la révocation de la sanction", "error");
+                }
+              }
+            }, "Lever / Pardon") : h("span", { class: "muted text-sm" }, "—")
+          )
+        );
+        sanctionsTbody.appendChild(tr);
+      });
+    }
+  }
+
+  // 11. Remplir Sous-onglet Logs
+  const logsBadge = $("#pp-logs-count");
+  if (logsBadge) logsBadge.textContent = playerLogs.length;
+
+  const logsTbody = $("#pp-logs-tbody");
   if (logsTbody) {
     logsTbody.innerHTML = "";
     if (playerLogs.length === 0) {
-      logsTbody.innerHTML = "<tr><td colspan='3' class='muted' style='text-align: center; padding: 20px;'>Aucun log enregistré pour ce joueur pour le moment.</td></tr>";
+      logsTbody.innerHTML = "<tr><td colspan='3' class='muted' style='text-align: center; padding: 24px;'>Aucun log d'activité récent enregistré pour ce joueur.</td></tr>";
     } else {
       playerLogs.forEach((l) => {
         const tr = h("tr", null,
-          h("td", { class: "muted", style: "font-family: monospace;" }, l.time),
+          h("td", { class: "muted", style: "font-family: monospace; font-size: 12px;" }, l.time),
           h("td", null, h("span", { class: "log-badge log-badge-" + (l.type || "INFO") }, l.type || "INFO")),
           h("td", null,
             h("div", null,
               h("b", null, l.message),
-              l.details ? h("div", { class: "muted text-sm", style: "font-size: 11px;" }, l.details) : null
+              l.details ? h("div", { class: "muted text-sm", style: "font-size: 11px; margin-top: 2px;" }, l.details) : null
             )
           )
         );
@@ -7326,14 +7527,10 @@ const openPlayerInspector = async (playerName) => {
       });
     }
   }
+};
 
-  // 7. Charger et afficher l'historique des sanctions
-  renderPlayerSanctionsTab(playerName);
-
-  // Basculer sur l'onglet stats par défaut
-  switchInspectorTab("stats");
-
-  modal.showModal();
+const openPlayerInspector = async (playerName) => {
+  openPlayerProfile(playerName);
 };
 
 const switchInspectorTab = (tabId) => {
@@ -8395,7 +8592,13 @@ const renderPlayersTab = async () => {
 
       const card = h(
         "div",
-        { class: "player-profile-card" },
+        {
+          class: "player-profile-card",
+          style: "cursor: pointer;",
+          onclick: (e) => {
+            if (!e.target.closest("button")) openPlayerProfile(pName);
+          }
+        },
         h(
           "div",
           { class: "player-profile-card-header" },
