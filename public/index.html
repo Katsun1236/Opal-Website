@@ -50,7 +50,7 @@
       </div>
 
       <nav class="sidebar-nav" role="tablist" aria-label="Sections du studio">
-        <div class="nav-group-title">Hub & Pilotage</div>
+        <div class="nav-group-title">Hub & Métriques</div>
         <button type="button" role="tab" id="nav-dashboard" aria-controls="tab-dashboard" aria-selected="true" data-tab="dashboard" class="nav-item active" tabindex="0">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
           <span class="nav-label">Hub Central</span>
@@ -61,66 +61,22 @@
           <span class="nav-label">Activité & Logs</span>
         </button>
 
-        <div class="nav-group-title">Items & Textures</div>
-        <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="false" data-tab="library" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <span class="nav-label">Catalogue & Textures</span>
+        <div class="nav-group-title">Gestion du Jeu</div>
+        <button type="button" role="tab" id="nav-gameplay" aria-controls="tab-gameplay" aria-selected="false" data-tab="gameplay" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+          <span class="nav-label">Économie & Gameplay</span>
+          <span class="subnav-badge">6 modules</span>
         </button>
-        <button type="button" role="tab" id="nav-entries" aria-controls="tab-entries" aria-selected="false" data-tab="entries" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span class="nav-label">Contenus Custom</span>
-        </button>
-        <button type="button" role="tab" id="nav-recipes" aria-controls="tab-recipes" aria-selected="false" data-tab="recipes" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          <span class="nav-label">Crafts & Recettes</span>
-        </button>
-
-        <div class="nav-group-title">Économie & Gameplay</div>
-        <button type="button" role="tab" id="nav-config-shop" aria-controls="tab-config-shop" aria-selected="false" data-tab="config-shop" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <span class="nav-label">Admin Shop</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-crates" aria-controls="tab-config-crates" aria-selected="false" data-tab="config-crates" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
-          <span class="nav-label">Box & Caisses</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-kits" aria-controls="tab-config-kits" aria-selected="false" data-tab="config-kits" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span class="nav-label">Kits & Équipements</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-jobs" aria-controls="tab-config-jobs" aria-selected="false" data-tab="config-jobs" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="18" x2="18" y2="6"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M15 9l-6 6"/></svg>
-          <span class="nav-label">Métiers & XP</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-daily" aria-controls="tab-config-daily" aria-selected="false" data-tab="config-daily" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-          <span class="nav-label">Calendrier Daily</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-quests" aria-controls="tab-config-quests" aria-selected="false" data-tab="config-quests" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span class="nav-label">Quêtes Journalières</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-warzone" aria-controls="tab-config-warzone" aria-selected="false" data-tab="config-warzone" class="nav-item" tabindex="-1">
+        <button type="button" role="tab" id="nav-content" aria-controls="tab-content" aria-selected="false" data-tab="content" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span class="nav-label">Warzone & KOTH</span>
+          <span class="nav-label">Objets & Textures</span>
+          <span class="subnav-badge">3 outils</span>
         </button>
 
-        <div class="nav-group-title">Maintenance & Système</div>
-        <button type="button" role="tab" id="nav-config-server" aria-controls="tab-config-server" aria-selected="false" data-tab="config-server" class="nav-item" tabindex="-1">
+        <div class="nav-group-title">Configuration</div>
+        <button type="button" role="tab" id="nav-system" aria-controls="tab-system" aria-selected="false" data-tab="system" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span class="nav-label">Général & Mondes</span>
-        </button>
-        <button type="button" role="tab" id="nav-sync-guide" aria-controls="tab-sync-guide" aria-selected="false" data-tab="sync-guide" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span class="nav-label">Synchronisation Jeu</span>
-        </button>
-        <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          <span class="nav-label">Sauvegardes & Versions</span>
-        </button>
-        <button type="button" role="tab" id="nav-tools-audit" aria-controls="tab-tools-audit" aria-selected="false" data-tab="tools-audit" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span class="nav-label">Diagnostic & Anti-Lag</span>
+          <span class="nav-label">Système & Serveur</span>
         </button>
       </nav>
 
@@ -278,6 +234,68 @@
       </div>
     </div>
 
+    <!-- GRAPHIQUES EN DIRECT ET MÉTRIQUES RÉELLES (TPS, JOUEURS, RAM) -->
+    <div class="hub-section-title-wrap">
+      <h3>Performances & Télémétrie en Direct</h3>
+      <p class="muted text-sm">Métriques de charge et de fluidité du serveur Axolotl-PM en temps réel</p>
+    </div>
+
+    <div class="hub-live-charts-grid">
+      <!-- GRAPHIQUE 1 : STABILITÉ TPS -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title-group">
+            <h4 class="chart-title">Stabilité & Ticks/Sec</h4>
+            <p class="chart-sub">Cible optimale : 20.0 TPS</p>
+          </div>
+          <span class="chart-val-big" id="hub-chart-tps-val">20.0</span>
+        </div>
+        <div class="chart-svg-box" id="hub-chart-tps-box">
+          <!-- Tracé dynamique SVG injecté par app.js -->
+        </div>
+        <div class="chart-footer-metrics">
+          <span>Statut : <b id="hub-tps-status-label" style="color:var(--primary-mint)">100% Fluide</b></span>
+          <span>Actualisé toutes les 10s</span>
+        </div>
+      </div>
+
+      <!-- GRAPHIQUE 2 : JOUEURS EN DIRECT -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title-group">
+            <h4 class="chart-title">Activité & Joueurs Connectés</h4>
+            <p class="chart-sub">Affluence en temps réel</p>
+          </div>
+          <span class="chart-val-big" id="hub-chart-players-val">0 / 100</span>
+        </div>
+        <div class="chart-svg-box" id="hub-chart-players-box">
+          <!-- Tracé dynamique SVG injecté par app.js -->
+        </div>
+        <div class="chart-footer-metrics">
+          <span id="hub-chart-peak-label">Pic session : 1 joueur</span>
+          <span>Capacité : 100 slots</span>
+        </div>
+      </div>
+
+      <!-- GRAPHIQUE 3 : CONSOMMATION MÉMOIRE RAM -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div class="chart-title-group">
+            <h4 class="chart-title">Mémoire RAM Allouée</h4>
+            <p class="chart-sub">Container Docker WinHeberge (6 Go)</p>
+          </div>
+          <span class="chart-val-big" id="hub-chart-ram-val">200 Mo</span>
+        </div>
+        <div class="chart-svg-box" id="hub-chart-ram-box">
+          <!-- Jauge dynamique SVG injectée par app.js -->
+        </div>
+        <div class="chart-footer-metrics">
+          <span>Charge RAM : <b id="hub-ram-pct-label" style="color:var(--primary-mint)">3.3%</b></span>
+          <span>Garbage Collector actif</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ACCÈS RAPIDES & GESTION DU SERVEUR -->
     <div class="hub-section-title-wrap">
       <h3>Accès Rapides & Configuration</h3>
@@ -397,6 +415,22 @@
   </section>
 
   <section id="tab-entries" class="tab" role="tabpanel" aria-labelledby="nav-entries" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CRÉATION & ITEMS -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="library">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span>Catalogue &amp; Textures</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="entries">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>Objets Custom (Armes, Armures, Minerais)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="recipes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span>Crafts &amp; Recettes d'Établi</span>
+      </button>
+    </div>
+
     <div class="split">
       <div class="card">
         <label class="sr-only" for="entry-filter">Filtrer les contenus</label>
@@ -462,6 +496,22 @@
   </section>
 
   <section id="tab-recipes" class="tab" role="tabpanel" aria-labelledby="nav-recipes" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CRÉATION & ITEMS -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="library">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span>Catalogue &amp; Textures</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="entries">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>Objets Custom (Armes, Armures, Minerais)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="recipes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span>Crafts &amp; Recettes d'Établi</span>
+      </button>
+    </div>
+
     <div class="split">
       <div class="card">
         <label class="sr-only" for="recipe-filter">Filtrer les crafts</label>
@@ -523,6 +573,22 @@
   </section>
 
   <section id="tab-library" class="tab" role="tabpanel" aria-labelledby="nav-library" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CRÉATION & ITEMS -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="library">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span>Catalogue &amp; Textures</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="entries">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>Objets Custom (Armes, Armures, Minerais)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="recipes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span>Crafts &amp; Recettes d'Établi</span>
+      </button>
+    </div>
+
     <div class="card">
       <h2>Contenu existant</h2>
       <p class="muted">Parcourez les items, blocs et recettes vanilla ou Opal Heaven. Les crafts non supportés par l’éditeur restent consultables mais ne sont ni modifiables ni désactivables.</p>
@@ -560,6 +626,26 @@
   </section>
 
   <section id="tab-data" class="tab" role="tabpanel" aria-labelledby="nav-data" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CONFIGURATION & SYSTÈME -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-server">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Général &amp; Mondes</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="sync-guide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Synchronisation Jeu</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <span>Sauvegardes &amp; Versions</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="tools-audit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Diagnostic &amp; Anti-Lag</span>
+      </button>
+    </div>
+
     <div class="data-stack">
       <div class="card">
         <h2>Export / import</h2>
@@ -588,6 +674,38 @@
 
   <!-- NOUVEAU TAB : CALENDRIER (DAILY) -->
   <section id="tab-config-daily" class="tab" role="tabpanel" aria-labelledby="nav-config-daily" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Calendrier de Récompenses Quotidiennes (/daily)</h2>
@@ -672,6 +790,38 @@
 
   <!-- NOUVEAU TAB : MÉTIERS & JOBS -->
   <section id="tab-config-jobs" class="tab" role="tabpanel" aria-labelledby="nav-config-jobs" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Configuration des Métiers & Système d’XP</h2>
@@ -809,6 +959,38 @@
 
   <!-- NOUVEAU TAB : ADMIN SHOP -->
   <section id="tab-config-shop" class="tab" role="tabpanel" aria-labelledby="nav-config-shop" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Configuration de l’Admin Shop (/shop)</h2>
@@ -886,6 +1068,26 @@
 
   <!-- NOUVEAU TAB : PARAMÈTRES GÉNÉRAUX -->
   <section id="tab-config-server" class="tab" role="tabpanel" aria-labelledby="nav-config-server" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CONFIGURATION & SYSTÈME -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-server">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Général &amp; Mondes</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="sync-guide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Synchronisation Jeu</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <span>Sauvegardes &amp; Versions</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="tools-audit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Diagnostic &amp; Anti-Lag</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Paramètres Généraux du Serveur</h2>
@@ -955,6 +1157,38 @@
 
   <!-- TAB : BOX & CAISSES -->
   <section id="tab-config-crates" class="tab" role="tabpanel" aria-labelledby="nav-config-crates" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Box & Caisses de Récompenses</h2>
@@ -1051,6 +1285,38 @@
 
   <!-- TAB : KITS & ÉQUIPEMENTS -->
   <section id="tab-config-kits" class="tab" role="tabpanel" aria-labelledby="nav-config-kits" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Kits & Équipements Joueurs</h2>
@@ -1118,6 +1384,38 @@
 
   <!-- TAB : QUÊTES JOURNALIÈRES -->
   <section id="tab-config-quests" class="tab" role="tabpanel" aria-labelledby="nav-config-quests" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Quêtes Journalières</h2>
@@ -1175,6 +1473,38 @@
 
   <!-- TAB : WARZONE, KOTH & AIRDROPS -->
   <section id="tab-config-warzone" class="tab" role="tabpanel" aria-labelledby="nav-config-warzone" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS GESTION DU JEU -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-shop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Admin Shop (/shop)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-crates">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
+        <span>Box &amp; Caisses (/crates)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-kits">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Kits &amp; Équipements (/kit)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-jobs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <span>Métiers &amp; XP (/jobs)</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-daily">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Calendrier Daily</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-quests">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Quêtes Journalières</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="config-warzone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        <span>Warzone &amp; KOTH</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Warzone, KOTH & Événements PvP</h2>
@@ -1257,6 +1587,26 @@
 
   <!-- TAB : AUDIT ÉCONOMIQUE & BOOSTS -->
   <section id="tab-tools-audit" class="tab" role="tabpanel" aria-labelledby="nav-tools-audit" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CONFIGURATION & SYSTÈME -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-server">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Général &amp; Mondes</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="sync-guide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Synchronisation Jeu</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <span>Sauvegardes &amp; Versions</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="tools-audit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Diagnostic &amp; Anti-Lag</span>
+      </button>
+    </div>
+
     <div class="tab-header-banner card">
       <div>
         <h2>Audit Économique & Boosts Temporaires</h2>
@@ -1410,6 +1760,26 @@
 
   <!-- NOUVEAU TAB : GUIDE SYNCHRONISATION -->
   <section id="tab-sync-guide" class="tab" role="tabpanel" aria-labelledby="nav-sync-guide" tabindex="0" hidden>
+    <!-- BARRE DE SOUS-ONGLETS CONFIGURATION & SYSTÈME -->
+    <div class="subnav-container">
+      <button type="button" class="subnav-btn" data-subtab="config-server">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Général &amp; Mondes</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="sync-guide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span>Synchronisation Jeu</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <span>Sauvegardes &amp; Versions</span>
+      </button>
+      <button type="button" class="subnav-btn" data-subtab="tools-audit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Diagnostic &amp; Anti-Lag</span>
+      </button>
+    </div>
+
     <div class="card">
       <h2>Guide & Statut de Synchronisation Serveur</h2>
       <p class="muted">Comment les modifications apportées sur ce studio sont appliquées sur votre serveur Minecraft Opal Heaven.</p>
