@@ -4463,13 +4463,24 @@ const renderDashboardTab = () => {
   if (!state.data) state.data = {};
   if (!state.data.configs) state.data.configs = defaultConfigs();
 
-  const status = state.realServerStatus || {
+  const telem = state.serverTelemetry?.telemetry;
+  const isTelemActive = Boolean(state.serverTelemetry?.connected && telem);
+
+  const status = isTelemActive ? {
+    checked: true,
+    online: true,
+    players: telem.players || { online: 0, max: 100, list: [] },
+    version: telem.server || "Axolotl-PM 5.49",
+    motd: `OPAL HEAVEN » Direct OpalCore (${telem.tps || 20} TPS)`,
+    software: "Axolotl-PM",
+    tps: telem.tps,
+  } : (state.realServerStatus || {
     checked: false,
     online: false,
     players: { online: 0, max: 100, list: [] },
     version: "Axolotl-PM 5.49",
     motd: "OPAL HEAVEN » PvP-Faction",
-  };
+  });
   const s = state.data?.configs?.server || defaultServerConfig();
   const host = (s.serverIp || "opalheaven.mcbe.fr").trim();
   const port = Number(s.serverPort) || 19153;
