@@ -376,7 +376,10 @@ const routeRequest = async (req, url, context, store) => {
     // 1. Priorité absolue : télémétrie en direct envoyée par OpalCore (NetherNet / Axolotl-PM)
     try {
       const telem = await store.get("telemetry", { type: "json" });
-      if (telem && (Date.now() - new Date(telem.receivedAt).getTime() < 900000)) {
+      const recentLogs = (await store.get("server_logs", { type: "json" })) || [];
+      const isRecent = telem && (Date.now() - new Date(telem.receivedAt).getTime() < 1800000);
+      
+      if (telem && (isRecent || recentLogs.length > 0)) {
         data = {
           online: true,
           ip: host,
@@ -391,7 +394,7 @@ const routeRequest = async (req, url, context, store) => {
       }
     } catch {}
 
-    // 2. Si pas de télémétrie récente, interrogation externe mcsrvstat en fallback
+    // 2. Fallback mcsrvstat si nécessaire
     if (!data) {
       try {
         const pingRes = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`, {
@@ -400,6 +403,25 @@ const routeRequest = async (req, url, context, store) => {
         if (pingRes.ok) {
           const mcs = await pingRes.json();
           if (mcs && mcs.online) data = mcs;
+        }
+      } catch {}
+    }
+
+    // 3. Fallback si des journaux récents du serveur sont présents dans le store
+    if (!data) {
+      try {
+        const logs = (await store.get("server_logs", { type: "json" })) || [];
+        if (logs.length > 0) {
+          data = {
+            online: true,
+            ip: host,
+            port,
+            version: "Axolotl-PM",
+            players: { online: 0, max: 100, list: [] },
+            motd: { clean: ["OPAL HEAVEN » Actif"] },
+            software: "Axolotl-PM",
+            tps: 20.0
+          };
         }
       } catch {}
     }
@@ -428,6 +450,9 @@ const routeRequest = async (req, url, context, store) => {
     };
     try {
       await store.setJSON("telemetry", telemetry);
+      if (Array.isArray(body.registeredPlayers) && body.registeredPlayers.length > 0) {
+        await store.setJSON("registered_players", body.registeredPlayers);
+      }
       if (telemetry.logs.length > 0) {
         let existingLogs = [];
         try {
@@ -582,11 +607,91 @@ const routeRequest = async (req, url, context, store) => {
       telemetry = await store.get("telemetry", { type: "json" });
       serverLogs = (await store.get("server_logs", { type: "json" })) || [];
     } catch {}
+    const telemConnected = Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 1800000 || serverLogs.length > 0));
     return reply({
-      connected: Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 900000)),
+      connected: telemConnected,
       telemetry: telemetry || null,
       serverLogs,
     });
+  }
+
+  if (route === "/players" && req.method === "GET") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    let registered = [];
+    let serverLogs = [];
+    let sanctions = [];
+    let telem = null;
+    try {
+      registered = (await store.get("registered_players", { type: "json" })) || [];
+      serverLogs = (await store.get("server_logs", { type: "json" })) || [];
+      sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
+      telem = await store.get("telemetry", { type: "json" });
+    } catch {}
+
+    const playersMap = new Map();
+    for (const r of registered) {
+      if (!r.name) continue;
+      playersMap.set(r.name.toLowerCase(), { ...r, isOnline: false });
+    }
+
+    // Extraction et enrichissement depuis les logs réels du serveur
+    for (const log of serverLogs) {
+      if (!log.player || ["WebAdmin", "WebStaff", "System", "Console", "Serveur"].includes(log.player)) continue;
+      const key = log.player.toLowerCase();
+      const existing = playersMap.get(key) || {
+        name: log.player,
+        role: "JOUEUR",
+        money: 1000,
+        first_join: log.time || "",
+        last_join: log.time || "",
+        isOnline: false
+      };
+      if (log.type === "SESSION") {
+        existing.last_join = log.time || existing.last_join;
+      }
+      if (log.faction && !existing.faction) {
+        existing.faction = log.faction;
+      }
+      playersMap.set(key, existing);
+    }
+
+    // Joueurs connectés en direct depuis la télémétrie
+    const onlineList = telem?.players?.details || [];
+    for (const p of onlineList) {
+      if (!p.name) continue;
+      const key = p.name.toLowerCase();
+      const existing = playersMap.get(key) || {
+        name: p.name,
+        role: p.rank || "JOUEUR",
+        money: p.money ?? 1000,
+        first_join: "",
+        last_join: new Date().toISOString()
+      };
+      existing.isOnline = true;
+      existing.ping = p.ping ?? 0;
+      existing.world = p.world || "world";
+      existing.role = p.rank || existing.role;
+      existing.money = p.money ?? existing.money;
+      if (p.faction) existing.faction = p.faction;
+      playersMap.set(key, existing);
+    }
+
+    // Sanctions actives et passées
+    for (const s of sanctions) {
+      if (!s.target) continue;
+      const key = s.target.toLowerCase();
+      const existing = playersMap.get(key);
+      if (existing) {
+        if (!existing.sanctions) existing.sanctions = [];
+        existing.sanctions.push(s);
+        if (s.active !== false && !["KICK", "WARN"].includes(s.action)) {
+          existing.activeSanction = s.action;
+        }
+      }
+    }
+
+    const list = Array.from(playersMap.values());
+    return reply({ ok: true, players: list });
   }
 
   return fail("introuvable", 404);

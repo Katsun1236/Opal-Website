@@ -8,7 +8,7 @@
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
 <title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css?v=3.4">
+<link rel="stylesheet" href="/style.css?v=3.5">
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -1864,11 +1864,11 @@
   </section>
 
   <!-- TAB : MOD�RATION & S�CURIT� -->
-  <section id="tab-moderation" class="tab" role="tabpanel" aria-labelledby="nav-moderation" tabindex="0" hidden>
+    <section id="tab-moderation" class="tab" role="tabpanel" aria-labelledby="nav-moderation" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
-        <h2>Mod�ration &amp; S�curit� en Temps R�el</h2>
-        <p class="muted">Pilotage des sanctions, surveillance des joueurs connect�s, avertissements et registre d'audit OpalCore.</p>
+        <h2>Mod&eacute;ration &amp; S&eacute;curit&eacute; en Temps R&eacute;el</h2>
+        <p class="muted">Pilotage des sanctions, surveillance des joueurs connect&eacute;s, avertissements et registre d'audit OpalCore.</p>
       </div>
       <div class="row row-tight">
         <button type="button" id="mod-tab-refresh-btn" class="ghost">
@@ -1898,7 +1898,46 @@
       <div class="card stat-card">
         <span class="muted text-sm">Joueurs en Direct</span>
         <strong id="mod-stat-online" class="stat-value" style="color: var(--primary-mint, #10b981);">0</strong>
-        <span class="stat-delta">Surveill�s en jeu</span>
+        <span class="stat-delta">Surveill&eacute;s en jeu</span>
+      </div>
+    </div>
+
+    <!-- CARTE : ANNUAIRE & FICHE DE TOUS LES JOUEURS ENREGISTRES -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-header" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <h3 style="margin: 0; font-size: 16px;">&#128101; Annuaire &amp; Fiches de tous les Joueurs Enregistr&eacute;s</h3>
+          <p class="muted text-sm" style="margin: 4px 0 0 0;">Consultez les informations d&eacute;taill&eacute;es (grade, solde &eacute;conomie, kills, ratio, date de premi&egrave;re connexion) de tous les joueurs du serveur.</p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <input type="text" id="reg-players-search" placeholder="Rechercher par pseudo, grade, faction..." style="padding: 6px 10px; font-size: 12px; width: 250px;" />
+          <div class="chips-row" id="reg-players-filters" style="margin: 0;">
+            <button type="button" class="chip-btn active" data-player-filter="all">Tous (<span id="reg-count-all">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="online">En Ligne (<span id="reg-count-online">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="staff">Staff (<span id="reg-count-staff">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="sanctioned">Sanctionn&eacute;s (<span id="reg-count-sanctioned">0</span>)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table-compact">
+          <thead>
+            <tr>
+              <th style="width: 180px;">Joueur</th>
+              <th style="width: 120px;">Grade / Rang</th>
+              <th style="width: 130px;">Faction</th>
+              <th style="width: 110px;">Solde ($)</th>
+              <th style="width: 110px;">Connexion</th>
+              <th style="width: 110px;">Mod&eacute;ration</th>
+              <th style="width: 140px;">Derni&egrave;re Activit&eacute;</th>
+              <th style="width: 160px; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="reg-players-table-body">
+            <!-- Rempli dynamiquement par renderRegisteredPlayers() -->
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -1907,8 +1946,8 @@
       <div class="card">
         <div class="card-header" style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 12px; margin-bottom: 16px;">
           <div>
-            <h3 style="margin: 0; font-size: 16px;">? Action Rapide de Mod�ration</h3>
-            <p class="muted text-sm" style="margin: 4px 0 0 0;">Sanctionnez un joueur imm�diatement (connect� ou hors ligne).</p>
+            <h3 style="margin: 0; font-size: 16px;">&#9889; Action Rapide de Mod&eacute;ration</h3>
+            <p class="muted text-sm" style="margin: 4px 0 0 0;">Sanctionnez un joueur imm&eacute;diatement (connect&eacute; ou hors ligne).</p>
           </div>
         </div>
 
@@ -1922,16 +1961,16 @@
           <div class="field">
             <label>Type de sanction</label>
             <div class="chips-row" id="mod-direct-type-chips">
-              <button type="button" class="chip-btn active" data-mod-type="WARN">?? Warn</button>
-              <button type="button" class="chip-btn" data-mod-type="MUTE">?? Mute</button>
-              <button type="button" class="chip-btn" data-mod-type="FREEZE">?? Freeze</button>
-              <button type="button" class="chip-btn" data-mod-type="KICK">?? Kick</button>
-              <button type="button" class="chip-btn" data-mod-type="BAN">?? Ban</button>
+              <button type="button" class="chip-btn active" data-mod-type="WARN">&#9888;&#65039; Warn</button>
+              <button type="button" class="chip-btn" data-mod-type="MUTE">&#128263; Mute</button>
+              <button type="button" class="chip-btn" data-mod-type="FREEZE">&#10052;&#65039; Freeze</button>
+              <button type="button" class="chip-btn" data-mod-type="KICK">&#128098; Kick</button>
+              <button type="button" class="chip-btn" data-mod-type="BAN">&#128296; Ban</button>
             </div>
           </div>
 
           <div class="field" id="mod-direct-duration-field" style="display: none;">
-            <label>Dur�e de la sanction</label>
+            <label>Dur&eacute;e de la sanction</label>
             <div class="chips-row" id="mod-direct-duration-chips">
               <button type="button" class="chip-btn active" data-duration="15m">15 min</button>
               <button type="button" class="chip-btn" data-duration="30m">30 min</button>
@@ -1940,29 +1979,29 @@
               <button type="button" class="chip-btn" data-duration="1d">24 h</button>
               <button type="button" class="chip-btn" data-duration="7d">7 jours</button>
               <button type="button" class="chip-btn" data-duration="30d">30 jours</button>
-              <button type="button" class="chip-btn" data-duration="perm">D�finitif</button>
+              <button type="button" class="chip-btn" data-duration="perm">D&eacute;finitif</button>
             </div>
           </div>
 
           <div class="field">
-            <label>Motifs fr�quents</label>
+            <label>Motifs fr&eacute;quents</label>
             <div class="chips-row" id="mod-direct-reason-chips">
               <button type="button" class="chip-btn" data-reason="Spam / Flood intempestif dans le chat">Spam / Flood</button>
               <button type="button" class="chip-btn" data-reason="Insultes, propos toxiques ou irrespect">Insultes / Toxique</button>
-              <button type="button" class="chip-btn" data-reason="Triche av�r�e / Fly / AutoClick / X-Ray">Triche / Hack</button>
+              <button type="button" class="chip-btn" data-reason="Triche avérée / Fly / AutoClick / X-Ray">Triche / Hack</button>
               <button type="button" class="chip-btn" data-reason="Anti-jeu / Grief / Abus de bug">Anti-jeu / Grief</button>
-              <button type="button" class="chip-btn" data-reason="Publicit� non autoris�e">Publicit�</button>
-              <button type="button" class="chip-btn" data-reason="Refus d'obtemp�rer / Provocation staff">Provoc Staff</button>
+              <button type="button" class="chip-btn" data-reason="Publicité non autorisée">Publicit&eacute;</button>
+              <button type="button" class="chip-btn" data-reason="Refus d'obtempérer / Provocation staff">Provoc Staff</button>
             </div>
           </div>
 
           <div class="field">
-            <label for="mod-direct-reason">Motif personnalis� / D�tails</label>
-            <input type="text" id="mod-direct-reason" placeholder="Ex: Spam r�p�t� apr�s avertissements" required />
+            <label for="mod-direct-reason">Motif personnalis&eacute; / D&eacute;tails</label>
+            <input type="text" id="mod-direct-reason" placeholder="Ex: Spam répété après avertissements" required />
           </div>
 
           <button type="submit" id="mod-direct-submit-btn" class="danger" style="margin-top: 6px; padding: 10px 16px; font-weight: 600;">
-            ?? Appliquer la Sanction au Joueur
+            &#9878;&#65039; Appliquer la Sanction au Joueur
           </button>
         </form>
       </div>
@@ -1971,14 +2010,14 @@
       <div class="card" style="display: flex; flex-direction: column;">
         <div class="card-header" style="border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08)); padding-bottom: 12px; margin-bottom: 16px;">
           <div>
-            <h3 style="margin: 0; font-size: 16px;">?? Joueurs en Ligne &amp; Surveillance</h3>
-            <p class="muted text-sm" style="margin: 4px 0 0 0;">Joueurs connect�s sur OpalCore avec actions rapides de mod�ration.</p>
+            <h3 style="margin: 0; font-size: 16px;">&#128994; Joueurs en Ligne &amp; Surveillance</h3>
+            <p class="muted text-sm" style="margin: 4px 0 0 0;">Joueurs connect&eacute;s sur OpalCore avec actions rapides de mod&eacute;ration.</p>
           </div>
           <span class="subnav-badge" id="mod-online-count-badge">0 en jeu</span>
         </div>
 
         <div id="mod-live-players-container" style="flex: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 480px;">
-          <!-- Inject� dynamiquement par app.js -->
+          <!-- Injecté dynamiquement par app.js -->
         </div>
       </div>
     </div>
@@ -1987,8 +2026,8 @@
     <div class="card">
       <div class="card-header" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
         <div>
-          <h3 style="margin: 0; font-size: 16px;">?? Registre des Sanctions &amp; Audit Staff</h3>
-          <p class="muted text-sm" style="margin: 4px 0 0 0;">Historique chronologique des sanctions �mises avec r�vocation directe (Unban / Unmute / Unfreeze).</p>
+          <h3 style="margin: 0; font-size: 16px;">&#128220; Registre des Sanctions &amp; Audit Staff</h3>
+          <p class="muted text-sm" style="margin: 4px 0 0 0;">Historique chronologique des sanctions &eacute;mises avec r&eacute;vocation directe (Unban / Unmute / Unfreeze).</p>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
           <input type="text" id="mod-audit-search" placeholder="Rechercher joueur ou motif..." style="padding: 6px 10px; font-size: 12px; width: 220px;" />
@@ -2010,15 +2049,15 @@
               <th style="width: 150px;">Date &amp; Heure</th>
               <th style="width: 100px;">Sanction</th>
               <th style="width: 160px;">Joueur Cible</th>
-              <th style="width: 120px;">�metteur</th>
+              <th style="width: 120px;">&Eacute;metteur</th>
               <th>Motif</th>
-              <th style="width: 100px;">Dur�e</th>
+              <th style="width: 100px;">Dur&eacute;e</th>
               <th style="width: 100px;">Statut</th>
               <th style="width: 140px; text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody id="mod-sanctions-table-body">
-            <!-- Inject� dynamiquement par app.js -->
+            <!-- Injecté dynamiquement par app.js -->
           </tbody>
         </table>
       </div>
@@ -2222,7 +2261,7 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=3.4"></script>
+<script type="module" src="/app.js?v=3.5"></script>
 
 <!-- DIALOG : DOSSIER & INSPECTEUR JOUEUR COMPLET -->
 <dialog id="player-inspector-modal" class="card modal-dialog player-inspector-dialog">

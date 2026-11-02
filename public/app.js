@@ -4119,6 +4119,43 @@ let serverPollingTimer = null;
 let lastRealServerStatusCheck = 0;
 state.ui.logsLive = true;
 
+const updateGlobalServerStatus = () => {
+  const telem = state.serverTelemetry?.telemetry;
+  const isTelemOnline = Boolean(state.serverTelemetry?.connected || (state.serverTelemetry?.serverLogs && state.serverTelemetry.serverLogs.length > 0));
+  const isOnline = isTelemOnline || Boolean(state.realServerStatus?.online);
+  const curOnline = isOnline ? (telem?.players?.online ?? state.realServerStatus?.players?.online ?? 0) : 0;
+
+  const navLiveIndicator = $("#nav-live-indicator");
+  if (navLiveIndicator) {
+    if (isOnline) {
+      navLiveIndicator.textContent = `${curOnline} en jeu`;
+      navLiveIndicator.style.background = "rgba(82, 184, 155, 0.15)";
+      navLiveIndicator.style.color = "var(--mint)";
+    } else {
+      navLiveIndicator.textContent = "Hors ligne";
+      navLiveIndicator.style.background = "rgba(235, 104, 117, 0.15)";
+      navLiveIndicator.style.color = "var(--danger)";
+    }
+  }
+
+  const livePill = $("#hub-server-live-pill");
+  const liveText = $("#hub-live-status-text");
+  if (livePill && liveText) {
+    if (isOnline) {
+      livePill.className = "hub-server-status-pill online";
+      liveText.textContent = `Serveur En Ligne (${telem?.server || state.realServerStatus?.software || "Axolotl-PM"})`;
+    } else if (state.realServerStatus?.checked) {
+      livePill.className = "hub-server-status-pill offline";
+      liveText.textContent = "Serveur Hors Ligne / Injoignable";
+    }
+  }
+
+  const modOnlineBadge = $("#mod-online-count-badge");
+  if (modOnlineBadge) {
+    modOnlineBadge.textContent = isOnline ? `${curOnline} en jeu` : "Serveur hors ligne";
+  }
+};
+
 const pollRealServer = async (forcePing = false) => {
   const tasks = [fetchServerTelemetry()];
   const now = Date.now();
@@ -4155,6 +4192,7 @@ const pollRealServer = async (forcePing = false) => {
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
   if (state.ui.tab === "moderation") renderModerationTab();
+  updateGlobalServerStatus();
 };
 
 const startServerPolling = () => {
@@ -7324,7 +7362,9 @@ const renderPlayerSanctionsTab = async (playerName) => {
   container.innerHTML = "<p class='muted text-sm'>Chargement des sanctions…</p>";
 
   try {
-    const res = await fetch("/api/moderation/sanctions");
+    const res = await fetch("/api/moderation/sanctions", {
+      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) }
+    });
     if (res.ok) {
       const data = await res.json();
       const sanctions = (data.sanctions || []).filter((s) => (s.target || "").toLowerCase() === playerName.toLowerCase());
@@ -7391,7 +7431,10 @@ const dispatchModerationCommand = async (command) => {
   try {
     const res = await fetch("/api/moderation/action", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(state.token ? { Authorization: "Bearer " + state.token } : {})
+      },
       body: JSON.stringify({
         target: state.ui.inspectorPlayer || "Joueur",
         action: "CMD",
@@ -7421,7 +7464,10 @@ const submitModerationAction = async (target, action, reason, duration) => {
   try {
     const res = await fetch("/api/moderation/action", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(state.token ? { Authorization: "Bearer " + state.token } : {})
+      },
       body: JSON.stringify({ target, action, reason, duration, command: cmd })
     });
     if (res.ok) {
@@ -7567,6 +7613,190 @@ on("#mod-action-form", "submit", async (e) => {
    MODULE MODÉRATION DÉDIÉ (ONGLET MODÉRATION)
 ===================================================================== */
 
+
+let regPlayersFilter = "all";
+let regPlayersSearch = "";
+
+const renderRegisteredPlayers = async () => {
+  let players = [];
+  try {
+    const res = await fetch("/api/players", {
+      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      players = data.players || [];
+    }
+  } catch {}
+
+  const tbody = $("#reg-players-table-body");
+  if (!tbody) return;
+  tbody.replaceChildren();
+
+  // Mettre à jour les compteurs de badges
+  const onlineCount = players.filter((p) => p.isOnline).length;
+  const staffCount = players.filter((p) => {
+    const r = (p.role || "").toUpperCase();
+    return ["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(r);
+  }).length;
+  const sanctionedCount = players.filter((p) => p.activeSanction).length;
+
+  const cAll = $("#reg-count-all");
+  const cOnline = $("#reg-count-online");
+  const cStaff = $("#reg-count-staff");
+  const cSanctioned = $("#reg-count-sanctioned");
+  if (cAll) cAll.textContent = String(players.length);
+  if (cOnline) cOnline.textContent = String(onlineCount);
+  if (cStaff) cStaff.textContent = String(staffCount);
+  if (cSanctioned) cSanctioned.textContent = String(sanctionedCount);
+
+  // Filtrage
+  const q = (regPlayersSearch || "").toLowerCase().trim();
+  const filtered = players.filter((p) => {
+    if (regPlayersFilter === "online" && !p.isOnline) return false;
+    if (regPlayersFilter === "staff") {
+      const r = (p.role || "").toUpperCase();
+      if (!["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(r)) return false;
+    }
+    if (regPlayersFilter === "sanctioned" && !p.activeSanction) return false;
+    if (q) {
+      const nMatch = (p.name || "").toLowerCase().includes(q);
+      const rMatch = (p.role || "").toLowerCase().includes(q);
+      const fMatch = (p.faction || "").toLowerCase().includes(q);
+      if (!nMatch && !rMatch && !fMatch) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.appendChild(
+      h(
+        "tr",
+        null,
+        h("td", { colspan: "8", class: "muted text-sm", style: "text-align: center; padding: 24px;" }, "Aucun joueur enregistré ne correspond à ces critères.")
+      )
+    );
+    return;
+  }
+
+  filtered.forEach((p) => {
+    const pName = p.name || "Steve";
+    const role = p.role || "Joueur";
+    const money = p.money ?? 1000;
+    const faction = p.faction || "Sans Faction";
+    const isOnline = Boolean(p.isOnline);
+    const lastActive = p.last_join
+      ? (p.last_join.includes("T") || p.last_join.includes("-")
+          ? new Date(p.last_join.replace(/\[|\]/g, "")).toLocaleString("fr-FR", {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : p.last_join)
+      : "-";
+
+    const avatarImg = h("img", {
+      src: `https://api.creepernation.net/avatar/${encodeURIComponent(pName)}?fallback=steve&size=24`,
+      alt: pName,
+      style: "width: 22px; height: 22px; border-radius: 4px; image-rendering: pixelated; flex-shrink: 0;",
+      onerror: (e) => {
+        e.target.src = "/assets/icon.png";
+      }
+    });
+
+    const isStaff = ["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(role.toUpperCase());
+
+    const row = h(
+      "tr",
+      null,
+      h(
+        "td",
+        null,
+        h(
+          "div",
+          { style: "display: flex; align-items: center; gap: 8px;" },
+          avatarImg,
+          h(
+            "button",
+            {
+              type: "button",
+              class: "ghost",
+              style: "font-weight: 600; padding: 0; color: var(--text); font-size: 13px;",
+              onclick: () => openPlayerInspector(pName),
+              title: "Consulter la fiche complète de " + pName
+            },
+            pName
+          )
+        )
+      ),
+      h(
+        "td",
+        null,
+        h(
+          "span",
+          {
+            class: "subnav-badge",
+            style: `font-size: 11px; padding: 2px 7px; ${isStaff ? "background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);" : ""}`
+          },
+          role
+        )
+      ),
+      h("td", { class: "muted text-sm" }, faction),
+      h("td", { style: "font-family: monospace; font-weight: 600; color: var(--mint);" }, `${money.toLocaleString("fr-FR")}`),
+      h(
+        "td",
+        null,
+        isOnline
+          ? h("span", { class: "status-badge-active" }, "🟢 En ligne")
+          : h("span", { class: "status-badge-expired" }, "⚪ Déconnecté")
+      ),
+      h(
+        "td",
+        null,
+        p.activeSanction
+          ? h("span", { class: "mod-action-badge badge-ban", style: "font-size: 10px;" }, p.activeSanction)
+          : h("span", { class: "status-badge-active", style: "font-size: 11px;" }, "🟢 En règle")
+      ),
+      h("td", { class: "muted text-sm", style: "font-size: 11px; font-family: monospace;" }, lastActive),
+      h(
+        "td",
+        { style: "text-align: right;" },
+        h(
+          "div",
+          { style: "display: flex; gap: 6px; justify-content: flex-end;" },
+          h(
+            "button",
+            {
+              type: "button",
+              class: "btn-xs",
+              title: "Ouvrir le dossier complet",
+              onclick: () => openPlayerInspector(pName)
+            },
+            "🔍 Fiche"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              class: "btn-xs danger-ghost",
+              title: "Sanctionner ce joueur",
+              onclick: () => {
+                const targetInput = $("#mod-direct-target");
+                if (targetInput) targetInput.value = pName;
+                document.getElementById("mod-direct-form")?.scrollIntoView({ behavior: "smooth" });
+                $("#mod-direct-reason")?.focus();
+              }
+            },
+            "⚖️ Sanction"
+          )
+        )
+      )
+    );
+    tbody.appendChild(row);
+  });
+};
+
 let modAuditFilter = "all";
 let modAuditSearch = "";
 
@@ -7585,7 +7815,10 @@ const revokeSanction = async (sanctionId, target, action) => {
   try {
     const res = await fetch("/api/moderation/revoke", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(state.token ? { Authorization: "Bearer " + state.token } : {})
+      },
       body: JSON.stringify({ id: sanctionId, target, action })
     });
     if (res.ok) {
@@ -7603,7 +7836,9 @@ const renderModerationTab = async () => {
   // 1. Récupération des sanctions depuis l'API
   let sanctions = [];
   try {
-    const res = await fetch("/api/moderation/sanctions");
+    const res = await fetch("/api/moderation/sanctions", {
+      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) }
+    });
     if (res.ok) {
       const data = await res.json();
       sanctions = data.sanctions || [];
@@ -7798,6 +8033,9 @@ const renderModerationTab = async () => {
     }
   }
 
+  // 5bis. Rendu de l'annuaire des joueurs enregistrés
+  await renderRegisteredPlayers();
+
   // 6. Rendu du registre d'audit des sanctions
   const tbody = $("#mod-sanctions-table-body");
   if (tbody) {
@@ -7989,3 +8227,17 @@ on("#mod-tab-refresh-btn", "click", async () => {
   await renderModerationTab();
 });
 
+
+document.querySelectorAll("#reg-players-filters .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#reg-players-filters .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    regPlayersFilter = chip.dataset.playerFilter || "all";
+    renderRegisteredPlayers();
+  });
+});
+
+on("#reg-players-search", "input", (e) => {
+  regPlayersSearch = e.target.value;
+  renderRegisteredPlayers();
+});
