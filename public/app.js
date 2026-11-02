@@ -4195,7 +4195,7 @@ const renderLogsTab = () => {
     }
   }
 
-  const totalMoney = logs.reduce((sum, l) => sum + (Number(l.amount) || 0), 0);
+  const totalMoney = logs.reduce((sum, l) => sum + Math.abs(Number(l.amount) || 0), 0);
   const statMoney = $("#log-stat-money");
   if (statMoney) statMoney.textContent = `$${totalMoney.toLocaleString("fr-FR")}`;
 
