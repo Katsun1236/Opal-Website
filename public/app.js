@@ -3921,8 +3921,65 @@ const getStoredLogs = () => {
     }
   } catch {}
 
-  // Logs réels transmis par le plugin OpalCore s'il y en a
-  const remoteLogs = state.serverTelemetry?.serverLogs || [];
+  // Logs réels transmis par le plugin OpalCore normalisés
+  const rawRemote = state.serverTelemetry?.serverLogs || [];
+  const remoteLogs = rawRemote.map((l) => {
+    let type = l.type ? String(l.type).toUpperCase() : "CONSOLE";
+    let player = l.player || "Serveur";
+    let message = l.message || "";
+    let details = l.details || "";
+
+    // 1. Détection CHAT : format "[Role][Fac] Katsun1246 » cc" ou "<Katsun1246> cc"
+    if (message.includes(" » ") || message.startsWith("<")) {
+      type = "CHAT";
+      const m = message.match(/^(?:.*?\]\s*)*([a-zA-Z0-9_]{3,16})\s*»\s*(.*)$/) || message.match(/^<([a-zA-Z0-9_]{3,16})>\s*(.*)$/);
+      if (m) {
+        player = m[1];
+        message = m[2];
+        details = "Discussion en jeu";
+      }
+    }
+    // 2. Détection SESSIONS : "Player joined the game" / "logged in"
+    else if (message.includes("joined the game") || message.includes("left the game") || message.includes("logged in with") || message.includes("Session opened")) {
+      type = "SESSION";
+      const m = message.match(/([a-zA-Z0-9_]{3,16})\s+(?:joined the game|logged in with|left the game|disconnected)/) || message.match(/Player:\s*([a-zA-Z0-9_]{3,16})/);
+      if (m) player = m[1];
+      details = "Connexion / Déconnexion";
+    }
+    // 3. Détection COMMANDES : "[Player: ...]" ou "Player issued server command"
+    else if (message.includes("issued server command") || message.startsWith("/") || /\[[a-zA-Z0-9_]{3,16}:/.test(message)) {
+      type = "CMD";
+      const m = message.match(/\[([a-zA-Z0-9_]{3,16}):\s*(.*)\]/) || message.match(/([a-zA-Z0-9_]{3,16})\s+issued server command:\s*(.*)/);
+      if (m) {
+        player = m[1];
+        message = "/" + m[2].replace(/^\//, "");
+      }
+      details = "Commande exécutée";
+    }
+    // 4. Détection SYNCHRO / CONFIG : "[OpalCore] ..."
+    else if (message.includes("OpalCore") || message.includes("synchronis")) {
+      type = "CONFIG";
+      player = "Admin";
+      details = "Synchronisation OpalCore";
+    }
+    // 5. Console
+    else if (type === "INFO" || type === "WARNING" || type === "ERROR") {
+      type = "CONSOLE";
+    }
+
+    return {
+      id: l.id || ("rem_" + Math.random().toString(36).slice(2, 9)),
+      time: l.time || new Date().toLocaleTimeString("fr-FR"),
+      type,
+      player,
+      message,
+      details,
+      server: l.server || "opalheaven.mcbe.fr",
+      world: l.world || "world",
+      amount: l.amount || 0
+    };
+  });
+
   const combined = [...remoteLogs, ...localLogs];
   return combined.slice(0, 350);
 };
@@ -5280,6 +5337,12 @@ const resetCratesDefaults = async () => {
 const renderKitsTab = () => {
   if (!state.data.configs) state.data.configs = defaultConfigs();
   if (!state.data.configs.kits) state.data.configs.kits = defaultKitsConfig();
+
+  // Migration automatique si d'anciens kits factices subsistent
+  if (state.data.configs.kits && (state.data.configs.kits.guerrier || state.data.configs.kits.vip)) {
+    state.data.configs.kits = defaultKitsConfig();
+    setDirty(true);
+  }
 
   const kits = state.data.configs.kits;
   const keys = Object.keys(kits);

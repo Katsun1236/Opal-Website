@@ -525,60 +525,75 @@ export const defaultKitsConfig = () => ({
   joueur: {
     id: "joueur",
     name: "Kit Joueur",
+    cooldown_hours: 4,
+    permission: "opal.player",
+    icon: "textures/items/wood_sword",
+    items: [
+      { item: "minecraft:stone_sword", count: 1, name: "Épée en pierre" },
+      { item: "minecraft:stone_pickaxe", count: 1, name: "Pioche en pierre" },
+      { item: "minecraft:stone_axe", count: 1, name: "Hache en pierre" },
+      { item: "minecraft:bread", count: 16, name: "Pain" },
+      { item: "minecraft:cooked_beef", count: 8, name: "Steak grillé" }
+    ]
+  },
+  vote: {
+    id: "vote",
+    name: "Kit Vote",
     cooldown_hours: 24,
-    permission: "",
-    icon: "minecraft:stone_pickaxe",
+    permission: "opal.kit.vote",
+    icon: "textures/items/emerald",
     items: [
-      { item: "minecraft:stone_sword", count: 1, name: "Épée du débutant" },
-      { item: "minecraft:stone_pickaxe", count: 1, name: "Pioche du débutant" },
-      { item: "minecraft:bread", count: 32, name: "Rations de survie" },
-      { item: "minecraft:leather_helmet", count: 1, name: "Casque en cuir" },
-      { item: "minecraft:leather_chestplate", count: 1, name: "Tunique en cuir" },
-    ],
+      { item: "minecraft:iron_sword", count: 1, name: "Épée en fer" },
+      { item: "minecraft:iron_pickaxe", count: 1, name: "Pioche en fer" },
+      { item: "minecraft:golden_apple", count: 2, name: "Pomme dorée" },
+      { item: "minecraft:cooked_beef", count: 16, name: "Steak grillé" },
+      { item: "minecraft:diamond", count: 2, name: "Diamant" }
+    ]
   },
-  guerrier: {
-    id: "guerrier",
-    name: "Kit Guerrier",
+  joyaux: {
+    id: "joyaux",
+    name: "Kit Joyaux",
+    cooldown_hours: 24,
+    permission: "opal.kit.joyaux",
+    icon: "textures/items/ruby",
+    items: [
+      { item: "minecraft:diamond_sword", count: 1, name: "Épée en diamant" },
+      { item: "minecraft:diamond_pickaxe", count: 1, name: "Pioche en diamant" },
+      { item: "minecraft:golden_apple", count: 4, name: "Pomme dorée" },
+      { item: "minecraft:cooked_beef", count: 32, name: "Steak grillé" },
+      { item: "minecraft:experience_bottle", count: 16, name: "Bouteille d'XP" }
+    ]
+  },
+  celeste: {
+    id: "celeste",
+    name: "Kit Céleste",
     cooldown_hours: 48,
-    permission: "opal.kit.guerrier",
-    icon: "minecraft:iron_sword",
+    permission: "opal.kit.celeste",
+    icon: "textures/items/diamond",
     items: [
-      { item: "minecraft:iron_sword", count: 1, name: "Lame de fer aiguisée" },
-      { item: "minecraft:iron_helmet", count: 1, name: "Heaume de fer" },
-      { item: "minecraft:iron_chestplate", count: 1, name: "Cuirasse de fer" },
-      { item: "minecraft:iron_leggings", count: 1, name: "Jambières de fer" },
-      { item: "minecraft:iron_boots", count: 1, name: "Grèves de fer" },
-      { item: "minecraft:golden_apple", count: 4, name: "Pommes dorées" },
-    ],
+      { item: "minecraft:diamond_helmet", count: 1, name: "Casque en diamant" },
+      { item: "minecraft:diamond_chestplate", count: 1, name: "Plastron en diamant" },
+      { item: "minecraft:diamond_leggings", count: 1, name: "Jambières en diamant" },
+      { item: "minecraft:diamond_boots", count: 1, name: "Bottes en diamant" },
+      { item: "minecraft:diamond_sword", count: 1, name: "Épée en diamant" },
+      { item: "minecraft:golden_apple", count: 8, name: "Pomme dorée" },
+      { item: "minecraft:ender_pearl", count: 4, name: "Perle de l'Ender" }
+    ]
   },
-  vip: {
-    id: "vip",
-    name: "Kit VIP",
+  donateur: {
+    id: "donateur",
+    name: "Kit Donateur",
     cooldown_hours: 72,
-    permission: "opal.kit.vip",
-    icon: "minecraft:diamond_sword",
+    permission: "opal.kit.donateur",
+    icon: "textures/items/nether_star",
     items: [
-      { item: "minecraft:diamond_sword", count: 1, name: "Tranchant VIP" },
-      { item: "minecraft:diamond_pickaxe", count: 1, name: "Foreuse VIP" },
-      { item: "minecraft:diamond_helmet", count: 1, name: "Casque VIP" },
-      { item: "minecraft:diamond_chestplate", count: 1, name: "Plastron VIP" },
-      { item: "minecraft:golden_apple", count: 8, name: "Pommes dorées" },
-      { item: "minecraft:cooked_beef", count: 64, name: "Steaks grillés" },
-    ],
-  },
-  opal: {
-    id: "opal",
-    name: "Kit Opal Céleste",
-    cooldown_hours: 168,
-    permission: "opal.kit.opal",
-    icon: "opal:gemme_opale",
-    items: [
-      { item: "opal:epee_opale_icon", count: 1, name: "Épée en Opale" },
-      { item: "opal:pioche_opale_icon", count: 1, name: "Pioche en Opale" },
-      { item: "opal:gemme_opale", count: 3, name: "Opales Célestes" },
-      { item: "minecraft:golden_apple", count: 16, name: "Pommes d'or bénies" },
-    ],
-  },
+      { item: "minecraft:netherite_sword", count: 1, name: "Épée en Netherite" },
+      { item: "minecraft:netherite_pickaxe", count: 1, name: "Pioche en Netherite" },
+      { item: "minecraft:enchanted_golden_apple", count: 2, name: "Pomme de Notch" },
+      { item: "minecraft:cooked_beef", count: 64, name: "Steak grillé" },
+      { item: "minecraft:totem_of_undying", count: 1, name: "Totem d'immortalité" }
+    ]
+  }
 });
 
 export const defaultQuestsConfig = () => ({
