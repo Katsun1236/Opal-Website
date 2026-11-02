@@ -9,7 +9,23 @@
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
 <title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css?v=4.2">
+<link rel="stylesheet" href="/style.css?v=4.3">
+<script>
+if (typeof SVGAnimatedString !== "undefined") {
+  if (!SVGAnimatedString.prototype.indexOf) {
+    SVGAnimatedString.prototype.indexOf = function(s, p) { return (this.baseVal || "").indexOf(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.includes) {
+    SVGAnimatedString.prototype.includes = function(s, p) { return (this.baseVal || "").includes(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.startsWith) {
+    SVGAnimatedString.prototype.startsWith = function(s, p) { return (this.baseVal || "").startsWith(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.split) {
+    SVGAnimatedString.prototype.split = function(s, l) { return (this.baseVal || "").split(s, l); };
+  }
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -2526,7 +2542,7 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=4.2"></script>
+<script type="module" src="/app.js?v=4.3"></script>
 
 <!-- DIALOG : DOSSIER & INSPECTEUR JOUEUR COMPLET -->
 <dialog id="player-inspector-modal" class="card modal-dialog player-inspector-dialog">

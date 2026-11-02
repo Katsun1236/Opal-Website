@@ -25,6 +25,23 @@ import {
    CONSTANTES MÉTIER
 ===================================================================== */
 
+// Polyfill d'immunité contre les extensions navigateur (DeepL, Google Translate, TWP)
+// qui appellent target.className.indexOf() sur des éléments SVG (SVGAnimatedString)
+if (typeof SVGAnimatedString !== "undefined") {
+  if (!SVGAnimatedString.prototype.indexOf) {
+    SVGAnimatedString.prototype.indexOf = function(s, p) { return (this.baseVal || "").indexOf(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.includes) {
+    SVGAnimatedString.prototype.includes = function(s, p) { return (this.baseVal || "").includes(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.startsWith) {
+    SVGAnimatedString.prototype.startsWith = function(s, p) { return (this.baseVal || "").startsWith(s, p); };
+  }
+  if (!SVGAnimatedString.prototype.split) {
+    SVGAnimatedString.prototype.split = function(s, l) { return (this.baseVal || "").split(s, l); };
+  }
+}
+
 const VANILLA = ["diamond","iron_ingot","gold_ingot","netherite_ingot","emerald","redstone","stick","string","leather","coal","copper_ingot","amethyst_shard","diamond_ore","deepslate_diamond_ore","iron_ore","deepslate_iron_ore","redstone_ore","gold_ore","stone_bricks","redstone_lamp","obsidian","glass","diamond_block","iron_block","gold_block","netherite_block","stone","cobblestone","oak_planks","oak_log","tnt","nether_star","blaze_rod","blaze_powder","ender_pearl","gunpowder","paper","book","quartz","glowstone_dust","prismarine_shard","totem_of_undying","golden_apple","bone","feather","flint","brick","sand","dirt","lapis_lazuli","lapis_block","barrier","beacon","golden_helmet","golden_chestplate","golden_leggings","golden_boots","iron_helmet","iron_chestplate","iron_leggings","iron_boots","diamond_helmet","diamond_chestplate","diamond_leggings","diamond_boots","netherite_helmet","netherite_chestplate","netherite_leggings","netherite_boots","diamond_sword","iron_sword","golden_sword","netherite_sword","diamond_pickaxe","iron_pickaxe","golden_pickaxe","netherite_pickaxe","diamond_axe","iron_axe","golden_axe","diamond_shovel","iron_shovel","diamond_hoe"];
 
 const VANILLA_LABELS = {

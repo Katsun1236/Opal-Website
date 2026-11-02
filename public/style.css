@@ -3862,3 +3862,9 @@ dialog[open].player-inspector-dialog {
   padding-top: 12px;
   margin-top: auto;
 }
+
+/* Neutralisation des bugs d'extensions navigateur (DeepL, Google Translate, TWP) sur les SVG */
+svg, svg * {
+  pointer-events: none;
+}
+
