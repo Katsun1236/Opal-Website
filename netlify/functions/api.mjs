@@ -86,9 +86,7 @@ const validPluginToken = (req) => {
   return false;
 };
 
-let cachedStore = null;
-const contentStore = () =>
-  cachedStore || (cachedStore = getStore({ name: "opal-content" }));
+const contentStore = () => getStore({ name: "opal-content" });
 
 const readBody = async (req) => {
   const length = Number(req.headers.get("content-length") || 0);

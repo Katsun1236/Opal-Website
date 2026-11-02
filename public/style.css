@@ -3707,6 +3707,51 @@ dialog[open].player-inspector-dialog {
   font-size: 11.5px;
 }
 
+/* --- Grilles de Métriques (Joueurs & Modération) --------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--card-soft, #13171a);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card .stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text, #ffffff);
+  margin-top: 4px;
+}
+
+.stat-card .stat-delta {
+  font-size: 11px;
+  color: var(--text-muted, #8e9ca6);
+  margin-top: 2px;
+}
+
 /* --- Grille et Cartes Profils Joueurs -------------------------------- */
 .players-cards-grid {
   display: grid;
