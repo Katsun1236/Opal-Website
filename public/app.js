@@ -202,6 +202,14 @@ const formatDate = (value) => {
   return date.toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "medium" });
 };
 
+const escapeHtml = (str) =>
+  String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 class ApiError extends Error {
   constructor(message, status = 0, body = null) {
     super(message);
