@@ -6,9 +6,9 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0f1020">
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
-<title>Opal Heaven — Studio de contenu</title>
+<title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/style.css?v=3.0">
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -50,14 +50,19 @@
       </div>
 
       <nav class="sidebar-nav" role="tablist" aria-label="Sections du studio">
-        <div class="nav-group-title">Vue d'ensemble</div>
-        <button type="button" role="tab" id="nav-dashboard" aria-controls="tab-dashboard" aria-selected="false" data-tab="dashboard" class="nav-item" tabindex="-1">
+        <div class="nav-group-title">Hub & Pilotage</div>
+        <button type="button" role="tab" id="nav-dashboard" aria-controls="tab-dashboard" aria-selected="true" data-tab="dashboard" class="nav-item active" tabindex="0">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-          <span class="nav-label">Dashboard & Graphiques</span>
+          <span class="nav-label">Hub Central</span>
+          <span class="nav-pill-live" id="nav-live-indicator">Direct</span>
+        </button>
+        <button type="button" role="tab" id="nav-logs" aria-controls="tab-logs" aria-selected="false" data-tab="logs" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span class="nav-label">Activité & Logs</span>
         </button>
 
-        <div class="nav-group-title">Studio & Texturing</div>
-        <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="true" data-tab="library" class="nav-item active" tabindex="0">
+        <div class="nav-group-title">Items & Textures</div>
+        <button type="button" role="tab" id="nav-library" aria-controls="tab-library" aria-selected="false" data-tab="library" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           <span class="nav-label">Catalogue & Textures</span>
         </button>
@@ -70,15 +75,7 @@
           <span class="nav-label">Crafts & Recettes</span>
         </button>
 
-        <div class="nav-group-title">Configuration Serveur</div>
-        <button type="button" role="tab" id="nav-config-daily" aria-controls="tab-config-daily" aria-selected="false" data-tab="config-daily" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-          <span class="nav-label">Calendrier (Daily)</span>
-        </button>
-        <button type="button" role="tab" id="nav-config-jobs" aria-controls="tab-config-jobs" aria-selected="false" data-tab="config-jobs" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="18" x2="18" y2="6"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M15 9l-6 6"/></svg>
-          <span class="nav-label">Métiers & XP</span>
-        </button>
+        <div class="nav-group-title">Économie & Gameplay</div>
         <button type="button" role="tab" id="nav-config-shop" aria-controls="tab-config-shop" aria-selected="false" data-tab="config-shop" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span class="nav-label">Admin Shop</span>
@@ -91,6 +88,14 @@
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span class="nav-label">Kits & Équipements</span>
         </button>
+        <button type="button" role="tab" id="nav-config-jobs" aria-controls="tab-config-jobs" aria-selected="false" data-tab="config-jobs" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="18" x2="18" y2="6"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M15 9l-6 6"/></svg>
+          <span class="nav-label">Métiers & XP</span>
+        </button>
+        <button type="button" role="tab" id="nav-config-daily" aria-controls="tab-config-daily" aria-selected="false" data-tab="config-daily" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+          <span class="nav-label">Calendrier Daily</span>
+        </button>
         <button type="button" role="tab" id="nav-config-quests" aria-controls="tab-config-quests" aria-selected="false" data-tab="config-quests" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span class="nav-label">Quêtes Journalières</span>
@@ -99,27 +104,23 @@
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span class="nav-label">Warzone & KOTH</span>
         </button>
-        <button type="button" role="tab" id="nav-tools-audit" aria-controls="tab-tools-audit" aria-selected="false" data-tab="tools-audit" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span class="nav-label">Audit & Boosts</span>
-        </button>
+
+        <div class="nav-group-title">Maintenance & Système</div>
         <button type="button" role="tab" id="nav-config-server" aria-controls="tab-config-server" aria-selected="false" data-tab="config-server" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span class="nav-label">Paramètres Généraux</span>
-        </button>
-
-        <div class="nav-group-title">Système</div>
-        <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          <span class="nav-label">Données & Versions</span>
-        </button>
-        <button type="button" role="tab" id="nav-logs" aria-controls="tab-logs" aria-selected="false" data-tab="logs" class="nav-item" tabindex="-1">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          <span class="nav-label">Logs & Activité</span>
+          <span class="nav-label">Général & Mondes</span>
         </button>
         <button type="button" role="tab" id="nav-sync-guide" aria-controls="tab-sync-guide" aria-selected="false" data-tab="sync-guide" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span class="nav-label">Synchronisation</span>
+          <span class="nav-label">Synchronisation Jeu</span>
+        </button>
+        <button type="button" role="tab" id="nav-data" aria-controls="tab-data" aria-selected="false" data-tab="data" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <span class="nav-label">Sauvegardes & Versions</span>
+        </button>
+        <button type="button" role="tab" id="nav-tools-audit" aria-controls="tab-tools-audit" aria-selected="false" data-tab="tools-audit" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span class="nav-label">Diagnostic & Anti-Lag</span>
         </button>
       </nav>
 
@@ -140,8 +141,8 @@
         <div class="topbar-left">
           <button type="button" id="mobile-menu-btn" class="mobile-menu-btn ghost" aria-label="Ouvrir le menu">☰</button>
           <div class="page-title-area">
-            <h1 id="current-section-title">Catalogue & Textures</h1>
-            <span id="current-section-sub" class="section-sub">Consultez et modifiez les textures vanilla et personnalisées</span>
+            <h1 id="current-section-title">Hub Central & Serveur</h1>
+            <span id="current-section-sub" class="section-sub">Pilotage en direct, statut Bedrock et configuration centralisée</span>
           </div>
         </div>
         <div class="topbar-actions">
@@ -164,502 +165,234 @@
       </div>
 
   <!-- TAB : DASHBOARD & GRAPHIQUES -->
-  <section id="tab-dashboard" class="tab" role="tabpanel" aria-labelledby="nav-dashboard" tabindex="0" hidden>
-    <div class="tab-header-banner card">
-      <div>
-        <h2>Tableau de Bord & Métriques Globales</h2>
-        <p class="muted">Télémétrie complète et analyses en direct du réseau Opal Heaven : économie, flux monétaires, minage, joueurs et combats.</p>
-      </div>
-      <div class="row row-tight">
-        <div class="dashboard-timeframe-selector" id="dashboard-timeframe-selector">
-          <button type="button" class="btn-timeframe active" data-timeframe="24h">24 Heures</button>
-          <button type="button" class="btn-timeframe" data-timeframe="7d">7 Jours</button>
-          <button type="button" class="btn-timeframe" data-timeframe="30d">30 Jours</button>
+  <section id="tab-dashboard" class="tab" role="tabpanel" aria-labelledby="nav-dashboard" tabindex="0">
+    <!-- HERO COMMAND CENTER -->
+    <div class="hub-hero-banner card">
+      <div class="hub-hero-main">
+        <div class="hub-server-status-pill" id="hub-server-live-pill">
+          <span class="live-dot"></span>
+          <span id="hub-live-status-text">Vérification de l'état du serveur…</span>
         </div>
-        <button type="button" id="dashboard-refresh-btn" class="ghost btn-sm">↺ Actualiser</button>
-      </div>
-    </div>
-
-    <!-- SOUS-NAVIGATION DES ANALYSES -->
-    <div class="analytics-subnav card" role="tablist">
-      <button type="button" class="analytics-subtab active" data-subtab="overview">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-        <span>Vue d'Ensemble & KPIs</span>
-      </button>
-      <button type="button" class="analytics-subtab" data-subtab="economy">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
-        <span>Économie & Money ($)</span>
-      </button>
-      <button type="button" class="analytics-subtab" data-subtab="mining">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-        <span>Minage & Détection Ressources</span>
-      </button>
-      <button type="button" class="analytics-subtab" data-subtab="players">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Joueurs & Réseau Serveurs</span>
-      </button>
-      <button type="button" class="analytics-subtab" data-subtab="jobs-pvp">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span>Métiers, Quêtes & PvP</span>
-      </button>
-      <button type="button" class="analytics-subtab" data-subtab="multiworld">
-        <svg class="subnav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span>Mondes & Multi-World</span>
-      </button>
-    </div>
-
-    <!-- SOUS-ONGLET 1 : VUE D'ENSEMBLE -->
-    <div id="subtab-overview" class="analytics-panel">
-      <div class="dashboard-kpi-grid">
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-mint">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Joueurs Connectés</span>
-            <b class="kpi-val" id="kpi-players-online">87 / 150</b>
-            <span class="kpi-sub" id="kpi-players-peak">Pic 24h : 134 joueurs</span>
-          </div>
-        </div>
-
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-accent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Masse Monétaire</span>
-            <b class="kpi-val" id="kpi-total-money">$28 450 200</b>
-            <span class="kpi-sub" id="kpi-money-growth">Croissance : +1.8% / sem</span>
-          </div>
-        </div>
-
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-gold">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Opale Pure Minée</span>
-            <b class="kpi-val" id="kpi-opal-mined">482 blocs</b>
-            <span class="kpi-sub" id="kpi-opal-rarity">Taux de rareté : 0.04%</span>
-          </div>
-        </div>
-
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Frags PvP Warzone</span>
-            <b class="kpi-val" id="kpi-warzone-kills">318 Kills</b>
-            <span class="kpi-sub" id="kpi-koth-status">KOTH actif dans 42m</span>
-          </div>
-        </div>
-
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-mint">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Volume Économique 24h</span>
-            <b class="kpi-val" id="kpi-volume-trans">$4 920 400</b>
-            <span class="kpi-sub" id="kpi-tx-count">3 412 transactions</span>
-          </div>
-        </div>
-
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-accent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Stabilité Réseau</span>
-            <b class="kpi-val" id="kpi-server-tps">19.96 TPS</b>
-            <span class="kpi-sub" id="kpi-server-ping">Ping moyen : 24ms (0 crash)</span>
-          </div>
+        <h2 class="hub-hero-title">Hub Central Opal Heaven</h2>
+        <p class="hub-hero-sub">Plateforme unifiée d'administration et de pilotage du serveur Minecraft Bedrock.</p>
+        <div class="hub-server-ip-box">
+          <span class="hub-ip-badge">IP Serveur</span>
+          <code class="hub-ip-code" id="hub-ip-display">opalheaven.mcbe.fr:19153</code>
+          <button type="button" class="btn-sm ghost hub-copy-ip-btn" id="hub-copy-ip-btn" title="Copier l'adresse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copier</span>
+          </button>
         </div>
       </div>
-
-      <div class="dashboard-charts-grid">
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Affluence des Joueurs sur 24 Heures</h3>
-              <p class="muted text-sm">Évolution en direct de la fréquentation simultanée sur le réseau</p>
-            </div>
-            <span class="badge" id="chart-online-badge">Heure de pointe : 19h–21h</span>
-          </div>
-          <div class="chart-svg-wrap" id="chart-player-activity-container"></div>
-        </div>
-
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Répartition des Joueurs par Serveur</h3>
-              <p class="muted text-sm">Distribution actuelle de la population connectée</p>
-            </div>
-            <span class="badge badge-override" id="chart-servers-count-badge">5 Serveurs Connectés</span>
-          </div>
-          <div class="server-distribution-bars" id="chart-servers-distribution"></div>
-        </div>
-
-        <div class="card chart-card chart-card-full">
-          <div class="chart-header">
-            <div>
-              <h3>Heatmap d'Activité Globale (Heures de Pointe)</h3>
-              <p class="muted text-sm">Densité de connexions selon le jour de la semaine et l'heure de la journée</p>
-            </div>
-          </div>
-          <div class="heatmap-wrapper" id="chart-heatmap-wrapper"></div>
-        </div>
+      <div class="hub-hero-actions">
+        <button type="button" id="hub-refresh-btn" class="btn-sm ghost" title="Rafraîchir le statut">↺ Actualiser</button>
+        <button type="button" id="hub-quick-sync-btn" class="btn-sm btn-primary">⚡ Synchroniser en Jeu</button>
       </div>
     </div>
 
-    <!-- SOUS-ONGLET 2 : ÉCONOMIE & MONEY -->
-    <div id="subtab-economy" class="analytics-panel" hidden>
-      <div class="dashboard-kpi-grid">
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-mint">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+    <!-- GRILLE PRINCIPALE DU HUB -->
+    <div class="hub-grid">
+      <!-- CARTE 1 : ÉTAT EN DIRECT DU SERVEUR BEDROCK -->
+      <div class="card hub-card">
+        <div class="hub-card-header">
+          <div class="hub-card-title-box">
+            <div class="hub-icon-circle mint">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div>
+              <h3>État en Direct Bedrock</h3>
+              <p class="muted text-sm">Protocole Query UDP direct</p>
+            </div>
           </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Masse Monétaire Totale</span>
-            <b class="kpi-val" id="kpi-eco-total-money">$500</b>
-            <span class="kpi-sub" id="kpi-eco-avg-money">Solde : $500 / joueur</span>
+          <span class="badge" id="hub-server-version-badge">Axolotl-PM 5.49</span>
+        </div>
+
+        <div class="hub-live-metrics-row">
+          <div class="hub-metric-box">
+            <span class="hub-metric-label">Joueurs en Ligne</span>
+            <span class="hub-metric-value mint" id="hub-players-count">-- / --</span>
+            <span class="hub-metric-detail" id="hub-players-capacity">Capacité : 100 slots</span>
+          </div>
+          <div class="hub-metric-box">
+            <span class="hub-metric-label">Latence & Ping</span>
+            <span class="hub-metric-value" id="hub-latency-val">Opérationnel</span>
+            <span class="hub-metric-detail" id="hub-motd-snippet">OPAL HEAVEN » PvP-Faction</span>
           </div>
         </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-accent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+
+        <!-- JOUEURS CONNECTÉS RÉELS -->
+        <div class="hub-connected-players-section">
+          <div class="hub-sub-heading">
+            <span>Joueurs Réels Connectés</span>
+            <span class="badge" id="hub-connected-badge">0 en ligne</span>
           </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Génération de Monnaie</span>
-            <b class="kpi-val text-mint" id="kpi-eco-creation-val">Shop & Quotidien</b>
-            <span class="kpi-sub" id="kpi-eco-creation-sub">Sources : Ventes Shop, Daily</span>
-          </div>
-        </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-gold">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Puits & Destruction</span>
-            <b class="kpi-val text-accent" id="kpi-eco-destruction-val">Achats & Taxes AH</b>
-            <span class="kpi-sub" id="kpi-eco-destruction-sub">Absorption : Shop, Taxes</span>
-          </div>
-        </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Flux Net en Jeu</span>
-            <b class="kpi-val text-mint" id="kpi-eco-net-flow">Direct</b>
-            <span class="kpi-sub" id="kpi-eco-net-sub">Mesuré en continu</span>
+          <div class="hub-players-pill-list" id="hub-players-list">
+            <span class="hub-no-players-muted">Aucun joueur connecté actuellement.</span>
           </div>
         </div>
       </div>
 
-      <div class="dashboard-charts-grid">
-        <!-- Inflows & Sinks -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>D'où vient la Money ? (Money Inflows)</h3>
-              <p class="muted text-sm">Génération de monnaie par source de revenus sur 24h</p>
+      <!-- CARTE 2 : DÉPLOIEMENT & SYNCHRONISATION OPALCORE -->
+      <div class="card hub-card">
+        <div class="hub-card-header">
+          <div class="hub-card-title-box">
+            <div class="hub-icon-circle purple">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             </div>
-            <span class="badge" id="chart-money-inflows-badge" style="color: var(--mint); border-color: var(--mint);">Sources Configurées</span>
+            <div>
+              <h3>Synchronisation OpalCore</h3>
+              <p class="muted text-sm">Gestion des versions et rechargement à chaud</p>
+            </div>
           </div>
-          <div class="money-breakdown-container" id="chart-money-inflows"></div>
+          <span class="revision-pill" id="hub-active-revision-pill">Rev 0</span>
         </div>
 
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Où va la Money ? (Money Sinks)</h3>
-              <p class="muted text-sm">Destruction et absorption de monnaie par canal sur 24h</p>
-            </div>
-            <span class="badge" id="chart-money-sinks-badge" style="color: var(--accent); border-color: var(--accent);">Puits Configurés</span>
+        <div class="hub-sync-box">
+          <div class="hub-sync-info">
+            <span class="hub-sync-status-title" id="hub-sync-status-title">✅ Configuration prête</span>
+            <p class="muted text-sm" id="hub-sync-status-desc">Les modifications sauvegardées sont synchronisables sans redémarrer le serveur.</p>
           </div>
-          <div class="money-breakdown-container" id="chart-money-sinks"></div>
+          <div class="hub-cmd-container">
+            <span class="hub-cmd-label">Commande console / in-game :</span>
+            <div class="hub-cmd-field">
+              <code>/opalcontent sync</code>
+              <button type="button" class="btn-sm ghost" id="hub-copy-cmd-btn">Copier</button>
+            </div>
+          </div>
         </div>
 
-        <!-- Courbe de Masse Monétaire sur 7 Jours -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Évolution de la Masse Monétaire (7 Jours)</h3>
-              <p class="muted text-sm">Progression du capital cumulé et volume de liquidités</p>
-            </div>
-            <span class="badge" id="chart-money-curve-badge">En ligne : 1 joueur</span>
+        <div class="hub-steps-guide">
+          <div class="hub-step-item">
+            <span class="hub-step-num">1</span>
+            <span>Configurez le Shop, les Box ou les Kits</span>
           </div>
-          <div class="chart-svg-wrap" id="chart-money-curve-container"></div>
-        </div>
-
-        <!-- Classement Balancetop -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Top 10 Balancetop (Joueurs les plus Riches)</h3>
-              <p class="muted text-sm">Les plus gros patrimoines financiers du serveur</p>
-            </div>
-            <span class="badge" id="chart-balancetop-badge">Joueurs Réels Connectés</span>
+          <div class="hub-step-item">
+            <span class="hub-step-num">2</span>
+            <span>Cliquez sur <b>Enregistrer</b> en haut à droite</span>
           </div>
-          <div class="balancetop-table-wrap">
-            <table class="balancetop-table">
-              <thead>
-                <tr>
-                  <th style="width: 45px;">Rang</th>
-                  <th>Joueur & Faction</th>
-                  <th>Source Principale</th>
-                  <th style="text-align: right;">Fortune</th>
-                </tr>
-              </thead>
-              <tbody id="balancetop-table-body"></tbody>
-            </table>
+          <div class="hub-step-item">
+            <span class="hub-step-num">3</span>
+            <span>Lancez <code>/opalcontent sync</code> sur le serveur</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SOUS-ONGLET 3 : MINAGE & RESSOURCES -->
-    <div id="subtab-mining" class="analytics-panel" hidden>
-      <div class="dashboard-kpi-grid">
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-mint">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    <!-- ACCÈS RAPIDES & GESTION DU SERVEUR -->
+    <div class="hub-section-title-wrap">
+      <h3>Accès Rapides & Configuration</h3>
+      <p class="muted text-sm">Gérez tous les modules du jeu simplement et sans friction</p>
+    </div>
+
+    <div class="hub-quick-actions-grid">
+      <!-- SHOP -->
+      <div class="card hub-action-card" data-open-tab="config-shop">
+        <div class="hub-action-top">
+          <div class="hub-icon-circle mint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Blocs Précieux Minés</span>
-            <b class="kpi-val" id="kpi-total-ores">104 240 blocs</b>
-            <span class="kpi-sub">Sur les dernières 24 heures</span>
-          </div>
+          <span class="hub-action-badge" id="hub-stat-shop-items">41 articles</span>
         </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-gold">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Opale Pure Découverte</span>
-            <b class="kpi-val">482 minerais</b>
-            <span class="kpi-sub">Filons rares entre Y=-54 et Y=-58</span>
-          </div>
-        </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-blue">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Diamants Minés</span>
-            <b class="kpi-val">2 140 diamants</b>
-            <span class="kpi-sub">Moyenne : 24.5 / mineur</span>
-          </div>
-        </div>
-        <div class="card kpi-card">
-          <div class="kpi-icon-wrap kpi-accent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div class="kpi-info">
-            <span class="kpi-label">Télémétrie Anti-Xray</span>
-            <b class="kpi-val text-mint">Sécurisé (2 alertes)</b>
-            <span class="kpi-sub">98.4% de minage naturel vérifié</span>
-          </div>
-        </div>
+        <h4 class="hub-action-title">Admin Shop (/shop)</h4>
+        <p class="hub-action-desc">Ajustez les prix d'achat, de revente et les catégories d'articles.</p>
+        <span class="hub-action-link">Configurer le Shop →</span>
       </div>
 
-      <div class="dashboard-charts-grid">
-        <!-- Minerais minés -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Volume de Minage par Type de Minerai (24h)</h3>
-              <p class="muted text-sm">Extraction totale recensée sur Minage_1 et Minage_2</p>
-            </div>
+      <!-- CRATES -->
+      <div class="card hub-action-card" data-open-tab="config-crates">
+        <div class="hub-action-top">
+          <div class="hub-icon-circle gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><circle cx="12" cy="14" r="1.5"/></svg>
           </div>
-          <div class="mining-bars-container" id="chart-mining-ores"></div>
+          <span class="hub-action-badge" id="hub-stat-crates-count">3 box</span>
         </div>
+        <h4 class="hub-action-title">Box & Caisses (/crates)</h4>
+        <p class="hub-action-desc">Réglez les probabilités de loot et effectuez des tirages de test.</p>
+        <span class="hub-action-link">Gérer les Caisses →</span>
+      </div>
 
-        <!-- Couches Y -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Répartition du Minage par Profondeur (Couche Y)</h3>
-              <p class="muted text-sm">Histogramme d'extraction de Y=-64 à Y=+64</p>
-            </div>
-            <span class="badge" style="color: var(--mint); border-color: var(--mint);">Pic à Y=-58</span>
+      <!-- KITS -->
+      <div class="card hub-action-card" data-open-tab="config-kits">
+        <div class="hub-action-top">
+          <div class="hub-icon-circle blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <div class="chart-svg-wrap" id="chart-mining-depth-container"></div>
+          <span class="hub-action-badge" id="hub-stat-kits-count">6 kits</span>
         </div>
+        <h4 class="hub-action-title">Kits & Équipements (/kit)</h4>
+        <p class="hub-action-desc">Définissez les inventaires de kits VIP, joueurs et leurs cooldowns.</p>
+        <span class="hub-action-link">Éditer les Kits →</span>
+      </div>
 
-        <!-- Top Mineurs -->
-        <div class="card chart-card chart-card-full">
-          <div class="chart-header">
-            <div>
-              <h3>Top 5 des Plus Grands Mineurs du Réseau</h3>
-              <p class="muted text-sm">Statistiques d'extraction, opale trouvée et ratio de régularité</p>
-            </div>
+      <!-- CONTENUS CUSTOM -->
+      <div class="card hub-action-card" data-open-tab="entries">
+        <div class="hub-action-top">
+          <div class="hub-icon-circle purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
           </div>
-          <div class="top-miners-grid" id="chart-top-miners"></div>
+          <span class="hub-action-badge" id="hub-stat-entries-count">0 items</span>
         </div>
+        <h4 class="hub-action-title">Items & Textures Custom</h4>
+        <p class="hub-action-desc">Créez des armes, armures et composants avec textures dédiées.</p>
+        <span class="hub-action-link">Créer un Item →</span>
       </div>
     </div>
 
-    <!-- SOUS-ONGLET 4 : JOUEURS & RÉSEAU SERVEURS -->
-    <div id="subtab-players" class="analytics-panel" hidden>
-      <div class="server-nodes-grid" id="server-nodes-grid"></div>
-
-      <div class="dashboard-charts-grid" style="margin-top: 18px;">
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Stabilité TPS & Charge Mémoire par Serveur</h3>
-              <p class="muted text-sm">Temps de boucle processeur (Ticks Per Second) et consommation RAM</p>
-            </div>
-            <span class="badge text-mint" style="border-color: var(--mint);">Réseau Optimal</span>
+    <!-- VÉRIFICATEUR DE SANTÉ & COHÉRENCE -->
+    <div class="card hub-card" style="margin-top: 20px;">
+      <div class="hub-card-header">
+        <div class="hub-card-title-box">
+          <div class="hub-icon-circle mint">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
-          <div class="server-perf-bars" id="server-perf-bars"></div>
-        </div>
-
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Rétention & Durée des Sessions Joueurs</h3>
-              <p class="muted text-sm">Temps de jeu moyen et fidélité de la communauté Opal</p>
-            </div>
-          </div>
-          <div class="retention-stats-wrap" id="retention-stats-wrap"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SOUS-ONGLET 5 : MÉTIERS, QUÊTES & PVP -->
-    <div id="subtab-jobs-pvp" class="analytics-panel" hidden>
-      <div class="dashboard-charts-grid">
-        <!-- Distribution des Métiers -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Distribution des Métiers Actifs</h3>
-              <p class="muted text-sm">Répartition des joueurs selon leur métier principal et niveau moyen</p>
-            </div>
-            <span class="badge">5 Métiers</span>
-          </div>
-          <div class="jobs-distribution-bars" id="chart-jobs-distribution"></div>
-        </div>
-
-        <!-- Courbe d'XP des Métiers -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Courbe d'XP des Métiers (Niveaux 1 à 50)</h3>
-              <p class="muted text-sm">Progression exponentielle de l’expérience requise par niveau</p>
-            </div>
-            <span class="badge" id="chart-xp-formula-badge">Formule Standard</span>
-          </div>
-          <div class="chart-svg-wrap" id="chart-jobs-svg-container"></div>
-        </div>
-
-        <!-- Warzone PvP -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Warzone PvP : Armes les Plus Létales</h3>
-              <p class="muted text-sm">Part de frags par type d'armement en zone de combat</p>
-            </div>
-            <span class="badge" style="color: var(--danger); border-color: var(--danger);">318 Kills (24h)</span>
-          </div>
-          <div class="pvp-weapons-bars" id="chart-pvp-weapons"></div>
-        </div>
-
-        <!-- Top Combattants -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Top 5 Combattants de la Warzone</h3>
-              <p class="muted text-sm">Meilleurs ratios d'éliminations (KDR) et séries de victoires</p>
-            </div>
-          </div>
-          <div class="top-pvp-table-wrap">
-            <table class="balancetop-table">
-              <thead>
-                <tr>
-                  <th style="width: 40px;">Rang</th>
-                  <th>Guerrier</th>
-                  <th>Kills</th>
-                  <th>Morts</th>
-                  <th style="text-align: right;">KDR</th>
-                </tr>
-              </thead>
-              <tbody id="pvp-top-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SOUS-ONGLET 6 : MONDES & MULTI-WORLD -->
-    <div id="subtab-multiworld" class="analytics-panel" hidden>
-      <div class="card" style="margin-bottom: 20px;">
-        <div class="row row-between" style="align-items: center;">
           <div>
-            <h3 style="margin-bottom: 4px;">Architecture & Cartographie Multi-World</h3>
-            <p class="muted text-sm" style="margin: 0;">Surveillance des dimensions chargées sous Axolotl-PM / Bedrock, flux de joueurs par monde et occupation des chunks.</p>
+            <h3>Santé & Intégrité de la Configuration</h3>
+            <p class="muted text-sm">Contrôle en direct des règles économiques et techniques</p>
           </div>
-          <span class="badge" id="multiworld-status-badge" style="color: var(--mint); border-color: var(--mint);">6 Mondes Détectés</span>
         </div>
+        <span class="badge" id="hub-health-summary-badge">Configuration Saine</span>
       </div>
 
-      <!-- Grille des cartes des mondes -->
-      <div class="dashboard-charts-grid" id="multiworld-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-bottom: 24px;"></div>
-
-      <!-- Graphiques analytiques Multi-World -->
-      <div class="dashboard-charts-grid">
-        <!-- Répartition de la population par monde -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Répartition des Joueurs par Dimension</h3>
-              <p class="muted text-sm">Localisation en direct de la communauté sur le serveur Bedrock</p>
-            </div>
-            <span class="badge" id="multiworld-pop-badge">Direct Bedrock</span>
+      <div class="hub-health-grid" id="hub-health-grid">
+        <div class="hub-health-item">
+          <span class="hub-health-icon">✅</span>
+          <div>
+            <b>Cohérence du Shop</b>
+            <p class="muted text-sm" id="hub-health-shop-msg">Tous les prix d'achat sont supérieurs aux prix de revente.</p>
           </div>
-          <div class="server-distribution-bars" id="chart-multiworld-players"></div>
         </div>
-
-        <!-- Répartition du Minage par Monde -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Extraction & Minage par Monde</h3>
-              <p class="muted text-sm">Volume de blocs extraits : Monde Minage vs Faction vs Nether</p>
-            </div>
-            <span class="badge" id="multiworld-mining-badge">Télémétrie</span>
+        <div class="hub-health-item">
+          <span class="hub-health-icon">✅</span>
+          <div>
+            <b>Probabilités des Box</b>
+            <p class="muted text-sm" id="hub-health-crates-msg">Toutes les caisses possèdent des taux équilibrés.</p>
           </div>
-          <div class="server-distribution-bars" id="chart-multiworld-mining"></div>
         </div>
-
-        <!-- Combats & Dangers par Monde -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Activité PvP & Morts par Dimension</h3>
-              <p class="muted text-sm">Fréquence des éliminations et décès par monde</p>
-            </div>
-            <span class="badge" id="multiworld-pvp-badge">Combats</span>
+        <div class="hub-health-item">
+          <span class="hub-health-icon">✅</span>
+          <div>
+            <b>Identifiants & Textures</b>
+            <p class="muted text-sm" id="hub-health-textures-msg">Aucun conflit d'identifiant détecté.</p>
           </div>
-          <div class="server-distribution-bars" id="chart-multiworld-pvp"></div>
         </div>
-
-        <!-- Performance & Chunks par Monde -->
-        <div class="card chart-card">
-          <div class="chart-header">
-            <div>
-              <h3>Empreinte Chunks & Entités par Monde</h3>
-              <p class="muted text-sm">Surveillance de la charge technique et des entités en mémoire vive</p>
-            </div>
-            <span class="badge" id="multiworld-perf-badge">Performance</span>
+        <div class="hub-health-item">
+          <span class="hub-health-icon">✅</span>
+          <div>
+            <b>Économie & Monnaie de Départ</b>
+            <p class="muted text-sm" id="hub-health-economy-msg">Solde initial configuré à $500 par nouveau joueur.</p>
           </div>
-          <div class="server-distribution-bars" id="chart-multiworld-perf"></div>
         </div>
       </div>
+    </div>
+
+    <!-- ARCHITECTURE MULTI-MONDE BEDROCK -->
+    <div class="hub-section-title-wrap" style="margin-top: 24px;">
+      <h3>Mondes & Dimensions Opal Heaven</h3>
+      <p class="muted text-sm">Les 6 territoires actifs chargés sous Axolotl-PM</p>
+    </div>
+
+    <div class="hub-worlds-grid" id="hub-worlds-grid">
+      <!-- Rendu dynamique des 6 mondes sans faux graphiques -->
     </div>
   </section>
 
@@ -789,7 +522,7 @@
     </div>
   </section>
 
-  <section id="tab-library" class="tab" role="tabpanel" aria-labelledby="nav-library" tabindex="0">
+  <section id="tab-library" class="tab" role="tabpanel" aria-labelledby="nav-library" tabindex="0" hidden>
     <div class="card">
       <h2>Contenu existant</h2>
       <p class="muted">Parcourez les items, blocs et recettes vanilla ou Opal Heaven. Les crafts non supportés par l’éditeur restent consultables mais ne sont ni modifiables ni désactivables.</p>
@@ -1852,6 +1585,6 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=2.2"></script>
+<script type="module" src="/app.js?v=3.0"></script>
 </body>
 </html>

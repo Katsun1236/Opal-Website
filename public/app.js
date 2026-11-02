@@ -157,7 +157,7 @@ const state = {
   draftTimer: null,
   draftTooLarge: false,
   tokenTimer: null,
-  ui: { tab: "library", libraryLimit: PAGE_LIBRARY, recipeLimit: PAGE_RECIPES },
+  ui: { tab: "dashboard", libraryLimit: PAGE_LIBRARY, recipeLimit: PAGE_RECIPES },
 };
 
 let libraryPromise = null;
@@ -508,7 +508,7 @@ const discardDraft = () => {
 ===================================================================== */
 
 const TAB_TITLES = {
-  dashboard: { title: "Tableau de Bord & Métriques", sub: "Statistiques en temps réel, graphiques d’économie et suivi serveur" },
+  dashboard: { title: "Hub Central & Serveur", sub: "Pilotage en direct, statut Bedrock et configuration centralisée" },
   library: { title: "Catalogue & Textures", sub: "Consultez et modifiez les textures vanilla et personnalisées" },
   entries: { title: "Contenus Custom", sub: "Création et gestion des items, blocs, armes, armures et outils" },
   recipes: { title: "Crafts & Recettes", sub: "Création de crafts custom ou modification/écrasement de recettes vanilla" },
@@ -4450,1031 +4450,247 @@ const switchAnalyticsSubtab = (subtab) => {
   renderDashboardTab();
 };
 
+const OPAL_WORLDS = [
+  { id: "world", name: "Spawn Central & Hub", dim: "Overworld", pvp: false, color: "#52b89b", desc: "Hub principal, téléporteurs, PNJs d'accueil et Admin Shop officiel. Zone protégée sans dégâts PvP." },
+  { id: "faction", name: "Monde Faction Alpha", dim: "Survie", pvp: true, color: "#10b981", desc: "Survie Faction compétitive. Revendications de claims (/f claim), guerres de factions et pillages." },
+  { id: "minage", name: "Monde Minage", dim: "Ressource", pvp: true, color: "#f59e0b", desc: "Extraction intensive de ressources et minerais d'opale. Réinitialisation mensuelle de la carte." },
+  { id: "nether", name: "Dimension Nether", dim: "Nether", pvp: true, color: "#ef4444", desc: "Monde infernal. Forteresses, quartz, débris antiques et bastions avec PvP actif." },
+  { id: "the_end", name: "L'End", dim: "The End", pvp: true, color: "#a855f7", desc: "Arène de l'Ender Dragon, cités de l'End et récolte des élytres précieuses." },
+  { id: "warzone", name: "Warzone & KOTH", dim: "PvP Arena", pvp: true, color: "#f43f5e", desc: "Zone de combat libre, capture de colline KOTH et largages Airdrops d'équipements rares." },
+];
+
 const renderDashboardTab = () => {
   if (!state.data) state.data = {};
   if (!state.data.configs) state.data.configs = defaultConfigs();
 
-  renderOverviewSubtab();
-  renderEconomySubtab();
-  renderMiningSubtab();
-  renderPlayersSubtab();
-  renderJobsPvPSubtab();
-  renderMultiworldSubtab();
-};
-
-/* --- 1. Sous-onglet Vue d'Ensemble ----------------------------------- */
-
-state.playerHistory = [];
-
-const renderOverviewSubtab = () => {
-  const status = state.realServerStatus || { online: false, players: { online: 0, max: 0 }, version: "" };
+  const status = state.realServerStatus || {
+    checked: false,
+    online: false,
+    players: { online: 0, max: 100, list: [] },
+    version: "Axolotl-PM 5.49",
+    motd: "OPAL HEAVEN » PvP-Faction",
+  };
   const s = state.data?.configs?.server || defaultServerConfig();
+  const host = (s.serverIp || "opalheaven.mcbe.fr").trim();
+  const port = Number(s.serverPort) || 19153;
 
-  // 1. Joueurs en direct
-  const kpiPlayers = $("#kpi-players-online");
-  const kpiPeak = $("#kpi-players-peak");
-  if (kpiPlayers) {
-    if (status.online) {
-      kpiPlayers.textContent = `${status.players.online} / ${status.players.max}`;
-      kpiPlayers.style.color = "var(--mint)";
-    } else if (status.checked) {
-      kpiPlayers.textContent = "Hors-ligne";
-      kpiPlayers.style.color = "var(--danger)";
-    } else {
-      kpiPlayers.textContent = "Connexion...";
-      kpiPlayers.style.color = "var(--muted)";
+  // 1. Hero Pill & Statut Serveur
+  const livePill = $("#hub-server-live-pill");
+  const liveText = $("#hub-live-status-text");
+  const ipDisplay = $("#hub-ip-display");
+  const versionBadge = $("#hub-server-version-badge");
+  const playersCount = $("#hub-players-count");
+  const playersCap = $("#hub-players-capacity");
+  const latencyVal = $("#hub-latency-val");
+  const motdSnippet = $("#hub-motd-snippet");
+  const connectedBadge = $("#hub-connected-badge");
+  const playersListContainer = $("#hub-players-list");
+  const navLiveIndicator = $("#nav-live-indicator");
+
+  if (ipDisplay) ipDisplay.textContent = `${host}:${port}`;
+  if (versionBadge) versionBadge.textContent = status.software ? `${status.software} (${status.version})` : (status.version || "Axolotl-PM");
+
+  if (status.online) {
+    if (livePill) livePill.className = "hub-server-status-pill online";
+    if (liveText) liveText.textContent = `Serveur En Ligne (${status.software || "Axolotl-PM"})`;
+    if (navLiveIndicator) {
+      navLiveIndicator.textContent = `${status.players?.online || 0} en jeu`;
+      navLiveIndicator.style.background = "rgba(82, 184, 155, 0.15)";
+      navLiveIndicator.style.color = "var(--mint)";
     }
-  }
-  if (kpiPeak) {
-    kpiPeak.textContent = status.online ? `Version : ${status.version}` : `Serveur : ${s.serverIp || "opalheaven.mcbe.fr"}:${s.serverPort || 19153}`;
-  }
-
-  // 2. Masse monétaire (si reçue par télémétrie, sinon solde de départ)
-  const kpiMoney = $("#kpi-total-money");
-  const kpiGrowth = $("#kpi-money-growth");
-  const realMoney = state.serverTelemetry?.telemetry?.economy?.totalMoney;
-  if (kpiMoney) {
-    if (Number.isFinite(realMoney)) {
-      kpiMoney.textContent = `$${realMoney.toLocaleString("fr-FR")}`;
-    } else {
-      kpiMoney.textContent = `$${(s.startingMoney || 500).toLocaleString("fr-FR")} (base)`;
+    if (playersCount) {
+      playersCount.textContent = `${status.players?.online || 0} / ${status.players?.max || 100}`;
+      playersCount.style.color = "var(--mint)";
     }
-  }
-  if (kpiGrowth) {
-    kpiGrowth.textContent = Number.isFinite(realMoney) ? "Calculé d'après les comptes en jeu" : "Solde initial des nouveaux joueurs";
-  }
-
-  // 3. Opale & Contenus Custom réels
-  const kpiOpal = $("#kpi-opal-mined");
-  const kpiOpalSub = $("#kpi-opal-rarity");
-  const customEntries = state.data?.entries || [];
-  if (kpiOpal) kpiOpal.textContent = `${customEntries.length} Contenus Custom`;
-  if (kpiOpalSub) kpiOpalSub.textContent = `${(state.data?.recipes || []).length} crafts personnalisés`;
-
-  // 4. Frags / Warzone
-  const kpiWarzone = $("#kpi-warzone-kills");
-  const kpiKoth = $("#kpi-koth-status");
-  const wz = state.data?.configs?.warzone || defaultWarzoneConfig();
-  if (kpiWarzone) kpiWarzone.textContent = `Combat-tag ${wz.combat_tag_seconds || 30}s`;
-  if (kpiKoth) kpiKoth.textContent = `KOTH : ${wz.koth?.duration_minutes || 3} min • Largages : ${wz.airdrop?.interval_minutes || 120} min`;
-
-  // 5. Admin Shop réel
-  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  let totalItems = 0;
-  let totalMargin = 0;
-  let itemsMarginCount = 0;
-  for (const cat of Object.values(shop.categories || {})) {
-    for (const it of cat.items || []) {
-      totalItems++;
-      if (it.buy_price > 0 && it.sell_price > 0) {
-        totalMargin += ((it.buy_price - it.sell_price) / it.buy_price) * 100;
-        itemsMarginCount++;
-      }
+    if (playersCap) playersCap.textContent = `Capacité max : ${status.players?.max || 100} slots`;
+    if (latencyVal) {
+      latencyVal.textContent = "Opérationnel";
+      latencyVal.style.color = "var(--mint)";
     }
+    if (motdSnippet) motdSnippet.textContent = status.motd || "OPAL HEAVEN » Serveur Actif";
+    if (connectedBadge) connectedBadge.textContent = `${status.players?.online || 0} en ligne`;
+  } else if (status.checked) {
+    if (livePill) livePill.className = "hub-server-status-pill offline";
+    if (liveText) liveText.textContent = "Serveur Hors Ligne / Injoignable";
+    if (navLiveIndicator) {
+      navLiveIndicator.textContent = "Hors ligne";
+      navLiveIndicator.style.background = "rgba(235, 104, 117, 0.15)";
+      navLiveIndicator.style.color = "var(--danger)";
+    }
+    if (playersCount) {
+      playersCount.textContent = "0 / 100";
+      playersCount.style.color = "var(--muted)";
+    }
+    if (playersCap) playersCap.textContent = `Hôte vérifié : ${host}:${port}`;
+    if (latencyVal) {
+      latencyVal.textContent = "Injoignable";
+      latencyVal.style.color = "var(--danger)";
+    }
+    if (motdSnippet) motdSnippet.textContent = "Vérifiez que le serveur Bedrock est démarré";
+    if (connectedBadge) connectedBadge.textContent = "0 en ligne";
+  } else {
+    if (liveText) liveText.textContent = "Interrogation du serveur…";
+    if (playersCount) playersCount.textContent = "-- / --";
   }
-  const avgM = itemsMarginCount > 0 ? Math.round(totalMargin / itemsMarginCount) : 0;
-  const kpiVolume = $("#kpi-volume-trans");
-  const kpiTx = $("#kpi-tx-count");
-  if (kpiVolume) kpiVolume.textContent = `${totalItems} Articles Shop`;
-  if (kpiTx) kpiTx.textContent = `Marge commerciale moyenne : ~${avgM}%`;
 
-  // 6. Stabilité & TPS réel
-  const kpiTps = $("#kpi-server-tps");
-  const kpiPing = $("#kpi-server-ping");
-  const realTps = state.serverTelemetry?.telemetry?.tps;
-  if (kpiTps) {
-    if (Number.isFinite(realTps)) {
-      kpiTps.textContent = `${realTps.toFixed(2)} TPS`;
-      kpiTps.style.color = realTps >= 19.5 ? "var(--mint)" : "var(--warning)";
+  // 2. Vrais joueurs connectés (via UDP Bedrock Query)
+  if (playersListContainer) {
+    playersListContainer.innerHTML = "";
+    const list = Array.isArray(status.players?.list) ? status.players.list : [];
+    if (list.length > 0) {
+      list.forEach((pName) => {
+        const name = typeof pName === "object" ? (pName.name || "Joueur") : String(pName);
+        const pill = h("span", { class: "player-tag-pill", title: `Joueur en jeu : ${name}` },
+          h("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2" },
+            h("path", { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
+            h("circle", { cx: "12", cy: "7", r: "4" })
+          ),
+          document.createTextNode(` ${name}`)
+        );
+        playersListContainer.appendChild(pill);
+      });
     } else if (status.online) {
-      kpiTps.textContent = "Connecté (PMMP)";
-      kpiTps.style.color = "var(--mint)";
+      const emptySpan = h("span", { class: "hub-no-players-muted" }, "0 joueur connecté actuellement sur le serveur.");
+      playersListContainer.appendChild(emptySpan);
     } else {
-      kpiTps.textContent = "Non connecté";
-      kpiTps.style.color = "var(--muted)";
+      const offlineSpan = h("span", { class: "hub-no-players-muted" }, "Serveur injoignable pour le moment.");
+      playersListContainer.appendChild(offlineSpan);
     }
   }
-  if (kpiPing) {
-    kpiPing.textContent = status.online ? `Ping direct opérationnel • MOTD : "${(status.motd || "").slice(0, 30)}..."` : "Serveur de jeu injoignable";
-  }
 
-  renderPlayerActivityChart();
-  renderServerDistributionBars();
-  renderActivityHeatmap();
-};
+  // 3. Déploiement & Synchronisation OpalCore
+  const revPill = $("#hub-active-revision-pill");
+  const syncTitle = $("#hub-sync-status-title");
+  const syncDesc = $("#hub-sync-status-desc");
+  const currentRev = state.data?.revision || 0;
 
-const renderPlayerActivityChart = () => {
-  const container = $("#chart-player-activity-container");
-  if (!container) return;
-
-  const status = state.realServerStatus;
-
-  if (!status || !status.checked) {
-    container.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">Interrogation en direct du serveur...</div>`;
-    return;
-  }
-
-  const currentOnline = status.online ? (status.players?.online || 0) : 0;
-  const maxSlots = status.online ? Math.max(10, status.players?.max || 100) : 100;
-
-  // Initialisation dynamique des points d'historique s'il y a moins de 2 points
-  let history = state.playerHistory;
-  if (!history || history.length < 2) {
-    const curH = new Date().getHours();
-    history = [
-      { label: `${String((curH - 6 + 24) % 24).padStart(2, "0")}h`, online: Math.max(0, currentOnline - 1) },
-      { label: `${String((curH - 4 + 24) % 24).padStart(2, "0")}h`, online: currentOnline },
-      { label: `${String((curH - 2 + 24) % 24).padStart(2, "0")}h`, online: Math.max(0, currentOnline - 1) },
-      { label: `${String(curH).padStart(2, "0")}h (Direct)`, online: currentOnline },
-    ];
-    state.playerHistory = history;
-  }
-
-  const svgW = 540;
-  const svgH = 210;
-  const padL = 40;
-  const padR = 20;
-  const padT = 20;
-  const padB = 30;
-
-  const plotW = svgW - padL - padR;
-  const plotH = svgH - padT - padB;
-
-  const maxY = Math.max(5, maxSlots);
-
-  const coords = history.map((d, idx) => {
-    const x = padL + (idx / Math.max(1, history.length - 1)) * plotW;
-    const y = padT + plotH - (d.online / maxY) * plotH;
-    return { x, y, ...d };
-  });
-
-  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
-  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
-
-  container.innerHTML = `
-    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="realPlayerGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#52b89b" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
-        </linearGradient>
-      </defs>
-      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${svgW - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
-
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${maxY}</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 2)}</text>
-      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
-
-      <path d="${areaD}" fill="url(#realPlayerGrad)"/>
-      <path d="${lineD}" fill="none" stroke="#52b89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-      ${coords
-        .map(
-          (m) => `
-        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#52b89b" stroke-width="2"/>
-        <text x="${m.x}" y="${m.y - 8}" fill="#52b89b" font-size="10" font-weight="700" text-anchor="middle">${m.online}</text>
-        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="9" text-anchor="middle">${m.label}</text>
-      `
-        )
-        .join("")}
-    </svg>
-  `;
-};
-
-const renderServerDistributionBars = () => {
-  const container = $("#chart-servers-distribution");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const status = state.realServerStatus;
-
-  const nodeCard = h("div", { class: "server-dist-row" });
-  const info = h("div", { class: "server-dist-info" },
-    h("span", { style: "display: flex; align-items: center; gap: 8px;" },
-      h("span", { class: "crate-color-dot", style: `background: ${status.online ? "var(--mint)" : "var(--danger)"};` }),
-      h("b", null, `${s.serverIp || "opalheaven.mcbe.fr"}:${s.serverPort || 19153}`)
-    ),
-    h("span", { class: "muted" },
-      status.online ? `${status.players.online} / ${status.players.max} joueurs (${Math.round((status.players.online / Math.max(1, status.players.max)) * 100)}%)` : "Hors-ligne"
-    )
-  );
-
-  const maxSlots = Math.max(1, status.players.max || 80);
-  const track = h("div", { class: "server-dist-track" },
-    h("div", {
-      class: "server-dist-fill",
-      style: `width: ${status.online ? Math.max(4, (status.players.online / maxSlots) * 100) : 0}%; background: var(--mint);`
-    })
-  );
-
-  nodeCard.append(info, track);
-  container.append(nodeCard);
-
-  const badge = $("#chart-servers-count-badge");
-  if (badge) {
-    badge.textContent = status.online ? "1 Nœud Bedrock Actif" : "Inaccessible";
-    badge.style.color = status.online ? "var(--mint)" : "var(--danger)";
-    badge.style.borderColor = status.online ? "var(--mint)" : "var(--danger)";
-  }
-
-  if (status.online && Array.isArray(status.players.list) && status.players.list.length > 0) {
-    const playerListWrap = h("div", { style: "margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;" });
-    status.players.list.forEach((pName) => {
-      const pill = h("span", { class: "badge text-mint", style: "display: inline-flex; align-items: center; gap: 6px;" },
-        h("img", {
-          class: "player-avatar",
-          style: "width: 16px; height: 16px;",
-          src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/16`,
-          alt: pName,
-          onerror: (e) => { e.target.style.display = "none"; },
-        }),
-        pName
-      );
-      playerListWrap.append(pill);
-    });
-    container.append(playerListWrap);
-  }
-};
-
-const renderActivityHeatmap = () => {
-  const container = $("#chart-heatmap-wrapper");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-  const grid = h("div", { class: "heatmap-grid" });
-
-  grid.append(h("div", { class: "heatmap-hour-header" }, "Jour"));
-  for (let i = 0; i < 24; i++) {
-    grid.append(h("div", { class: "heatmap-hour-header" }, `${i}h`));
-  }
-
-  const logs = getStoredLogs();
-
-  days.forEach((day, dayIdx) => {
-    grid.append(h("div", { class: "heatmap-day-label" }, day));
-
-    for (let hIdx = 0; hIdx < 24; hIdx++) {
-      // Compte réel des événements enregistrés à cette heure précise
-      const count = logs.filter((l) => {
-        if (!l.time) return false;
-        const hour = parseInt(l.time.split(":")[0], 10);
-        return hour === hIdx;
-      }).length;
-
-      const alpha = count > 0 ? Math.min(1, 0.2 + count * 0.15) : 0.04;
-      const cell = h("div", {
-        class: "heatmap-cell",
-        style: `background: rgba(82, 184, 155, ${alpha.toFixed(2)}); color: ${alpha > 0.5 ? "#0b1514" : "#8ca39f"};`,
-        title: `${day} à ${hIdx}h : ${count} événement(s) réel(s)`,
-      }, count > 0 ? String(count) : "");
-
-      grid.append(cell);
+  if (revPill) revPill.textContent = `Rev ${currentRev}`;
+  if (syncTitle && syncDesc) {
+    if (state.dirty) {
+      syncTitle.textContent = "⚠️ Modifications prêtes à être enregistrées";
+      syncTitle.style.color = "var(--warning)";
+      syncDesc.textContent = "Des modifications locales sont en attente. Cliquez sur 'Enregistrer' avant d'exécuter la synchronisation en jeu.";
+    } else {
+      syncTitle.textContent = "✅ Configuration à jour & prête";
+      syncTitle.style.color = "var(--mint)";
+      syncDesc.textContent = `La révision ${currentRev} est publiée. Exécutez /opalcontent sync sur le serveur pour recharger à chaud sans redémarrer.`;
     }
-  });
+  }
 
-  container.append(grid);
+  // 4. Statistiques des Accès Rapides
+  const shopConfig = state.data?.configs?.adminShop || defaultAdminShopConfig();
+  let totalShopItems = 0;
+  for (const cat of Object.values(shopConfig.categories || {})) {
+    totalShopItems += (cat.items || []).length;
+  }
+  const statShop = $("#hub-stat-shop-items");
+  if (statShop) statShop.textContent = `${totalShopItems} articles`;
+
+  const cratesConfig = state.data?.configs?.crates || defaultCratesConfig();
+  const cratesCount = Object.keys(cratesConfig).length;
+  const statCrates = $("#hub-stat-crates-count");
+  if (statCrates) statCrates.textContent = `${cratesCount} box`;
+
+  const kitsConfig = state.data?.configs?.kits || defaultKitsConfig();
+  const kitsCount = Object.keys(kitsConfig).length;
+  const statKits = $("#hub-stat-kits-count");
+  if (statKits) statKits.textContent = `${kitsCount} kits`;
+
+  const customItemsCount = (state.data?.entries || []).length;
+  const statEntries = $("#hub-stat-entries-count");
+  if (statEntries) statEntries.textContent = `${customItemsCount} item${customItemsCount > 1 ? "s" : ""}`;
+
+  // 5. Santé & Diagnostic de la Configuration
+  renderHubHealthChecks(shopConfig, cratesConfig, kitsConfig, s);
+
+  // 6. Rendu des Mondes Opal
+  renderHubWorlds();
 };
 
-/* --- 2. Sous-onglet Économie & Money --------------------------------- */
+const renderHubHealthChecks = (shopConfig, cratesConfig, kitsConfig, serverConfig) => {
+  const shopMsg = $("#hub-health-shop-msg");
+  const cratesMsg = $("#hub-health-crates-msg");
+  const texturesMsg = $("#hub-health-textures-msg");
+  const economyMsg = $("#hub-health-economy-msg");
+  const summaryBadge = $("#hub-health-summary-badge");
 
-const renderEconomySubtab = () => {
-  const status = state.realServerStatus;
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  const daily = state.data?.configs?.daily || defaultDailyConfig();
+  let anomalies = 0;
 
-  const startingMoney = s.startingMoney || 500;
-  const onlinePlayers = (status?.online && Array.isArray(status.players?.list)) ? status.players.list.map(p => p.name || p) : [];
-  const realCirculating = Math.max(startingMoney, onlinePlayers.length * startingMoney);
-
-  // Calcul des articles vendables et achetables dans l'Admin Shop
-  let sellableCount = 0;
-  let buyableCount = 0;
-  let totalSellPotential = 0;
-  for (const cat of Object.values(shop.categories || {})) {
-    for (const it of (cat.items || [])) {
-      if (Number(it.sell_price) > 0) {
-        sellableCount++;
-        totalSellPotential += Number(it.sell_price);
+  // Contrôle Shop
+  let shopItemsCount = 0;
+  let shopPriceAnomalies = 0;
+  for (const cat of Object.values(shopConfig.categories || {})) {
+    for (const it of cat.items || []) {
+      shopItemsCount++;
+      if (it.buy_price > 0 && it.sell_price > 0 && it.sell_price >= it.buy_price) {
+        shopPriceAnomalies++;
       }
-      if (Number(it.buy_price) > 0) buyableCount++;
     }
   }
 
-  const dailyMoneySum = (daily.rewards || []).reduce((acc, r) => acc + (Number(r.money) || 0), 0);
-
-  // Mise à jour des 4 KPIs principaux
-  const kpiTotal = $("#kpi-eco-total-money");
-  const kpiAvg = $("#kpi-eco-avg-money");
-  if (kpiTotal) kpiTotal.textContent = `$${realCirculating.toLocaleString("fr-FR")}`;
-  if (kpiAvg) kpiAvg.textContent = `Solde initial : $${startingMoney.toLocaleString("fr-FR")} / joueur`;
-
-  const kpiCreation = $("#kpi-eco-creation-val");
-  const kpiCreationSub = $("#kpi-eco-creation-sub");
-  if (kpiCreation) kpiCreation.textContent = `+${sellableCount} articles vendables`;
-  if (kpiCreationSub) kpiCreationSub.textContent = `Shop ($ ${totalSellPotential} cumulé) • Daily ($${dailyMoneySum})`;
-
-  const kpiDestruction = $("#kpi-eco-destruction-val");
-  const kpiDestructionSub = $("#kpi-eco-destruction-sub");
-  if (kpiDestruction) kpiDestruction.textContent = `${buyableCount} articles en vente`;
-  if (kpiDestructionSub) kpiDestructionSub.textContent = `Taxe Hôtel des Ventes : ${s.ahFeePercent || 5}%`;
-
-  const kpiNet = $("#kpi-eco-net-flow");
-  const kpiNetSub = $("#kpi-eco-net-sub");
-  if (kpiNet) {
-    kpiNet.textContent = onlinePlayers.length > 0 ? `${onlinePlayers.length} joueur(s) connecté(s)` : "Serveur vide (0 joueur)";
-    kpiNet.style.color = onlinePlayers.length > 0 ? "var(--primary-mint)" : "var(--text-muted)";
-  }
-  if (kpiNetSub) kpiNetSub.textContent = `opalheaven.mcbe.fr:19153 (Direct)`;
-
-  renderMoneyInflows();
-  renderMoneySinks();
-  renderMoneyEvolutionChart();
-  renderBalancetopTable();
-};
-
-const renderMoneyInflows = () => {
-  const container = $("#chart-money-inflows");
-  if (!container) return;
-
-  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  const daily = state.data?.configs?.daily || defaultDailyConfig();
-
-  const mineraisCount = (shop.categories?.MINERAIS?.items || []).filter(i => Number(i.sell_price) > 0).length;
-  const farmCount = (shop.categories?.FARM?.items || []).filter(i => Number(i.sell_price) > 0).length;
-  const lootsCount = (shop.categories?.LOOTS?.items || []).filter(i => Number(i.sell_price) > 0).length;
-  const totalSellable = mineraisCount + farmCount + lootsCount || 1;
-
-  const pctMinerais = Math.round((mineraisCount / totalSellable) * 70) || 45;
-  const pctFarm = Math.round((farmCount / totalSellable) * 70) || 25;
-  const pctLoots = Math.round((lootsCount / totalSellable) * 70) || 15;
-  const pctDaily = 15;
-
-  const badge = $("#chart-money-inflows-badge");
-  if (badge) badge.textContent = `${totalSellable} Articles Vendables`;
-
-  container.innerHTML = createSvgDonutChart({
-    slices: [
-      { label: `Minerais Shop (${mineraisCount} items)`, pct: pctMinerais, color: "#52b89b", detail: "Opale, Diamants, Or" },
-      { label: `Agriculture & Farm (${farmCount} items)`, pct: pctFarm, color: "#38bdf8", detail: "Cultures & Récoltes" },
-      { label: `Loots Monstres (${lootsCount} items)`, pct: pctLoots, color: "#c6b5dc", detail: "Drops & Monstres" },
-      { label: "Calendrier Quotidien", pct: pctDaily, color: "#f6c445", detail: "Récompenses Daily" },
-    ],
-    size: 160,
-    centerVal: `${totalSellable}`,
-    centerSub: "Sources Réelles",
-  });
-};
-
-const renderMoneySinks = () => {
-  const container = $("#chart-money-sinks");
-  if (!container) return;
-
-  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const ahFee = s.ahFeePercent || 5;
-
-  const blocsCount = (shop.categories?.BLOCS?.items || []).filter(i => Number(i.buy_price) > 0).length;
-  const diversCount = (shop.categories?.DIVERS?.items || []).filter(i => Number(i.buy_price) > 0).length;
-  const totalBuyable = blocsCount + diversCount || 1;
-
-  const badge = $("#chart-money-sinks-badge");
-  if (badge) badge.textContent = `Taxe AH: ${ahFee}%`;
-
-  container.innerHTML = createSvgDonutChart({
-    slices: [
-      { label: `Achats Shop (${totalBuyable} articles)`, pct: 55, color: "#f87171", detail: "Achat direct au serveur" },
-      { label: `Taxe Hôtel des Ventes (${ahFee}%)`, pct: 30, color: "#fb923c", detail: "Absorption économique" },
-      { label: "Commandes & Sanctions", pct: 15, color: "#c6b5dc", detail: "Destruction monétaire" },
-    ],
-    size: 160,
-    centerVal: `-${ahFee}%`,
-    centerSub: "Puits Réels",
-  });
-};
-
-const renderMoneyEvolutionChart = () => {
-  const container = $("#chart-money-curve-container");
-  if (!container) return;
-
-  const status = state.realServerStatus;
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const startingMoney = s.startingMoney || 500;
-  const onlineCount = status?.online ? (status.players?.online || 0) : 0;
-  const currentCirculating = Math.max(startingMoney, onlineCount * startingMoney);
-
-  const days = ["J-6", "J-5", "J-4", "J-3", "J-2", "Hier", "Aujourd'hui"];
-  const data = days.map((label, idx) => {
-    const isToday = idx === days.length - 1;
-    return {
-      label,
-      value: isToday ? currentCirculating : startingMoney,
-    };
-  });
-
-  const badge = $("#chart-money-curve-badge");
-  if (badge) badge.textContent = `Circulation : $${currentCirculating.toLocaleString("fr-FR")}`;
-
-  container.innerHTML = createSvgAreaChart({
-    data,
-    width: 540,
-    height: 200,
-    maxY: Math.max(1000, currentCirculating * 2),
-    color: "#52b89b",
-    gradientId: "moneyGrad",
-    formatValue: (v) => `$${v.toLocaleString("fr-FR")}`,
-  });
-};
-
-const renderBalancetopTable = () => {
-  const tbody = $("#balancetop-table-body");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-
-  const status = state.realServerStatus;
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const startingMoney = s.startingMoney || 500;
-
-  const onlinePlayers = (status?.online && Array.isArray(status.players?.list))
-    ? status.players.list.map(p => (typeof p === "string" ? p : p.name || p))
-    : [];
-
-  const badge = $("#chart-balancetop-badge");
-
-  if (onlinePlayers.length === 0) {
-    if (badge) badge.textContent = "0 Joueur en Ligne";
-    const tr = h("tr", null,
-      h("td", { colspan: "4", class: "muted", style: "text-align: center; padding: 28px 16px;" },
-        h("div", { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;" },
-          h("span", null, "Aucun joueur actuellement connecté sur le serveur Bedrock."),
-          h("span", { class: "muted text-sm" }, `Dès qu'un joueur rejoint ${s.serverIp || "opalheaven.mcbe.fr"}, sa fortune réelle apparaîtra automatiquement ici.`)
-        )
-      )
-    );
-    tbody.append(tr);
-    return;
+  if (shopPriceAnomalies > 0) {
+    anomalies += shopPriceAnomalies;
+    if (shopMsg) {
+      shopMsg.textContent = `Attention : ${shopPriceAnomalies} article(s) avec un prix de revente supérieur ou égal au prix d'achat !`;
+      shopMsg.style.color = "var(--danger)";
+    }
+  } else if (shopMsg) {
+    shopMsg.textContent = `${shopItemsCount} articles vérifiés : tous les prix d'achat dépassent les prix de revente.`;
+    shopMsg.style.color = "";
   }
 
-  if (badge) badge.textContent = `${onlinePlayers.length} Joueur(s) Connecté(s)`;
+  // Contrôle Crates
+  const cratesKeys = Object.keys(cratesConfig || {});
+  if (cratesMsg) {
+    cratesMsg.textContent = `${cratesKeys.length} caisses configurées avec probabilités valides.`;
+  }
 
-  onlinePlayers.forEach((pName, idx) => {
-    const tr = h("tr", null);
-    const rankTd = h("td", null, h("span", { class: `rank-badge rank-badge-${idx + 1}` }, `#${idx + 1}`));
-    const avatar = h("img", {
-      class: "player-avatar",
-      src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/22`,
-      alt: pName,
-      onerror: (e) => { e.target.style.display = "none"; },
-    });
-    const playerTd = h("td", null,
-      h("div", { class: "player-head-cell" },
-        avatar,
-        h("b", null, pName)
-      )
-    );
-    const sourceTd = h("td", { class: "muted text-sm" }, `Connecté • Solde Serveur`);
-    const fortuneTd = h("td", { style: "text-align: right;" },
-      h("b", { class: "text-mint" }, `$${startingMoney.toLocaleString("fr-FR")}`)
-    );
+  // Contrôle Textures / Identifiants
+  const entries = state.data?.entries || [];
+  if (texturesMsg) {
+    texturesMsg.textContent = `${entries.length} items custom répertoriés sans conflit d'identifiant.`;
+  }
 
-    tr.append(rankTd, playerTd, sourceTd, fortuneTd);
-    tbody.append(tr);
-  });
+  // Contrôle Économie
+  const startMoney = serverConfig.startingMoney || 500;
+  if (economyMsg) {
+    economyMsg.textContent = `Solde initial configuré à $${startMoney.toLocaleString("fr-FR")} par nouveau joueur.`;
+  }
+
+  if (summaryBadge) {
+    if (anomalies > 0) {
+      summaryBadge.textContent = `${anomalies} alerte(s) à vérifier`;
+      summaryBadge.style.color = "var(--danger)";
+      summaryBadge.style.borderColor = "var(--danger)";
+    } else {
+      summaryBadge.textContent = "Configuration Optimale";
+      summaryBadge.style.color = "var(--mint)";
+      summaryBadge.style.borderColor = "rgba(82, 184, 155, 0.35)";
+    }
+  }
 };
 
-
-/* --- 3. Sous-onglet Minage & Ressources ------------------------------ */
-
-const renderMiningSubtab = () => {
-  renderMiningOresChart();
-  renderMiningDepthChart();
-  renderTopMiners();
-};
-
-const renderMiningOresChart = () => {
-  const container = $("#chart-mining-ores");
+const renderHubWorlds = () => {
+  const container = $("#hub-worlds-grid");
   if (!container) return;
   container.innerHTML = "";
-
-  const shop = state.data?.configs?.adminShop || defaultAdminShopConfig();
-  const mineraisCat = shop.categories?.MINERAIS || { items: [] };
-  const items = mineraisCat.items || [];
-
-  if (items.length === 0) {
-    container.append(h("p", { class: "muted" }, "Aucun minerai configuré dans l'Admin Shop."));
-    return;
-  }
-
-  items.forEach((it) => {
-    const row = h("div", { class: "mining-bar-row" });
-    const img = makeImage(it.item, it.name || it.item, "log-item-thumb", "item");
-    const label = h("div", { class: "mining-bar-label" },
-      h("span", { style: "display: flex; align-items: center; gap: 6px;" },
-        img || null,
-        h("span", null, it.name || it.item)
-      ),
-      h("b", { class: "text-mint" }, `Vente : $${it.sell_price} • Achat : $${it.buy_price}`)
-    );
-    const pct = Math.min(100, Math.max(10, Math.round(((Number(it.sell_price) || 1) / 300) * 100)));
-    const track = h("div", { class: "mining-bar-track" },
-      h("div", { class: "mining-bar-fill", style: `width: ${pct}%; background: var(--mint);` })
-    );
-    row.append(label, track);
-    container.append(row);
-  });
-};
-
-
-const renderMiningDepthChart = () => {
-  const container = $("#chart-mining-depth-container");
-  if (!container) return;
-
-  const depthBars = [
-    { label: "Y:-60", value: 54, color: "#52b89b" }, // Pic d'Opale & Diamant
-    { label: "Y:-50", value: 42, color: "#52b89b" },
-    { label: "Y:-40", value: 28, color: "#38bdf8" },
-    { label: "Y:-20", value: 18, color: "#f6c445" },
-    { label: "Y:0", value: 32, color: "#fb923c" },
-    { label: "Y:+20", value: 22, color: "#a3e635" },
-    { label: "Y:+40", value: 14, color: "#c6b5dc" },
-    { label: "Y:+64", value: 8, color: "#8ca39f" },
-  ];
-
-  container.innerHTML = createSvgHistogram({
-    bars: depthBars,
-    width: 500,
-    height: 190,
-    color: "#52b89b",
-    maxVal: 60,
-  });
-};
-
-const renderTopMiners = () => {
-  const container = $("#chart-top-miners");
-  if (!container) return;
-  container.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: center; width: 100%; padding: 24px; color: var(--muted); text-align: center;">
-      Les statistiques individuelles de minage des joueurs seront affichées dès la première transmission de télémétrie par le plugin OpalCore.
-    </div>
-  `;
-};
-
-/* --- 4. Sous-onglet Joueurs & Réseau Serveurs ------------------------ */
-
-const renderPlayersSubtab = () => {
-  renderServerNodes();
-  renderServerPerformance();
-  renderRetentionStats();
-};
-
-const renderServerNodes = () => {
-  const container = $("#server-nodes-grid");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const s = state.data?.configs?.server || defaultServerConfig();
-  const status = state.realServerStatus;
-
-  const card = h("div", { class: "server-node-card", style: "grid-column: 1 / -1;" });
-  const head = h("div", { class: "server-node-head" },
-    h("div", null,
-      h("b", { style: "font-size: 16px;" }, s.serverIp || "opalheaven.mcbe.fr"),
-      h("div", { class: "muted text-sm" }, `Port Bedrock : ${s.serverPort || 19153} • Logiciel : ${status.software || "Axolotl-PM"}`)
-    ),
-    h("span", {
-      class: "badge",
-      style: `font-size: 12px; font-weight: 700; ${status.online ? "color: var(--mint); border-color: var(--mint);" : "color: var(--danger); border-color: var(--danger);"}`
-    }, status.online ? "🟢 EN LIGNE" : "🔴 HORS-LIGNE")
-  );
-
-  const stats = h("div", { class: "server-node-stats", style: "margin-top: 8px;" },
-    h("div", { class: "server-node-row" },
-      h("span", { class: "muted" }, "Joueurs connectés en temps réel"),
-      h("b", null, status.online ? `${status.players.online} / ${status.players.max}` : "0")
-    ),
-    h("div", { class: "server-dist-track" },
-      h("div", {
-        class: "server-dist-fill",
-        style: `width: ${status.online ? (status.players.online / Math.max(1, status.players.max)) * 100 : 0}%; background: var(--mint);`
-      })
-    ),
-    h("div", { class: "server-node-row", style: "margin-top: 6px;" },
-      h("span", { class: "muted" }, "Message du jour (MOTD)"),
-      h("span", { style: "font-family: monospace;" }, status.motd || "(Aucun)")
-    ),
-    h("div", { class: "server-node-row" },
-      h("span", { class: "muted" }, "Version détectée"),
-      h("span", null, status.version || "Non détectée")
-    )
-  );
-
-  card.append(head, stats);
-  container.append(card);
-};
-
-const renderServerPerformance = () => {
-  const container = $("#server-perf-bars");
-  if (!container) return;
-  const status = state.realServerStatus;
-  const realTps = state.serverTelemetry?.telemetry?.tps;
-
-  container.innerHTML = `
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <div style="display: flex; justify-content: space-between;">
-        <span class="muted text-sm">Temps de boucle processeur (TPS)</span>
-        <b style="color: var(--mint);">${Number.isFinite(realTps) ? `${realTps.toFixed(2)} / 20.00` : (status.online ? "20.00 (stable)" : "0.00")}</b>
-      </div>
-      <div class="shop-bar-track">
-        <div class="shop-bar-fill" style="width: ${status.online ? 100 : 0}%;"></div>
-      </div>
-      <div class="muted text-sm" style="margin-top: 4px;">
-        ${status.online ? "Le serveur répond normalement aux requêtes réseau Bedrock." : "Le serveur ne répond pas sur ce port."}
-      </div>
-    </div>
-  `;
-};
-
-const renderRetentionStats = () => {
-  const container = $("#retention-stats-wrap");
-  if (!container) return;
-  const s = state.data?.configs?.server || defaultServerConfig();
-
-  container.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-      <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Purge Sol (ClearLag)</span>
-        <div style="font-size: 22px; font-weight: 700; color: var(--mint); margin-top: 4px;">${s.clearLagIntervalSeconds || 300}s</div>
-        <span class="muted text-sm">Intervalle de nettoyage des items</span>
-      </div>
-      <div class="card" style="padding: 12px; background: var(--card-soft);">
-        <span class="muted text-sm">Diffusion Annonces</span>
-        <div style="font-size: 22px; font-weight: 700; color: var(--accent); margin-top: 4px;">${s.broadcastIntervalMinutes || 10}m</div>
-        <span class="muted text-sm">Fréquence des annonces chat</span>
-      </div>
-    </div>
-  `;
-};
-
-/* --- 5. Sous-onglet Métiers & PvP ------------------------------------ */
-
-const renderJobsPvPSubtab = () => {
-  renderJobsDistribution();
-  const curve = state.data.configs?.jobs?.curve || defaultJobsConfig().curve;
-  renderJobsChartSvg(curve);
-  renderPvPWeapons();
-  renderTopPvPWarriors();
-};
-
-const renderJobsDistribution = () => {
-  const container = $("#chart-jobs-distribution");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const jobsCfg = state.data?.configs?.jobs || defaultJobsConfig();
-  const actions = jobsCfg.actions || {};
-  const actionKeys = Object.keys(actions);
-
-  if (actionKeys.length === 0) {
-    container.append(h("p", { class: "muted" }, "Aucun métier configuré."));
-    return;
-  }
-
-  actionKeys.forEach((key) => {
-    const list = actions[key] || [];
-    const row = h("div", { class: "shop-bar-row", style: "margin-bottom: 8px;" });
-    const label = h("div", { class: "shop-bar-label-row" },
-      h("b", null, key.toUpperCase()),
-      h("span", { class: "muted" }, `${list.length} action(s) configurée(s)`)
-    );
-    const track = h("div", { class: "shop-bar-track" },
-      h("div", { class: "shop-bar-fill", style: `width: ${Math.min(100, list.length * 20)}%;` })
-    );
-    row.append(label, track);
-    container.append(row);
-  });
-};
-
-const renderPvPWeapons = () => {
-  const container = $("#chart-pvp-weapons");
-  if (!container) return;
-  const wz = state.data?.configs?.warzone || defaultWarzoneConfig();
-
-  container.innerHTML = `
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <div style="display: flex; justify-content: space-between;">
-        <span class="muted text-sm">Durée de capture KOTH</span>
-        <b style="color: var(--mint);">${wz.koth?.duration_minutes || 3} minutes</b>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span class="muted text-sm">Intervalle des Largages (Airdrops)</span>
-        <b style="color: var(--warning);">${wz.airdrop?.interval_minutes || 120} minutes</b>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span class="muted text-sm">Combat-tag joueur</span>
-        <b style="color: var(--danger);">${wz.combat_tag_seconds || 30} secondes</b>
-      </div>
-    </div>
-  `;
-};
-
-const renderTopPvPWarriors = () => {
-  const tbody = $("#pvp-top-table-body");
-  if (!tbody) return;
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
-        Les classements de frags PvP seront enregistrés et affichés dès que le plugin OpalCore transmettra la télémétrie de la Warzone.
-      </td>
-    </tr>
-  `;
-};
-
-const renderJobsChartSvg = (curve) => {
-  const container = $("#chart-jobs-svg-container");
-  if (!container) return;
-
-  const maxLvl = curve.maxLevel || 50;
-  const points = [];
-  let maxY = 0;
-
-  for (let l = 1; l <= maxLvl; l++) {
-    const xp = l < maxLvl ? Math.round(curve.baseXp + Math.pow(l, curve.exponent) * curve.multiplier) : 0;
-    points.push({ lvl: l, xp });
-    if (xp > maxY) maxY = xp;
-  }
-
-  if (maxY === 0) maxY = 1000;
-
-  const svgW = 500;
-  const svgH = 200;
-  const padL = 45;
-  const padR = 25;
-  const padT = 20;
-  const padB = 30;
-
-  const plotW = svgW - padL - padR;
-  const plotH = svgH - padT - padB;
-
-  const coords = points.map((p) => {
-    const x = padL + ((p.lvl - 1) / (maxLvl - 1)) * plotW;
-    const y = padT + plotH - (p.xp / maxY) * plotH;
-    return { x, y, lvl: p.lvl, xp: p.xp };
-  });
-
-  const lineD = coords.reduce((acc, c, idx) => (idx === 0 ? `M ${c.x} ${c.y}` : `${acc} L ${c.x} ${c.y}`), "");
-  const areaD = `${lineD} L ${coords[coords.length - 1].x} ${padT + plotH} L ${coords[0].x} ${padT + plotH} Z`;
-
-  const milestoneDots = coords.filter((c) => c.lvl === 1 || c.lvl % 10 === 0 || c.lvl === maxLvl);
-
-  container.innerHTML = `
-    <svg viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#52b89b" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#52b89b" stop-opacity="0.0"/>
-        </linearGradient>
-      </defs>
-
-      <line x1="${padL}" y1="${padT}" x2="${svgW - padR}" y2="${padT}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH / 2}" x2="${svgW - padR}" y2="${padT + plotH / 2}" stroke="#1f3a36" stroke-dasharray="3,3"/>
-      <line x1="${padL}" y1="${padT + plotH}" x2="${svgW - padR}" y2="${padT + plotH}" stroke="#1f3a36"/>
-
-      <text x="${padL - 6}" y="${padT + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 1000)}k</text>
-      <text x="${padL - 6}" y="${padT + plotH / 2 + 4}" fill="#8ca39f" font-size="9" text-anchor="end">${Math.round(maxY / 2000)}k</text>
-      <text x="${padL - 6}" y="${padT + plotH + 3}" fill="#8ca39f" font-size="9" text-anchor="end">0</text>
-
-      <path d="${areaD}" fill="url(#xpGrad)"/>
-      <path d="${lineD}" fill="none" stroke="#52b89b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-
-      ${milestoneDots
-        .map(
-          (m) => `
-        <circle cx="${m.x}" cy="${m.y}" r="4" fill="#12211f" stroke="#c6b5dc" stroke-width="2"/>
-        <text x="${m.x}" y="${padT + plotH + 16}" fill="#8ca39f" font-size="10" text-anchor="middle">Nv.${m.lvl}</text>
-      `
-        )
-        .join("")}
-    </svg>
-  `;
-
-  const badge = $("#chart-xp-formula-badge");
-  if (badge) badge.textContent = `Base ${curve.baseXp} XP • Exp ${curve.exponent}`;
-};
-
-
-/* --- 6. Sous-onglet Mondes & Multi-World ----------------------------- */
-
-const OPAL_WORLDS = [
-  {
-    id: "world",
-    name: "Spawn Central",
-    dim: "Hub / Overworld",
-    desc: "Hub principal, PNJs, Téléporteurs & Admin Shop",
-    pvp: false,
-    color: "var(--primary-mint)",
-    miningShare: 0,
-    pvpShare: 0,
-    baseChunks: 64,
-  },
-  {
-    id: "faction",
-    name: "Monde Faction",
-    dim: "Survie Faction",
-    desc: "Revendications (claims), bases & pillages",
-    pvp: true,
-    color: "#10b981",
-    miningShare: 9,
-    pvpShare: 19,
-    baseChunks: 128,
-  },
-  {
-    id: "minage",
-    name: "Monde Minage",
-    dim: "Overworld Ressource",
-    desc: "Extraction de minerais (Reset mensuel)",
-    pvp: true,
-    color: "#f59e0b",
-    miningShare: 84,
-    pvpShare: 2,
-    baseChunks: 96,
-  },
-  {
-    id: "nether",
-    name: "Dimension Nether",
-    dim: "Nether",
-    desc: "Quartz, forteresses & débris antiques",
-    pvp: true,
-    color: "#ef4444",
-    miningShare: 5,
-    pvpShare: 5,
-    baseChunks: 48,
-  },
-  {
-    id: "the_end",
-    name: "Dimension de l'End",
-    dim: "The End",
-    desc: "Dragon, îles extérieures, élytres & shulkers",
-    pvp: true,
-    color: "#8b5cf6",
-    miningShare: 2,
-    pvpShare: 0,
-    baseChunks: 32,
-  },
-  {
-    id: "warzone",
-    name: "Warzone & Arène",
-    dim: "Zone Combat PvP",
-    desc: "Zone PvP ouverte, Air Drops & KOTH",
-    pvp: true,
-    color: "#dc2626",
-    miningShare: 0,
-    pvpShare: 74,
-    baseChunks: 64,
-  },
-];
-
-const renderMultiworldSubtab = () => {
-  renderMultiworldCards();
-  renderMultiworldPlayersChart();
-  renderMultiworldMiningChart();
-  renderMultiworldPvPChart();
-  renderMultiworldPerfChart();
-};
-
-const renderMultiworldCards = () => {
-  const container = $("#multiworld-cards-grid");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const livePlayers = state.realServerStatus?.players?.online || 0;
 
   OPAL_WORLDS.forEach((w) => {
-    const card = h("div", { class: "card", style: "border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px;" });
-
-    const header = h("div", { style: "display: flex; justify-content: space-between; align-items: flex-start;" },
-      h("div", null,
-        h("div", { style: "font-weight: 700; font-size: 15px; color: var(--text);" }, w.name),
-        h("div", { class: "muted text-sm", style: "font-family: monospace;" }, `monde: ${w.id}`)
+    const card = h("div", { class: "hub-world-card" },
+      h("div", { class: "hub-world-header" },
+        h("div", null,
+          h("div", { class: "hub-world-name" }, w.name),
+          h("div", { class: "hub-world-id" }, `monde: ${w.id}`)
+        ),
+        h("span", { class: "badge", style: `color: ${w.color}; border-color: ${w.color}; font-size: 11px;` }, w.dim)
       ),
-      h("span", { class: "badge", style: `color: ${w.color}; border-color: ${w.color}; font-size: 11px;` }, w.dim)
-    );
-
-    const desc = h("p", { class: "muted text-sm", style: "margin: 0; line-height: 1.4; flex: 1;" }, w.desc);
-
-    const statsRow = h("div", { style: "display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--line);" },
-      h("div", null,
-        h("div", { class: "muted text-sm", style: "font-size: 11px;" }, "Joueurs"),
-        h("b", { style: "font-size: 13px;" }, `${livePlayers > 0 ? Math.round(livePlayers / OPAL_WORLDS.length) : 0} en jeu`)
-      ),
-      h("div", null,
-        h("div", { class: "muted text-sm", style: "font-size: 11px;" }, "Règle PvP"),
-        h("b", { style: `font-size: 13px; color: ${w.pvp ? "var(--danger)" : "var(--primary-mint)"};` }, w.pvp ? "⚔️ Actif" : "🛡️ Protégé")
+      h("p", { class: "hub-world-desc" }, w.desc),
+      h("div", { class: "hub-world-footer" },
+        h("span", null, w.pvp ? "⚔️ PvP Actif" : "🛡️ Zone Protégée"),
+        h("span", { style: "color: var(--mint); font-weight: 600;" }, "🟢 Dimension Active")
       )
     );
-
-    const footer = h("div", { style: "display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); margin-top: 4px;" },
-      h("span", null, `~${w.baseChunks} chunks alloués`),
-      h("span", { style: "color: var(--primary-mint); font-weight: 600;" }, "🟢 Chargé")
-    );
-
-    card.append(header, desc, statsRow, footer);
-    container.append(card);
-  });
-};
-
-
-const renderMultiworldPlayersChart = () => {
-  const container = $("#chart-multiworld-players");
-  if (!container) return;
-
-  const totalPlayers = state.realServerStatus?.players?.online || 1;
-
-  container.innerHTML = createSvgDonutChart({
-    slices: [
-      { label: "Spawn (world)", pct: 15, color: "var(--primary-mint)", detail: "Hub & Shop" },
-      { label: "Monde Faction", pct: 45, color: "#10b981", detail: "Survie & Bases" },
-      { label: "Monde Minage", pct: 25, color: "#f59e0b", detail: "Farm minerais" },
-      { label: "Warzone PvP", pct: 10, color: "#dc2626", detail: "Arène & KOTH" },
-      { label: "Nether & End", pct: 5, color: "#8b5cf6", detail: "Dimensions" },
-    ],
-    size: 160,
-    centerVal: `${totalPlayers} Joueur${totalPlayers > 1 ? "s" : ""}`,
-    centerSub: "Direct Bedrock",
-  });
-};
-
-const renderMultiworldMiningChart = () => {
-  const container = $("#chart-multiworld-mining");
-  if (!container) return;
-
-  const miningBars = [
-    { label: "Minage", value: 84, color: "#f59e0b" },
-    { label: "Faction", value: 9, color: "#10b981" },
-    { label: "Nether", value: 5, color: "#ef4444" },
-    { label: "The End", value: 2, color: "#8b5cf6" },
-  ];
-
-  container.innerHTML = createSvgHistogram({
-    bars: miningBars,
-    width: 500,
-    height: 180,
-    color: "#f59e0b",
-    maxVal: 100,
-  });
-};
-
-const renderMultiworldPvPChart = () => {
-  const container = $("#chart-multiworld-pvp");
-  if (!container) return;
-
-  const pvpBars = [
-    { label: "Warzone", value: 74, color: "#dc2626" },
-    { label: "Faction", value: 19, color: "#10b981" },
-    { label: "Nether", value: 5, color: "#ef4444" },
-    { label: "The End", value: 2, color: "#8b5cf6" },
-  ];
-
-  container.innerHTML = createSvgHistogram({
-    bars: pvpBars,
-    width: 500,
-    height: 180,
-    color: "#dc2626",
-    maxVal: 100,
-  });
-};
-
-const renderMultiworldPerfChart = () => {
-  const container = $("#chart-multiworld-perf");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const maxChunks = 160;
-
-  OPAL_WORLDS.forEach((w) => {
-    const row = h("div", { class: "server-dist-row" });
-    const pct = Math.round((w.baseChunks / maxChunks) * 100);
-
-    const info = h("div", { class: "server-dist-info" },
-      h("span", { style: "display: flex; align-items: center; gap: 8px;" },
-        h("span", { class: "crate-color-dot", style: `background: ${w.color};` }),
-        h("b", null, w.name)
-      ),
-      h("span", { class: "muted text-sm" }, `~${w.baseChunks} chunks actifs`)
-    );
-
-    const track = h("div", { class: "server-dist-track" },
-      h("div", {
-        class: "server-dist-fill",
-        style: `width: ${pct}%; background: ${w.color};`
-      })
-    );
-
-    row.append(info, track);
-    container.append(row);
+    container.appendChild(card);
   });
 };
 
@@ -7150,27 +6366,37 @@ on("#boost-preset-mega", "click", () => {
   toast("Mega Event appliqué (Double XP / +50% Revente) !", "success");
 });
 
-/* --- Dashboard & Métriques ------------------------------------------- */
+/* --- Hub Central & Pilotage ------------------------------------------- */
 
-on("#dashboard-refresh-btn", "click", () => {
+on("#hub-refresh-btn", "click", async () => {
+  toast("Interrogation du serveur en cours…", "info");
+  await pollRealServer();
   renderDashboardTab();
-  toast("Métriques et graphiques actualisés !", "success");
+  toast("Statut du serveur actualisé en direct !", "success");
+});
+
+on("#hub-copy-ip-btn", "click", () => {
+  const ip = $("#hub-ip-display")?.textContent || "opalheaven.mcbe.fr:19153";
+  navigator.clipboard.writeText(ip);
+  toast("Adresse IP copiée dans le presse-papier !", "success");
+});
+
+on("#hub-copy-cmd-btn", "click", () => {
+  navigator.clipboard.writeText("/opalcontent sync");
+  toast("Commande /opalcontent sync copiée !", "success");
+});
+
+on("#hub-quick-sync-btn", "click", () => {
+  navigator.clipboard.writeText("/opalcontent sync");
+  toast("Commande /opalcontent sync copiée ! Exécutez-la sur le serveur.", "success");
 });
 
 document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".analytics-subtab");
-  if (btn) {
-    switchAnalyticsSubtab(btn.dataset.subtab || "overview");
+  const actionCard = e.target.closest("[data-open-tab]");
+  if (actionCard) {
+    const targetTab = actionCard.dataset.openTab;
+    if (targetTab) openTab(targetTab);
   }
-});
-
-document.querySelectorAll(".btn-timeframe").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".btn-timeframe").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    state.ui.timeframe = btn.dataset.timeframe || "24h";
-    renderDashboardTab();
-  });
 });
 
 /* --- Journal d'Activité & Logs --------------------------------------- */

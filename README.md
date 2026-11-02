@@ -72,7 +72,7 @@ Pour générer des valeurs aléatoires :
 node -e "const c=require('node:crypto');const r=n=>c.randomBytes(n).toString('base64url');console.log('ADMIN_PASSWORD='+r(12));console.log('SESSION_SECRET='+r(24));console.log('PLUGIN_TOKEN='+r(18))"
 ```
 
-Conservez la valeur de `ADMIN_PASSWORD` : c’est le mot de passe à saisir dans le studio.
+Conservez la valeur de `ADMIN_PASSWORD` : c’est le mot de passe à saisir dans le studio. Pour `SESSION_SECRET` et `PLUGIN_TOKEN`, utilisez de préférence des valeurs **base64url** (`[A-Za-z0-9_-]`) : les caractères `#` et `$` sont interprétés par Netlify/dotenv et peuvent tronquer la valeur.
 
 ## Variables d’environnement
 
