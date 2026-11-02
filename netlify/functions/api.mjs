@@ -449,7 +449,75 @@ const routeRequest = async (req, url, context, store) => {
     } catch (e) {
       return reply({ ok: false, error: e.message, stack: e.stack });
     }
-    return reply({ ok: true, timestamp: Date.now() });
+    let commandsToRun = [];
+    try {
+      commandsToRun = (await store.get("pending_commands", { type: "json" })) || [];
+      if (commandsToRun.length > 0) {
+        await store.delete("pending_commands");
+      }
+    } catch {}
+
+    return reply({ ok: true, timestamp: Date.now(), commands: commandsToRun });
+  }
+
+  if (route === "/moderation/action" && req.method === "POST") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    const body = parseJson(await readBody(req));
+    const { target, action, reason, duration, command } = body || {};
+    if (!target || !action) return fail("paramètres manquants", 400);
+
+    const cmd = command || `${action.toLowerCase()} ${target} ${reason || ""}`.trim();
+    
+    // 1. Ajouter aux commandes en attente pour exécution en jeu
+    try {
+      const pending = (await store.get("pending_commands", { type: "json" })) || [];
+      pending.push(cmd);
+      await store.setJSON("pending_commands", pending);
+    } catch {}
+
+    // 2. Enregistrer dans l'historique des sanctions
+    const sanction = {
+      id: "sanc_" + Date.now(),
+      target,
+      action: action.toUpperCase(),
+      reason: reason || "Non spécifié",
+      duration: duration || null,
+      staff: "WebAdmin",
+      date: new Date().toISOString(),
+      active: !["KICK", "WARN"].includes(action.toUpperCase())
+    };
+
+    try {
+      const sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
+      sanctions.unshift(sanction);
+      await store.setJSON("moderation_sanctions", sanctions.slice(0, 200));
+    } catch {}
+
+    // 3. Ajouter un log de modération dans server_logs
+    try {
+      const logs = (await store.get("server_logs", { type: "json" })) || [];
+      logs.unshift({
+        time: new Date().toISOString().replace("T", " [").slice(0, 19) + "]",
+        type: "CMD",
+        player: "WebAdmin",
+        message: `Sanction [${action.toUpperCase()}] sur ${target}`,
+        details: `Motif: ${reason || "N/A"}${duration ? ` (Durée: ${duration})` : ""}`,
+        server: "opalheaven.mcbe.fr",
+        world: "world"
+      });
+      await store.setJSON("server_logs", logs.slice(0, 300));
+    } catch {}
+
+    return reply({ ok: true, message: `Sanction ${action} transmise au serveur pour ${target}`, command: cmd });
+  }
+
+  if (route === "/moderation/sanctions" && req.method === "GET") {
+    if (!validSession(req)) return fail("non autorisé", 401);
+    let sanctions = [];
+    try {
+      sanctions = (await store.get("moderation_sanctions", { type: "json" })) || [];
+    } catch {}
+    return reply({ ok: true, sanctions });
   }
 
   if (route === "/logs/clear" && req.method === "POST") {

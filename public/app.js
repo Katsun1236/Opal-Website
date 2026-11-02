@@ -524,6 +524,7 @@ const TAB_TITLES = {
   logs: { title: "Journal d’Activité & Logs", sub: "Historique chronologique des synchronisations et modifications" },
   data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
+  "config-roles": { title: "Grades & Permissions", sub: "Configuration des rangs, multiplicateurs et hiérarchie de permissions" },
 };
 
 const renderActiveTab = () => {
@@ -540,6 +541,7 @@ const renderActiveTab = () => {
   else if (state.ui.tab === "config-kits") renderKitsTab();
   else if (state.ui.tab === "config-quests") renderQuestsTab();
   else if (state.ui.tab === "config-warzone") renderWarzoneTab();
+  else if (state.ui.tab === "config-roles") renderRolesTab();
   else if (state.ui.tab === "tools-audit") renderAuditTab();
   else if (state.ui.tab === "config-server") renderServerConfigTab();
   else if (state.ui.tab === "logs") renderLogsTab();
@@ -555,6 +557,7 @@ const TAB_GROUPS = {
   "config-daily": "gameplay",
   "config-quests": "gameplay",
   "config-warzone": "gameplay",
+  "config-roles": "gameplay",
   // Content
   "library": "content",
   "entries": "content",
@@ -4297,13 +4300,9 @@ const renderLogsTab = () => {
         class: "log-player-link",
         onclick: (e) => {
           e.preventDefault();
-          const pInput = $("#logs-player-filter");
-          if (pInput) {
-            pInput.value = playerName;
-            renderLogsTab();
-          }
+          openPlayerInspector(playerName);
         },
-        title: `Filtrer tous les logs de ${playerName}`,
+        title: "Consulter le dossier joueur de " + playerName,
       },
       playerName
     );
@@ -4825,7 +4824,12 @@ const renderDashboardTab = () => {
     if (list.length > 0) {
       list.forEach((pName) => {
         const name = typeof pName === "object" ? (pName.name || "Joueur") : String(pName);
-        const pill = h("span", { class: "player-tag-pill", title: `Joueur en jeu : ${name}` },
+        const pill = h("span", {
+          class: "player-tag-pill",
+          style: "cursor: pointer;",
+          onclick: () => openPlayerInspector(name),
+          title: "Inspecter le dossier de " + name
+        },
           h("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2" },
             h("path", { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
             h("circle", { cx: "12", cy: "7", r: "4" })
@@ -6768,3 +6772,766 @@ if (state.token) {
   showApp(false);
   $("#password").focus();
 }
+
+
+/* ========================================================================= */
+/* MODULE GRADES, INSPECTEUR JOUEUR & SYSTÈME DE MODÉRATION                  */
+/* ========================================================================= */
+
+const formatMinecraftText = (text) => {
+  if (!text) return "";
+  const colorMap = {
+    "0": "#000000", "1": "#0000aa", "2": "#00aa00", "3": "#00aaaa",
+    "4": "#aa0000", "5": "#aa00aa", "6": "#ffaa00", "7": "#aaaaaa",
+    "8": "#555555", "9": "#5555ff", "a": "#55ff55", "b": "#55ffff",
+    "c": "#ff5555", "d": "#ff55ff", "e": "#ffff55", "f": "#ffffff"
+  };
+  let curColor = "#ffffff";
+  let isBold = false;
+  let out = "";
+  const parts = String(text).split(/§([0-9a-fk-or])/i);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      const code = parts[i].toLowerCase();
+      if (colorMap[code]) {
+        curColor = colorMap[code];
+      } else if (code === "l") {
+        isBold = true;
+      } else if (code === "r") {
+        curColor = "#ffffff";
+        isBold = false;
+      }
+    } else if (parts[i]) {
+      const style = "color: " + curColor + "; " + (isBold ? "font-weight: 700;" : "");
+      out += "<span style=\"" + style + "\">" + escapeHtml(parts[i]) + "</span>";
+    }
+  }
+  return out;
+};
+
+const PERM_CATEGORIES = [
+  {
+    name: "👤 Joueur & Base",
+    perms: [
+      { node: "opal.player", name: "Accès Joueur de base" },
+      { node: "pocketmine.command.tell", name: "Messages privés (/tell, /msg)" },
+      { node: "pocketmine.command.help", name: "Consulter l'aide (/help)" },
+      { node: "pocketmine.command.me", name: "Action publique (/me)" },
+    ]
+  },
+  {
+    name: "💬 Chat & Cosmétiques",
+    perms: [
+      { node: "opal.chat.color", name: "Couleurs dans le chat (& et §)" },
+      { node: "opal.chat.format", name: "Mise en forme (Gras, Italique)" },
+      { node: "opal.fly.hub", name: "Vol au Hub (/fly)" },
+    ]
+  },
+  {
+    name: "🎒 Kits & Équipements",
+    perms: [
+      { node: "opal.kit.joueur", name: "Kit Joueur (/kit joueur)" },
+      { node: "opal.kit.vote", name: "Kit Vote (/kit vote)" },
+      { node: "opal.kit.joyaux", name: "Kit Joyaux (/kit joyaux)" },
+      { node: "opal.kit.celeste", name: "Kit Céleste (/kit celeste)" },
+      { node: "opal.kit.donateur", name: "Kit Donateur (/kit donateur)" },
+    ]
+  },
+  {
+    name: "🏡 Téléportation & Homes",
+    perms: [
+      { node: "opal.homes.extra", name: "Homes supplémentaires" },
+      { node: "pocketmine.command.teleport", name: "Téléportation (/tp)" },
+    ]
+  },
+  {
+    name: "🛡️ Modération & Staff",
+    perms: [
+      { node: "opal.staff", name: "Canal Staff (/sc) & Sécurité" },
+      { node: "opal.command.warn", name: "Avertir (/warn)" },
+      { node: "opal.command.tempmute", name: "Mute temporaire (/tempmute)" },
+      { node: "opal.command.mute", name: "Mute permanent (/mute)" },
+      { node: "opal.command.kick", name: "Expulser (/kick)" },
+      { node: "opal.command.freeze", name: "Figer un joueur (/freeze)" },
+      { node: "opal.command.tempban", name: "Ban temporaire (/tempban)" },
+      { node: "opal.command.ban", name: "Ban permanent (/ban)" },
+    ]
+  },
+  {
+    name: "👑 Administration & Serveur",
+    perms: [
+      { node: "opal.admin", name: "Permissions Administrateur" },
+      { node: "opal.content.sync", name: "Synchroniser le studio (/opalcontent)" },
+      { node: "pocketmine.command.gamemode", name: "Changer de mode (/gamemode)" },
+      { node: "pocketmine.command.op", name: "Promouvoir opérateur (/op)" },
+    ]
+  }
+];
+
+const renderRolesTab = () => {
+  if (!state.data.configs) state.data.configs = defaultConfigs();
+  if (!state.data.configs.roles) state.data.configs.roles = defaultRolesConfig();
+
+  const roles = state.data.configs.roles;
+  const keys = Object.keys(roles);
+  if (keys.length === 0) {
+    state.data.configs.roles = defaultRolesConfig();
+  }
+
+  if (!state.ui.selectedRole || !roles[state.ui.selectedRole]) {
+    state.ui.selectedRole = Object.keys(state.data.configs.roles)[0] || "joueur";
+  }
+
+  renderRolesSidebar();
+  renderSelectedRole();
+};
+
+const renderRolesSidebar = () => {
+  const container = $("#roles-list-bar");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const roles = state.data.configs.roles || {};
+  const searchQ = ($("#roles-search-input")?.value || "").toLowerCase().trim();
+
+  const sorted = Object.entries(roles).sort((a, b) => (b[1].priority || 0) - (a[1].priority || 0));
+
+  sorted.forEach(([key, role]) => {
+    if (searchQ && !role.name.toLowerCase().includes(searchQ) && !key.toLowerCase().includes(searchQ)) {
+      return;
+    }
+
+    const isActive = state.ui.selectedRole === key;
+    const btn = h("button", {
+      type: "button",
+      class: "role-item-btn" + (isActive ? " active" : ""),
+      onclick: () => {
+        state.ui.selectedRole = key;
+        renderRolesTab();
+      }
+    });
+
+    const info = h("div", { class: "role-item-info" },
+      h("span", { class: "role-item-name" }, role.name || key),
+      h("span", { class: "role-item-prio" }, "Prio: " + (role.priority || 0) + " • " + (role.isStaff ? "Staff" : "Joueur"))
+    );
+
+    const badge = h("span", { class: "badge", style: "font-size: 11px; padding: 2px 6px;" });
+    badge.innerHTML = formatMinecraftText(role.prefix || key);
+
+    btn.append(info, badge);
+    container.appendChild(btn);
+  });
+};
+
+const renderSelectedRole = () => {
+  const container = $("#role-editor-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const roleId = state.ui.selectedRole;
+  const role = state.data.configs.roles?.[roleId];
+  if (!role) {
+    container.innerHTML = "<p class='muted'>Sélectionnez un grade à gauche.</p>";
+    return;
+  }
+
+  // En-tête
+  const header = h("div", { style: "display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 14px;" },
+    h("div", null,
+      h("h3", { style: "margin: 0; font-size: 17px;" }, "Grade : " + (role.name || roleId)),
+      h("span", { class: "muted text-sm" }, "ID technique: " + roleId)
+    ),
+    roleId !== "joueur" ? h("button", {
+      type: "button",
+      class: "danger",
+      style: "font-size: 12px; padding: 6px 12px;",
+      onclick: () => {
+        delete state.data.configs.roles[roleId];
+        state.ui.selectedRole = Object.keys(state.data.configs.roles)[0] || "joueur";
+        setDirty(true);
+        renderRolesTab();
+        toast("Grade \"" + role.name + "\" supprimé.", "info");
+      }
+    }, "Supprimer ce grade") : null
+  );
+
+  // Aperçu visuel Minecraft
+  const previewBox = h("div", null,
+    h("span", { class: "muted text-sm", style: "display: block; margin-bottom: 6px;" }, "Aperçu du rendu in-game (Chat & NameTag Bedrock) :"),
+    h("div", { class: "role-mc-preview", id: "role-preview-box" })
+  );
+  previewBox.querySelector("#role-preview-box").innerHTML = formatMinecraftText((role.prefix || "§7[Joueur]§r ") + "Joueur » Bonjour sur Opal Heaven !");
+
+  // Section 1 : Propriétés générales
+  const formGrid = h("div", { style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;" },
+    h("div", { class: "field" },
+      h("label", null, "Nom affiché"),
+      h("input", {
+        type: "text",
+        value: role.name || "",
+        oninput: (e) => {
+          role.name = e.target.value.trim();
+          setDirty(true);
+          renderRolesSidebar();
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Préfixe Minecraft (avec §)"),
+      h("input", {
+        type: "text",
+        value: role.prefix || "",
+        oninput: (e) => {
+          role.prefix = e.target.value;
+          previewBox.querySelector("#role-preview-box").innerHTML = formatMinecraftText(role.prefix + "Joueur » Bonjour sur Opal Heaven !");
+          setDirty(true);
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Priorité d'affichage (0-100)"),
+      h("input", {
+        type: "number",
+        min: "0",
+        max: "100",
+        value: role.priority ?? 0,
+        onchange: (e) => {
+          role.priority = Number(e.target.value) || 0;
+          setDirty(true);
+          renderRolesSidebar();
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Grade Staff (Modération)"),
+      h("select", {
+        onchange: (e) => {
+          role.isStaff = e.target.value === "true";
+          setDirty(true);
+          renderRolesSidebar();
+        }
+      },
+        h("option", { value: "false", selected: !role.isStaff }, "Non (Joueur classique)"),
+        h("option", { value: "true", selected: Boolean(role.isStaff) }, "Oui (Membre du Staff)")
+      )
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Max Homes (/sethome)"),
+      h("input", {
+        type: "number",
+        min: "1",
+        max: "100",
+        value: role.maxHomes ?? 2,
+        onchange: (e) => {
+          role.maxHomes = Math.max(1, Number(e.target.value) || 2);
+          setDirty(true);
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Multiplicateur Argent (Shop/Jobs)"),
+      h("input", {
+        type: "number",
+        step: "0.05",
+        min: "0.5",
+        max: "5",
+        value: role.moneyMultiplier ?? 1.0,
+        onchange: (e) => {
+          role.moneyMultiplier = Math.max(0.5, Number(e.target.value) || 1.0);
+          setDirty(true);
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Multiplicateur XP Métiers"),
+      h("input", {
+        type: "number",
+        step: "0.05",
+        min: "0.5",
+        max: "5",
+        value: role.xpMultiplier ?? 1.0,
+        onchange: (e) => {
+          role.xpMultiplier = Math.max(0.5, Number(e.target.value) || 1.0);
+          setDirty(true);
+        }
+      })
+    ),
+    h("div", { class: "field" },
+      h("label", null, "Hérite du grade"),
+      (() => {
+        const sel = h("select", {
+          onchange: (e) => {
+            const v = e.target.value;
+            role.inheritance = v ? [v] : [];
+            setDirty(true);
+          }
+        }, h("option", { value: "" }, "Aucun héritage"));
+        Object.keys(state.data.configs.roles).forEach((k) => {
+          if (k !== roleId) {
+            sel.appendChild(h("option", { value: k, selected: (role.inheritance || []).includes(k) }, state.data.configs.roles[k].name || k));
+          }
+        });
+        return sel;
+      })()
+    )
+  );
+
+  // Section 2 : Permissions rapides par catégorie
+  const permsTitle = h("div", { style: "margin-top: 10px;" },
+    h("h4", { style: "margin: 0 0 6px 0; font-size: 15px;" }, "Arbre de Permissions & Pouvoirs"),
+    h("p", { class: "muted text-sm", style: "margin: 0;" }, "Activez ou désactivez les permissions du grade de façon modulaire.")
+  );
+
+  if (!role.permissions) role.permissions = {};
+
+  const permsCategoriesWrap = h("div", { class: "role-perms-categories" });
+
+  PERM_CATEGORIES.forEach((cat) => {
+    const catCard = h("div", { class: "perm-cat-card" },
+      h("h5", { class: "perm-cat-title" }, cat.name)
+    );
+
+    cat.perms.forEach((p) => {
+      const isGranted = role.permissions[p.node] === true;
+      const toggleRow = h("div", { class: "perm-toggle-row" },
+        h("div", { class: "perm-toggle-label" },
+          h("span", { class: "perm-toggle-name" }, p.name),
+          h("span", { class: "perm-toggle-node" }, p.node)
+        ),
+        h("input", {
+          type: "checkbox",
+          checked: isGranted,
+          onchange: (e) => {
+            if (e.target.checked) {
+              role.permissions[p.node] = true;
+            } else {
+              delete role.permissions[p.node];
+            }
+            setDirty(true);
+          }
+        })
+      );
+      catCard.appendChild(toggleRow);
+    });
+
+    permsCategoriesWrap.appendChild(catCard);
+  });
+
+  // Section 3 : Permissions libres personnalisées
+  const customPermsCard = h("div", { class: "perm-cat-card", style: "margin-top: 14px;" },
+    h("h5", { class: "perm-cat-title" }, "⚡ Permissions Personnalisées Libres"),
+    h("div", { style: "display: flex; gap: 8px;" },
+      h("input", {
+        type: "text",
+        id: "role-custom-perm-input",
+        placeholder: "ex: opal.custom.feature",
+        style: "font-size: 12px; font-family: monospace; flex: 1;"
+      }),
+      h("button", {
+        type: "button",
+        class: "primary",
+        style: "font-size: 12px;",
+        onclick: () => {
+          const inp = $("#role-custom-perm-input");
+          const val = inp?.value.trim().toLowerCase();
+          if (val) {
+            role.permissions[val] = true;
+            setDirty(true);
+            renderSelectedRole();
+            toast("Permission \"" + val + "\" ajoutée.", "success");
+          }
+        }
+      }, "+ Ajouter")
+    ),
+    h("div", { class: "perms-custom-list", id: "role-custom-perms-list" })
+  );
+
+  const customListWrap = customPermsCard.querySelector("#role-custom-perms-list");
+  const knownNodes = new Set(PERM_CATEGORIES.flatMap((c) => c.perms.map((p) => p.node)));
+
+  Object.entries(role.permissions).forEach(([node, allowed]) => {
+    if (!knownNodes.has(node)) {
+      const chip = h("span", { class: "perm-node-chip" + (!allowed ? " denied" : "") },
+        document.createTextNode(node),
+        h("button", {
+          type: "button",
+          class: "perm-node-remove",
+          title: "Supprimer",
+          onclick: () => {
+            delete role.permissions[node];
+            setDirty(true);
+            renderSelectedRole();
+          }
+        }, "✕")
+      );
+      customListWrap.appendChild(chip);
+    }
+  });
+
+  container.append(header, previewBox, formGrid, permsTitle, permsCategoriesWrap, customPermsCard);
+};
+
+/* --- INSPECTEUR JOUEUR & MODERATION ---------------------------------- */
+
+const openPlayerInspector = async (playerName) => {
+  if (!playerName) return;
+  state.ui.inspectorPlayer = playerName;
+  state.ui.inspectorTab = "stats";
+
+  const modal = $("#player-inspector-modal");
+  if (!modal) return;
+
+  // 1. Extraire les données en direct de télémétrie
+  const onlineList = state.serverTelemetry?.telemetry?.players?.details || [];
+  const liveData = onlineList.find((p) => (p.name || "").toLowerCase() === playerName.toLowerCase());
+  const isOnline = Boolean(liveData);
+
+  // 2. Extraire tous les logs du joueur
+  const allLogs = getStoredLogs();
+  const playerLogs = allLogs.filter((l) => (l.player || "").toLowerCase() === playerName.toLowerCase());
+
+  // 3. Calculer les statistiques
+  const kills = playerLogs.filter((l) => l.type === "COMBAT" && (l.opponent || l.details?.includes("face à"))).length;
+  const deaths = playerLogs.filter((l) => l.type === "COMBAT" && !l.opponent).length;
+  const kd = deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2);
+  const money = liveData?.money ?? playerLogs.filter((l) => l.amount).reduce((sum, l) => sum + (Number(l.amount) || 0), 1000);
+
+  // 4. Remplir les champs d'en-tête
+  const avatar = $("#pi-avatar");
+  if (avatar) avatar.src = "https://mc-heads.net/avatar/" + encodeURIComponent(playerName) + "/64";
+
+  const nameSpan = $("#pi-player-name span");
+  if (nameSpan) nameSpan.textContent = playerName;
+
+  const statusDot = $("#pi-online-status");
+  if (statusDot) {
+    statusDot.className = "player-online-dot " + (isOnline ? "online" : "offline");
+    statusDot.title = isOnline ? "En ligne actuellement" : "Hors ligne";
+  }
+
+  const worldBadge = $("#pi-world-badge");
+  if (worldBadge) worldBadge.textContent = liveData?.world || playerLogs[0]?.world || "world";
+
+  const coordsPill = $("#pi-coords-pill");
+  if (coordsPill) {
+    if (liveData?.x !== undefined) {
+      coordsPill.textContent = "X: " + liveData.x + " Y: " + liveData.y + " Z: " + liveData.z;
+    } else {
+      coordsPill.textContent = "Coords: N/A";
+    }
+  }
+
+  const pingBadge = $("#pi-ping-badge");
+  if (pingBadge) pingBadge.textContent = liveData?.ping ? (liveData.ping + " ms") : "Ping: --";
+
+  // Remplir le sélecteur de grade
+  const rankSelect = $("#pi-rank-select");
+  if (rankSelect) {
+    rankSelect.innerHTML = "";
+    const roles = state.data.configs?.roles || defaultRolesConfig();
+    const curRankId = liveData?.rank_id || "joueur";
+    Object.entries(roles).forEach(([rId, r]) => {
+      rankSelect.appendChild(h("option", { value: rId, selected: rId === curRankId }, r.name || rId));
+    });
+    rankSelect.onchange = async (e) => {
+      const newRank = e.target.value;
+      await dispatchModerationCommand("setrank " + playerName + " " + newRank);
+      toast("Grade de " + playerName + " défini sur " + newRank + " !", "success");
+    };
+  }
+
+  // 5. Remplir l'onglet Stats
+  const statFaction = $("#pi-stat-faction");
+  if (statFaction) statFaction.textContent = liveData?.faction || "Sans Faction";
+
+  const statMoney = $("#pi-stat-money");
+  if (statMoney) statMoney.textContent = "$" + Math.max(0, money).toLocaleString("fr-FR");
+
+  const statKills = $("#pi-stat-kills");
+  if (statKills) statKills.textContent = kills;
+
+  const statDeaths = $("#pi-stat-deaths");
+  if (statDeaths) statDeaths.textContent = deaths;
+
+  const statKd = $("#pi-stat-kd");
+  if (statKd) statKd.textContent = kd;
+
+  // 6. Remplir les logs du joueur
+  const logsBadge = $("#pi-logs-badge");
+  if (logsBadge) logsBadge.textContent = "(" + playerLogs.length + ")";
+
+  const logsTbody = $("#pi-logs-tbody");
+  if (logsTbody) {
+    logsTbody.innerHTML = "";
+    if (playerLogs.length === 0) {
+      logsTbody.innerHTML = "<tr><td colspan='3' class='muted' style='text-align: center; padding: 20px;'>Aucun log enregistré pour ce joueur pour le moment.</td></tr>";
+    } else {
+      playerLogs.forEach((l) => {
+        const tr = h("tr", null,
+          h("td", { class: "muted", style: "font-family: monospace;" }, l.time),
+          h("td", null, h("span", { class: "log-badge log-badge-" + (l.type || "INFO") }, l.type || "INFO")),
+          h("td", null,
+            h("div", null,
+              h("b", null, l.message),
+              l.details ? h("div", { class: "muted text-sm", style: "font-size: 11px;" }, l.details) : null
+            )
+          )
+        );
+        logsTbody.appendChild(tr);
+      });
+    }
+  }
+
+  // 7. Charger et afficher l'historique des sanctions
+  renderPlayerSanctionsTab(playerName);
+
+  // Basculer sur l'onglet stats par défaut
+  switchInspectorTab("stats");
+
+  modal.showModal();
+};
+
+const switchInspectorTab = (tabId) => {
+  state.ui.inspectorTab = tabId;
+  document.querySelectorAll(".player-inspector-tab-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.piTab === tabId);
+  });
+  document.querySelectorAll(".pi-tab-content").forEach((c) => {
+    c.hidden = c.id !== ("pi-tab-content-" + tabId);
+  });
+};
+
+const renderPlayerSanctionsTab = async (playerName) => {
+  const container = $("#pi-sanctions-list");
+  if (!container) return;
+  container.innerHTML = "<p class='muted text-sm'>Chargement des sanctions…</p>";
+
+  try {
+    const res = await fetch("/api/moderation/sanctions");
+    if (res.ok) {
+      const data = await res.json();
+      const sanctions = (data.sanctions || []).filter((s) => (s.target || "").toLowerCase() === playerName.toLowerCase());
+      container.innerHTML = "";
+      if (sanctions.length === 0) {
+        container.innerHTML = "<div class='card' style='padding: 16px; text-align: center;'><p class='muted text-sm' style='margin: 0;'>Casier judiciaire vierge : aucune sanction enregistrée pour ce joueur.</p></div>";
+        return;
+      }
+      sanctions.forEach((s) => {
+        const card = h("div", { class: "card", style: "padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;" },
+          h("div", null,
+            h("div", { style: "display: flex; align-items: center; gap: 8px;" },
+              h("span", { class: "log-badge", style: "background: rgba(239, 68, 68, 0.2); color: #f87171;" }, s.action),
+              h("b", null, s.reason || "Sans motif")
+            ),
+            h("div", { class: "muted text-sm", style: "font-size: 11px; margin-top: 4px;" },
+              "Par " + (s.staff || "Staff") + " • " + new Date(s.date).toLocaleString("fr-FR") + (s.duration ? (" (Durée: " + s.duration + ")") : "")
+            )
+          ),
+          s.active ? h("button", {
+            type: "button",
+            class: "ghost",
+            style: "font-size: 11px;",
+            onclick: async () => {
+              const unCmd = s.action === "MUTE" ? ("unmute " + playerName) : s.action === "BAN" ? ("unban " + playerName) : "";
+              if (unCmd) await dispatchModerationCommand(unCmd);
+              toast("Sanction levée avec succès !", "success");
+              renderPlayerSanctionsTab(playerName);
+            }
+          }, "Lever la sanction") : h("span", { class: "muted text-sm" }, "Expirée")
+        );
+        container.appendChild(card);
+      });
+    }
+  } catch {
+    container.innerHTML = "<p class='muted text-sm'>Historique des sanctions local actif.</p>";
+  }
+};
+
+const openModerationModal = (actionType) => {
+  const modal = $("#moderation-action-modal");
+  if (!modal) return;
+  const player = state.ui.inspectorPlayer || "Steve";
+  state.ui.currentModAction = actionType;
+
+  const title = $("#mod-modal-title");
+  if (title) title.textContent = "Sanctionner : " + actionType.toUpperCase();
+
+  const info = $("#mod-modal-target-info");
+  if (info) info.innerHTML = "Joueur cible : <b style=\"color: var(--mint);\">" + player + "</b>";
+
+  const durationField = $("#mod-duration-field");
+  if (durationField) {
+    durationField.style.display = ["WARN", "KICK"].includes(actionType) ? "none" : "block";
+  }
+
+  const reasonInput = $("#mod-custom-reason");
+  if (reasonInput) reasonInput.value = "";
+
+  modal.showModal();
+};
+
+const dispatchModerationCommand = async (command) => {
+  try {
+    const res = await fetch("/api/moderation/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target: state.ui.inspectorPlayer || "Joueur",
+        action: "CMD",
+        command: command.trim()
+      })
+    });
+    if (res.ok) {
+      toast("Commande \"" + command + "\" transmise au serveur OpalCore !", "success");
+    }
+  } catch (e) {
+    toast("Erreur lors de la transmission de la commande.", "error");
+  }
+};
+
+const submitModerationAction = async (target, action, reason, duration) => {
+  let cmd = "";
+  if (action === "WARN") cmd = "warn " + target + " " + reason;
+  else if (action === "KICK") cmd = "kick " + target + " " + reason;
+  else if (action === "MUTE") {
+    cmd = duration && duration !== "perm" ? ("tempmute " + target + " " + duration + " " + reason) : ("mute " + target + " " + reason);
+  } else if (action === "BAN") {
+    cmd = duration && duration !== "perm" ? ("tempban " + target + " " + duration + " " + reason) : ("ban " + target + " " + reason);
+  } else if (action === "FREEZE") {
+    cmd = "freeze " + target;
+  }
+
+  try {
+    const res = await fetch("/api/moderation/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target, action, reason, duration, command: cmd })
+    });
+    if (res.ok) {
+      toast("Sanction " + action + " appliquée à " + target + " !", "success");
+      const modal = $("#moderation-action-modal");
+      if (modal) modal.close();
+      if (state.ui.inspectorPlayer) {
+        renderPlayerSanctionsTab(state.ui.inspectorPlayer);
+      }
+    } else {
+      toast("Erreur lors de l'application de la sanction.", "error");
+    }
+  } catch (e) {
+    toast("Erreur réseau modération.", "error");
+  }
+};
+
+/* --- EVENT LISTENERS NOUVEAUX MODULES --------------------------------- */
+
+on("#role-create-btn", "click", () => {
+  $("#role-create-dialog")?.showModal();
+});
+
+on("#role-create-close", "click", () => {
+  $("#role-create-dialog")?.close();
+});
+
+on("#role-create-cancel", "click", () => {
+  $("#role-create-dialog")?.close();
+});
+
+on("#role-create-form", "submit", (e) => {
+  e.preventDefault();
+  const idInput = $("#new-role-id");
+  const nameInput = $("#new-role-name");
+  const id = idInput?.value.trim().toLowerCase();
+  const name = nameInput?.value.trim();
+
+  if (!id || !name) return;
+  if (!state.data.configs.roles) state.data.configs.roles = defaultRolesConfig();
+
+  state.data.configs.roles[id] = {
+    id,
+    name,
+    prefix: "§7[" + name + "]§r ",
+    chatColor: "§f",
+    nameTagColor: "§7",
+    priority: 10,
+    isStaff: false,
+    maxHomes: 2,
+    moneyMultiplier: 1.0,
+    xpMultiplier: 1.0,
+    description: "Grade " + name + " personnalisé",
+    inheritance: ["joueur"],
+    permissions: { "opal.player": true }
+  };
+
+  state.ui.selectedRole = id;
+  setDirty(true);
+  $("#role-create-dialog")?.close();
+  renderRolesTab();
+  toast("Nouveau grade \"" + name + "\" créé avec succès !", "success");
+});
+
+on("#roles-search-input", "input", debounce(renderRolesSidebar, 100));
+
+// Inspecteur Joueur Listeners
+on("#pi-close-btn", "click", () => {
+  $("#player-inspector-modal")?.close();
+});
+
+document.querySelectorAll(".player-inspector-tab-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    switchInspectorTab(btn.dataset.piTab);
+  });
+});
+
+on("#pi-btn-filter-logs", "click", () => {
+  $("#player-inspector-modal")?.close();
+  const pInput = $("#logs-player-filter");
+  if (pInput && state.ui.inspectorPlayer) {
+    pInput.value = state.ui.inspectorPlayer;
+    state.ui.tab = "logs";
+    renderActiveTab();
+  }
+});
+
+// Boutons d'actions de modération dans le dossier
+on("#pi-act-freeze", "click", async () => {
+  if (!state.ui.inspectorPlayer) return;
+  await submitModerationAction(state.ui.inspectorPlayer, "FREEZE", "Contrôle staff / Freeze", null);
+});
+
+on("#pi-act-warn", "click", () => openModerationModal("WARN"));
+on("#pi-act-mute", "click", () => openModerationModal("MUTE"));
+on("#pi-act-kick", "click", () => openModerationModal("KICK"));
+on("#pi-act-ban", "click", () => openModerationModal("BAN"));
+
+// Modale de Sanction Listeners
+on("#mod-modal-close", "click", () => $("#moderation-action-modal")?.close());
+on("#mod-cancel-btn", "click", () => $("#moderation-action-modal")?.close());
+
+document.querySelectorAll("#mod-duration-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#mod-duration-chips .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+  });
+});
+
+document.querySelectorAll("#mod-reason-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#mod-reason-chips .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    const inp = $("#mod-custom-reason");
+    if (inp) inp.value = chip.dataset.reason;
+  });
+});
+
+on("#mod-action-form", "submit", async (e) => {
+  e.preventDefault();
+  const player = state.ui.inspectorPlayer;
+  const action = state.ui.currentModAction || "WARN";
+  const reason = $("#mod-custom-reason")?.value.trim() || "Sanction administrative";
+  const durationChip = $("#mod-duration-chips .chip-btn.active");
+  const duration = durationChip?.dataset.duration || "30m";
+
+  if (!player) return;
+  await submitModerationAction(player, action, reason, duration);
+});

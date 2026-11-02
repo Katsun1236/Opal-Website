@@ -3158,3 +3158,375 @@ button.danger.ghost { background: transparent; color: var(--danger); border-colo
   word-break: break-word;
 }
 
+
+
+/* --- MODULE GESTION DES GRADES & PERMISSIONS --------------------------- */
+.roles-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .roles-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roles-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.role-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.role-item-btn:hover {
+  border-color: var(--mint);
+  background: rgba(82, 184, 155, 0.08);
+}
+
+.role-item-btn.active {
+  border-color: var(--mint);
+  background: rgba(82, 184, 155, 0.16);
+  box-shadow: 0 0 12px rgba(82, 184, 155, 0.2);
+}
+
+.role-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.role-item-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.role-item-prio {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.role-editor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.role-mc-preview {
+  background: #111417;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'Minecraft', monospace, sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+}
+
+.role-perms-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.perm-cat-card {
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perm-cat-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mint);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.perm-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.perm-toggle-row:last-child {
+  border-bottom: none;
+}
+
+.perm-toggle-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.perm-toggle-name {
+  font-weight: 500;
+}
+
+.perm-toggle-node {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-family: monospace;
+}
+
+.perms-custom-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.perm-node-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-family: monospace;
+  background: rgba(82, 184, 155, 0.12);
+  border: 1px solid rgba(82, 184, 155, 0.3);
+  color: var(--mint);
+}
+
+.perm-node-chip.denied {
+  background: rgba(235, 104, 117, 0.12);
+  border-color: rgba(235, 104, 117, 0.3);
+  color: var(--danger);
+}
+
+.perm-node-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 2px;
+}
+
+/* --- INSPECTEUR JOUEUR & DOSSIER MODERATION --------------------------- */
+.player-inspector-dialog {
+  max-width: 860px;
+  width: 95vw;
+  max-height: 90vh;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-inspector-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(82, 184, 155, 0.15) 0%, rgba(20, 30, 35, 0.95) 100%);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.player-inspector-id-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.player-big-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 2px solid var(--mint);
+  image-rendering: pixelated;
+  background: #111417;
+}
+
+.player-inspector-name-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-inspector-name {
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.player-online-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.player-online-dot.online {
+  background: var(--primary-mint);
+  box-shadow: 0 0 8px var(--primary-mint);
+}
+
+.player-online-dot.offline {
+  background: #64748b;
+}
+
+.player-inspector-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.player-inspector-tabs-bar {
+  display: flex;
+  background: var(--card-soft);
+  border-bottom: 1px solid var(--line);
+  padding: 0 20px;
+  gap: 8px;
+}
+
+.player-inspector-tab-btn {
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.player-inspector-tab-btn:hover {
+  color: var(--text);
+}
+
+.player-inspector-tab-btn.active {
+  color: var(--mint);
+  border-bottom-color: var(--mint);
+}
+
+.player-inspector-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.player-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.player-stat-card {
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-stat-label {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.player-stat-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.player-inspector-actions-bar {
+  padding: 16px 24px;
+  background: var(--card-soft);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Modale Sanction */
+.moderation-dialog {
+  max-width: 520px;
+  width: 90vw;
+  padding: 20px 24px;
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.chip-btn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--card-soft);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.chip-btn:hover {
+  border-color: var(--mint);
+}
+
+.chip-btn.active {
+  background: rgba(82, 184, 155, 0.2);
+  border-color: var(--mint);
+  color: var(--mint);
+  font-weight: 600;
+}
