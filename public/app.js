@@ -3987,7 +3987,8 @@ const getStoredLogs = () => {
   const seen = new Set();
   const deduped = [];
   for (const log of combined) {
-    const key = (log.time || "") + "|" + (log.type || "") + "|" + (log.player || "") + "|" + (log.message || "");
+    const normTime = String(log.time || "").replace(/\.\d+/, "").trim();
+    const key = normTime + "|" + String(log.type || "").trim() + "|" + String(log.player || "").trim() + "|" + String(log.message || "").trim();
     if (!seen.has(key)) {
       seen.add(key);
       deduped.push(log);
@@ -4105,13 +4106,17 @@ const fetchServerTelemetry = async () => {
 };
 
 let serverPollingTimer = null;
+let lastRealServerStatusCheck = 0;
 state.ui.logsLive = true;
 
-const pollRealServer = async () => {
-  await Promise.all([
-    fetchRealServerStatus(),
-    fetchServerTelemetry(),
-  ]);
+const pollRealServer = async (forcePing = false) => {
+  const tasks = [fetchServerTelemetry()];
+  const now = Date.now();
+  if (forcePing || now - lastRealServerStatusCheck > 25000) {
+    lastRealServerStatusCheck = now;
+    tasks.push(fetchRealServerStatus());
+  }
+  await Promise.all(tasks);
 
   // Si la télémétrie en direct d'OpalCore est active, priorité absolue sur le statut
   if (state.serverTelemetry?.connected && state.serverTelemetry?.telemetry) {
@@ -4143,12 +4148,12 @@ const pollRealServer = async () => {
 
 const startServerPolling = () => {
   if (serverPollingTimer) clearInterval(serverPollingTimer);
-  pollRealServer();
+  pollRealServer(true);
   serverPollingTimer = setInterval(() => {
     if (state.ui.logsLive) {
       pollRealServer();
     }
-  }, 3000);
+  }, 5000);
 };
 
 const toggleLogsLive = () => {

@@ -434,11 +434,12 @@ const routeRequest = async (req, url, context, store) => {
           existingLogs = (await store.get("server_logs", { type: "json" })) || [];
         } catch {}
         
-        // Déduplication stricte par clé unique
+        // Déduplication stricte par clé unique sans artéfact de millisecondes
         const seen = new Set();
         const merged = [];
         for (const log of [...telemetry.logs, ...existingLogs]) {
-          const key = (log.time || "") + "|" + (log.type || "") + "|" + (log.player || "") + "|" + (log.message || "");
+          const normTime = String(log.time || "").replace(/\.\d+/, "").trim();
+          const key = normTime + "|" + String(log.type || "").trim() + "|" + String(log.player || "").trim() + "|" + String(log.message || "").trim();
           if (!seen.has(key)) {
             seen.add(key);
             merged.push(log);
