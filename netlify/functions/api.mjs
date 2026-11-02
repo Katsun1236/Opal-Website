@@ -372,31 +372,34 @@ const routeRequest = async (req, url, context, store) => {
     const host = (url.searchParams.get("host") || "opalheaven.mcbe.fr").trim();
     const port = Number(url.searchParams.get("port")) || 19153;
     let data = null;
+
+    // 1. Priorité absolue : télémétrie en direct envoyée par OpalCore (NetherNet / Axolotl-PM)
     try {
-      const pingRes = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`, {
-        headers: { "User-Agent": "OpalStudio/1.0" },
-      });
-      if (pingRes.ok) {
-        data = await pingRes.json();
+      const telem = await store.get("telemetry", { type: "json" });
+      if (telem && (Date.now() - new Date(telem.receivedAt).getTime() < 900000)) {
+        data = {
+          online: true,
+          ip: host,
+          port,
+          version: telem.server || "Axolotl-PM 5.51.0",
+          players: telem.players || { online: 0, max: 100, list: [] },
+          motd: { clean: ["OPAL HEAVEN » Direct OpalCore"] },
+          software: "Axolotl-PM",
+          tps: telem.tps || 20.0,
+          memoryMb: telem.memoryMb || 215.4
+        };
       }
     } catch {}
 
-    // Si mcsrvstat n'arrive pas à joindre le port UDP (filtrage anti-DDoS WinHeberge),
-    // bascule automatique sur le heartbeat direct d'OpalCore reçu dans les 5 dernières minutes !
-    if (!data || !data.online) {
+    // 2. Si pas de télémétrie récente, interrogation externe mcsrvstat en fallback
+    if (!data) {
       try {
-        const telem = await store.get("telemetry", { type: "json" });
-        if (telem && (Date.now() - new Date(telem.receivedAt).getTime() < 900000)) {
-          data = {
-            online: true,
-            ip: host,
-            port,
-            version: telem.server || "Axolotl-PM",
-            players: telem.players || { online: 0, max: 100, list: [] },
-            motd: { clean: ["OPAL HEAVEN » Direct OpalCore"] },
-            software: "Axolotl-PM",
-            tps: telem.tps,
-          };
+        const pingRes = await fetch(`https://api.mcsrvstat.us/bedrock/3/${encodeURIComponent(host)}:${port}`, {
+          headers: { "User-Agent": "OpalStudio/1.0" },
+        });
+        if (pingRes.ok) {
+          const mcs = await pingRes.json();
+          if (mcs && mcs.online) data = mcs;
         }
       } catch {}
     }
@@ -434,7 +437,7 @@ const routeRequest = async (req, url, context, store) => {
         await store.setJSON("server_logs", merged);
       }
     } catch (e) {
-      console.error("Écriture télémétrie impossible", e);
+      return reply({ ok: false, error: e.message, stack: e.stack });
     }
     return reply({ ok: true, timestamp: Date.now() });
   }
