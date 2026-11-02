@@ -8,7 +8,7 @@
 <meta name="description" content="Studio d’édition du contenu Opal Heaven : items, blocs, crafts et textures.">
 <title>Opal Heaven — Hub de Configuration</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css?v=3.5">
+<link rel="stylesheet" href="/style.css?v=3.7">
 </head>
 <body>
 <a class="skip-link" href="#app">Aller au contenu</a>
@@ -60,7 +60,12 @@
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
           <span class="nav-label">Activité & Logs</span>
         </button>
-        <button type="button" role="tab" id="nav-moderation" aria-controls="tab-moderation" aria-selected="false" data-tab="moderation" class="nav-item" tabindex="-1">
+                <button type="button" role="tab" id="nav-players" aria-controls="tab-players" aria-selected="false" data-tab="players" class="nav-item" tabindex="-1">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="nav-label">Joueurs</span>
+          <span class="subnav-badge" id="nav-players-badge">0</span>
+        </button>
+<button type="button" role="tab" id="nav-moderation" aria-controls="tab-moderation" aria-selected="false" data-tab="moderation" class="nav-item" tabindex="-1">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <span class="nav-label">Modération</span>
           <span class="subnav-badge" id="nav-moderation-badge">Actif</span>
@@ -1864,7 +1869,80 @@
   </section>
 
   <!-- TAB : MOD�RATION & S�CURIT� -->
-    <section id="tab-moderation" class="tab" role="tabpanel" aria-labelledby="nav-moderation" tabindex="0" hidden>
+      <!-- TAB : JOUEURS & PROFILS -->
+  <section id="tab-players" class="tab" role="tabpanel" aria-labelledby="nav-players" tabindex="0" hidden>
+    <div class="tab-header-banner card">
+      <div>
+        <h2>Base Joueurs &amp; Profils D&eacute;taill&eacute;s</h2>
+        <p class="muted">Annuaire complet de tous les joueurs enregistr&eacute;s sur Opal Heaven : grades, &eacute;conomie, factions, activit&eacute; et historique complet.</p>
+      </div>
+      <div class="row row-tight">
+        <button type="button" id="players-tab-refresh-btn" class="ghost">
+          <svg class="icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Actualiser
+        </button>
+      </div>
+    </div>
+
+    <!-- METRIQUES JOUEURS -->
+    <div class="stat-grid" style="margin-bottom: 20px;">
+      <div class="card stat-card">
+        <span class="muted text-sm">Joueurs Enregistr&eacute;s</span>
+        <strong id="players-stat-total" class="stat-value">0</strong>
+        <span class="stat-delta">Base globale du serveur</span>
+      </div>
+      <div class="card stat-card">
+        <span class="muted text-sm">Connect&eacute;s en Direct</span>
+        <strong id="players-stat-online" class="stat-value" style="color: var(--primary-mint, #10b981);">0</strong>
+        <span class="stat-delta">En jeu actuellement</span>
+      </div>
+      <div class="card stat-card">
+        <span class="muted text-sm">Membres du Staff</span>
+        <strong id="players-stat-staff" class="stat-value" style="color: #f59e0b;">0</strong>
+        <span class="stat-delta">Rangs privil&eacute;gi&eacute;s</span>
+      </div>
+      <div class="card stat-card">
+        <span class="muted text-sm">Factions Repr&eacute;sent&eacute;es</span>
+        <strong id="players-stat-factions" class="stat-value" style="color: #6366f1;">0</strong>
+        <span class="stat-delta">Guildes &amp; alliances</span>
+      </div>
+    </div>
+
+    <!-- FILTRES ET RECHERCHE JOUEURS -->
+    <div class="card" style="margin-bottom: 20px;">
+      <div style="display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 280px;">
+          <input type="text" id="players-search-input" placeholder="Rechercher par pseudo, grade, faction..." style="padding: 9px 14px; font-size: 13px; width: 100%; max-width: 360px;" />
+          <div class="chips-row" id="players-filter-chips" style="margin: 0;">
+            <button type="button" class="chip-btn active" data-player-filter="all">Tous (<span id="pcount-all">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="online">En Ligne (<span id="pcount-online">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="staff">Staff (<span id="pcount-staff">0</span>)</button>
+            <button type="button" class="chip-btn" data-player-filter="faction">En Faction (<span id="pcount-faction">0</span>)</button>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <select id="players-sort-select" style="padding: 7px 12px; font-size: 12px; background: var(--card-soft); border: 1px solid var(--line); color: var(--text); border-radius: 6px;">
+            <option value="recent">Tri : Derni&egrave;re Activit&eacute;</option>
+            <option value="money">Tri : Plus Riches ($)</option>
+            <option value="name">Tri : Pseudo (A-Z)</option>
+            <option value="oldest">Tri : Premi&egrave;re Connexion</option>
+          </select>
+          <div class="chips-row" id="players-view-toggle" style="margin: 0;">
+            <button type="button" class="chip-btn active" data-view="grid" title="Vue Cartes Profils">&#128392; Cartes</button>
+            <button type="button" class="chip-btn" data-view="table" title="Vue Tableau">&#128203; Tableau</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENEUR DES JOUEURS (VUE GRILLE OU TABLEAU) -->
+    <div id="players-view-container">
+      <!-- Rendu dynamique par renderPlayersTab() -->
+    </div>
+  </section>
+
+  <!-- TAB : MODERATION & SECURITE -->
+  <section id="tab-moderation" class="tab" role="tabpanel" aria-labelledby="nav-moderation" tabindex="0" hidden>
     <div class="tab-header-banner card">
       <div>
         <h2>Mod&eacute;ration &amp; S&eacute;curit&eacute; en Temps R&eacute;el</h2>
@@ -1899,45 +1977,6 @@
         <span class="muted text-sm">Joueurs en Direct</span>
         <strong id="mod-stat-online" class="stat-value" style="color: var(--primary-mint, #10b981);">0</strong>
         <span class="stat-delta">Surveill&eacute;s en jeu</span>
-      </div>
-    </div>
-
-    <!-- CARTE : ANNUAIRE & FICHE DE TOUS LES JOUEURS ENREGISTRES -->
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="card-header" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-        <div>
-          <h3 style="margin: 0; font-size: 16px;">&#128101; Annuaire &amp; Fiches de tous les Joueurs Enregistr&eacute;s</h3>
-          <p class="muted text-sm" style="margin: 4px 0 0 0;">Consultez les informations d&eacute;taill&eacute;es (grade, solde &eacute;conomie, kills, ratio, date de premi&egrave;re connexion) de tous les joueurs du serveur.</p>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          <input type="text" id="reg-players-search" placeholder="Rechercher par pseudo, grade, faction..." style="padding: 6px 10px; font-size: 12px; width: 250px;" />
-          <div class="chips-row" id="reg-players-filters" style="margin: 0;">
-            <button type="button" class="chip-btn active" data-player-filter="all">Tous (<span id="reg-count-all">0</span>)</button>
-            <button type="button" class="chip-btn" data-player-filter="online">En Ligne (<span id="reg-count-online">0</span>)</button>
-            <button type="button" class="chip-btn" data-player-filter="staff">Staff (<span id="reg-count-staff">0</span>)</button>
-            <button type="button" class="chip-btn" data-player-filter="sanctioned">Sanctionn&eacute;s (<span id="reg-count-sanctioned">0</span>)</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table class="table-compact">
-          <thead>
-            <tr>
-              <th style="width: 180px;">Joueur</th>
-              <th style="width: 120px;">Grade / Rang</th>
-              <th style="width: 130px;">Faction</th>
-              <th style="width: 110px;">Solde ($)</th>
-              <th style="width: 110px;">Connexion</th>
-              <th style="width: 110px;">Mod&eacute;ration</th>
-              <th style="width: 140px;">Derni&egrave;re Activit&eacute;</th>
-              <th style="width: 160px; text-align: right;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="reg-players-table-body">
-            <!-- Rempli dynamiquement par renderRegisteredPlayers() -->
-          </tbody>
-        </table>
       </div>
     </div>
 
@@ -1988,16 +2027,16 @@
             <div class="chips-row" id="mod-direct-reason-chips">
               <button type="button" class="chip-btn" data-reason="Spam / Flood intempestif dans le chat">Spam / Flood</button>
               <button type="button" class="chip-btn" data-reason="Insultes, propos toxiques ou irrespect">Insultes / Toxique</button>
-              <button type="button" class="chip-btn" data-reason="Triche avérée / Fly / AutoClick / X-Ray">Triche / Hack</button>
+              <button type="button" class="chip-btn" data-reason="Triche av&eacute;r&eacute;e / Fly / AutoClick / X-Ray">Triche / Hack</button>
               <button type="button" class="chip-btn" data-reason="Anti-jeu / Grief / Abus de bug">Anti-jeu / Grief</button>
-              <button type="button" class="chip-btn" data-reason="Publicité non autorisée">Publicit&eacute;</button>
-              <button type="button" class="chip-btn" data-reason="Refus d'obtempérer / Provocation staff">Provoc Staff</button>
+              <button type="button" class="chip-btn" data-reason="Publicit&eacute; non autoris&eacute;e">Publicit&eacute;</button>
+              <button type="button" class="chip-btn" data-reason="Refus d'obtemp&eacute;rer / Provocation staff">Provoc Staff</button>
             </div>
           </div>
 
           <div class="field">
             <label for="mod-direct-reason">Motif personnalis&eacute; / D&eacute;tails</label>
-            <input type="text" id="mod-direct-reason" placeholder="Ex: Spam répété après avertissements" required />
+            <input type="text" id="mod-direct-reason" placeholder="Ex: Spam r&eacute;p&eacute;t&eacute; apr&egrave;s avertissements" required />
           </div>
 
           <button type="submit" id="mod-direct-submit-btn" class="danger" style="margin-top: 6px; padding: 10px 16px; font-weight: 600;">
@@ -2017,7 +2056,7 @@
         </div>
 
         <div id="mod-live-players-container" style="flex: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 480px;">
-          <!-- Injecté dynamiquement par app.js -->
+          <!-- Inject&eacute; dynamiquement par app.js -->
         </div>
       </div>
     </div>
@@ -2057,7 +2096,7 @@
             </tr>
           </thead>
           <tbody id="mod-sanctions-table-body">
-            <!-- Injecté dynamiquement par app.js -->
+            <!-- Inject&eacute; dynamiquement par app.js -->
           </tbody>
         </table>
       </div>
@@ -2261,7 +2300,7 @@
 
 <datalist id="ingredients-vanilla"></datalist>
 <datalist id="ingredients"></datalist>
-<script type="module" src="/app.js?v=3.5"></script>
+<script type="module" src="/app.js?v=3.7"></script>
 
 <!-- DIALOG : DOSSIER & INSPECTEUR JOUEUR COMPLET -->
 <dialog id="player-inspector-modal" class="card modal-dialog player-inspector-dialog">

@@ -533,12 +533,14 @@ const TAB_TITLES = {
   data: { title: "Données & Historique", sub: "Export, import et historique des versions du studio" },
   "sync-guide": { title: "Synchronisation Serveur", sub: "Procédure d’application en direct sur le serveur de jeu" },
   "config-roles": { title: "Grades & Permissions", sub: "Configuration des rangs, multiplicateurs et hiérarchie de permissions" },
+  players: { title: "Base Joueurs & Profils", sub: "Annuaire exhaustif de tous les joueurs enregistr\u00e9s sur OpalCore" },
   moderation: { title: "Modération & Sécurité", sub: "Pilotage des sanctions, surveillance des joueurs connectés et registre d’audit" },
 };
 
 const renderActiveTab = () => {
   if (state.ui.tab === "dashboard") renderDashboardTab();
   if (state.ui.tab === "logs") renderLogsTab();
+  if (state.ui.tab === "players") renderPlayersTab();
   if (state.ui.tab === "moderation") renderModerationTab();
   if (!state.ready) return;
   if (state.ui.tab === "library") renderLibrary();
@@ -6809,23 +6811,9 @@ window.addEventListener("beforeunload", (event) => {
   event.returnValue = "";
 });
 
-/* =====================================================================
-   DÉMARRAGE
-===================================================================== */
+// Startup moved to bottom of file
 
-buildGrid();
-toggleEntryFields();
-toggleRecipeType();
-updateLoreCounter();
-updateEntryPreview();
-refreshStatus();
-ensureLibrary().catch(() => {});
-if (state.token) {
-  enter();
-} else {
-  showApp(false);
-  $("#password").focus();
-}
+
 
 
 /* ========================================================================= */
@@ -7697,10 +7685,11 @@ const renderRegisteredPlayers = async () => {
       : "-";
 
     const avatarImg = h("img", {
-      src: `https://api.creepernation.net/avatar/${encodeURIComponent(pName)}?fallback=steve&size=24`,
+      src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/24`,
       alt: pName,
       style: "width: 22px; height: 22px; border-radius: 4px; image-rendering: pixelated; flex-shrink: 0;",
       onerror: (e) => {
+        e.target.onerror = null;
         e.target.src = "/assets/icon.png";
       }
     });
@@ -7923,9 +7912,10 @@ const renderModerationTab = async () => {
 
         const avatarImg = h("img", {
           class: "mod-player-avatar",
-          src: `https://api.creepernation.net/avatar/${encodeURIComponent(pName)}?fallback=steve&size=40`,
+          src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/40`,
           alt: pName,
           onerror: (e) => {
+            e.target.onerror = null;
             e.target.src = "/assets/icon.png";
           }
         });
@@ -8108,10 +8098,11 @@ const renderModerationTab = async () => {
               "div",
               { style: "display: flex; align-items: center; gap: 8px;" },
               h("img", {
-                src: `https://api.creepernation.net/avatar/${encodeURIComponent(s.target)}?fallback=steve&size=20`,
+                src: `https://mc-heads.net/avatar/${encodeURIComponent(s.target)}/20`,
                 alt: s.target,
                 style: "width: 18px; height: 18px; border-radius: 3px; image-rendering: pixelated;",
                 onerror: (e) => {
+                  e.target.onerror = null;
                   e.target.src = "/assets/icon.png";
                 }
               }),
@@ -8241,3 +8232,433 @@ on("#reg-players-search", "input", (e) => {
   regPlayersSearch = e.target.value;
   renderRegisteredPlayers();
 });
+
+
+/* =====================================================================
+   MODULE JOUEURS DÉDIÉ (ONGLET JOUEURS & PROFILS)
+===================================================================== */
+
+let playersFilter = "all";
+let playersSearch = "";
+let playersSort = "recent";
+let playersView = "grid";
+
+const renderPlayersTab = async () => {
+  let players = [];
+  try {
+    const res = await fetch("/api/players", {
+      headers: { ...(state.token ? { Authorization: "Bearer " + state.token } : {}) }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      players = data.players || [];
+    }
+  } catch {}
+
+  // Fallback : extraire les joueurs uniques depuis les logs si la liste est vide
+  if (players.length === 0) {
+    const allLogs = getStoredLogs();
+    const seen = new Map();
+    for (const l of allLogs) {
+      if (!l.player || ["WebAdmin", "WebStaff", "System", "Console", "Serveur"].includes(l.player)) continue;
+      const key = l.player.toLowerCase();
+      if (!seen.has(key)) {
+        seen.set(key, {
+          name: l.player,
+          role: "Joueur",
+          money: 1000,
+          faction: l.faction || "Sans Faction",
+          isOnline: false,
+          last_join: l.time || "",
+          first_join: l.time || ""
+        });
+      }
+    }
+    players = Array.from(seen.values());
+  }
+
+  // Métriques globales joueurs
+  const onlineCount = players.filter((p) => p.isOnline).length;
+  const staffCount = players.filter((p) => {
+    const r = (p.role || "").toUpperCase();
+    return ["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(r);
+  }).length;
+  const factionsCount = new Set(players.map((p) => p.faction).filter((f) => f && f !== "Sans Faction")).size;
+
+  const sTotal = $("#players-stat-total");
+  const sOnline = $("#players-stat-online");
+  const sStaff = $("#players-stat-staff");
+  const sFactions = $("#players-stat-factions");
+  const navBadge = $("#nav-players-badge");
+
+  if (sTotal) sTotal.textContent = String(players.length);
+  if (sOnline) sOnline.textContent = String(onlineCount);
+  if (sStaff) sStaff.textContent = String(staffCount);
+  if (sFactions) sFactions.textContent = String(factionsCount);
+  if (navBadge) navBadge.textContent = String(players.length);
+
+  // Compteurs filtres
+  const pcAll = $("#pcount-all");
+  const pcOnline = $("#pcount-online");
+  const pcStaff = $("#pcount-staff");
+  const pcFaction = $("#pcount-faction");
+  if (pcAll) pcAll.textContent = String(players.length);
+  if (pcOnline) pcOnline.textContent = String(onlineCount);
+  if (pcStaff) pcStaff.textContent = String(staffCount);
+  if (pcFaction) pcFaction.textContent = String(players.filter((p) => p.faction && p.faction !== "Sans Faction").length);
+
+  // Filtrage
+  const q = (playersSearch || "").toLowerCase().trim();
+  let list = players.filter((p) => {
+    if (playersFilter === "online" && !p.isOnline) return false;
+    if (playersFilter === "staff") {
+      const r = (p.role || "").toUpperCase();
+      if (!["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(r)) return false;
+    }
+    if (playersFilter === "faction" && (!p.faction || p.faction === "Sans Faction")) return false;
+    if (q) {
+      const nMatch = (p.name || "").toLowerCase().includes(q);
+      const rMatch = (p.role || "").toLowerCase().includes(q);
+      const fMatch = (p.faction || "").toLowerCase().includes(q);
+      if (!nMatch && !rMatch && !fMatch) return false;
+    }
+    return true;
+  });
+
+  // Tri
+  if (playersSort === "money") {
+    list.sort((a, b) => (b.money ?? 0) - (a.money ?? 0));
+  } else if (playersSort === "name") {
+    list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  } else if (playersSort === "oldest") {
+    list.sort((a, b) => (a.first_join || "").localeCompare(b.first_join || ""));
+  } else {
+    // recent
+    list.sort((a, b) => {
+      if (a.isOnline && !b.isOnline) return -1;
+      if (!a.isOnline && b.isOnline) return 1;
+      return (b.last_join || "").localeCompare(a.last_join || "");
+    });
+  }
+
+  const container = $("#players-view-container");
+  if (!container) return;
+  container.replaceChildren();
+
+  if (list.length === 0) {
+    container.appendChild(
+      h(
+        "div",
+        { class: "card", style: "text-align: center; padding: 40px 20px; border: 1px dashed var(--line);" },
+        h("div", { style: "font-size: 32px; margin-bottom: 8px;" }, "🔍"),
+        h("strong", { style: "font-size: 15px;" }, "Aucun joueur trouvé"),
+        h("p", { class: "muted text-sm", style: "margin: 6px 0 0 0;" }, "Essayez de modifier votre recherche ou vos filtres.")
+      )
+    );
+    return;
+  }
+
+  if (playersView === "grid") {
+    const grid = h("div", { class: "players-cards-grid" });
+    list.forEach((p) => {
+      const pName = p.name || "Steve";
+      const role = p.role || "Joueur";
+      const money = p.money ?? 1000;
+      const faction = p.faction || "Sans Faction";
+      const isOnline = Boolean(p.isOnline);
+      const isStaff = ["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(role.toUpperCase());
+
+      const avatar = h("img", {
+        class: "player-card-avatar",
+        src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/44`,
+        alt: pName,
+        onerror: (e) => {
+          e.target.onerror = null;
+          e.target.src = "/assets/icon.png";
+        }
+      });
+
+      const card = h(
+        "div",
+        { class: "player-profile-card" },
+        h(
+          "div",
+          { class: "player-profile-card-header" },
+          h(
+            "div",
+            { class: "player-profile-identity" },
+            avatar,
+            h(
+              "div",
+              { class: "player-profile-names" },
+              h("div", { class: "player-card-username" }, pName),
+              h(
+                "div",
+                { class: "player-card-badges" },
+                h(
+                  "span",
+                  {
+                    class: "subnav-badge",
+                    style: `font-size: 10px; padding: 2px 6px; ${isStaff ? "background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);" : ""}`
+                  },
+                  role
+                ),
+                isOnline
+                  ? h("span", { class: "status-badge-active", style: "font-size: 10.5px;" }, "🟢 En jeu")
+                  : h("span", { class: "status-badge-expired", style: "font-size: 10.5px;" }, "⚪ Hors ligne")
+              )
+            )
+          )
+        ),
+        h(
+          "div",
+          { class: "player-card-stats-grid" },
+          h(
+            "div",
+            { class: "player-card-stat-item" },
+            h("span", { class: "player-card-stat-label" }, "Solde Cash"),
+            h("span", { class: "player-card-stat-val", style: "color: var(--mint);" }, `$${money.toLocaleString("fr-FR")}`)
+          ),
+          h(
+            "div",
+            { class: "player-card-stat-item" },
+            h("span", { class: "player-card-stat-label" }, "Faction"),
+            h("span", { class: "player-card-stat-val" }, faction)
+          ),
+          h(
+            "div",
+            { class: "player-card-stat-item" },
+            h("span", { class: "player-card-stat-label" }, "Monde actuel"),
+            h("span", { class: "player-card-stat-val" }, p.world || "world")
+          ),
+          h(
+            "div",
+            { class: "player-card-stat-item" },
+            h("span", { class: "player-card-stat-label" }, "Modération"),
+            h(
+              "span",
+              { class: "player-card-stat-val" },
+              p.activeSanction ? `🛑 ${p.activeSanction}` : "🟢 En règle"
+            )
+          )
+        ),
+        h(
+          "div",
+          { class: "player-card-footer" },
+          h(
+            "button",
+            {
+              type: "button",
+              class: "ghost",
+              style: "font-size: 12px; font-weight: 600; color: var(--mint); padding: 4px 8px;",
+              onclick: () => openPlayerInspector(pName)
+            },
+            "🔍 Consulter le Dossier"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              class: "btn-xs danger-ghost",
+              onclick: () => {
+                openTab("moderation");
+                const targetInput = $("#mod-direct-target");
+                if (targetInput) targetInput.value = pName;
+                document.getElementById("mod-direct-form")?.scrollIntoView({ behavior: "smooth" });
+                $("#mod-direct-reason")?.focus();
+              }
+            },
+            "⚖️ Sanctionner"
+          )
+        )
+      );
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  } else {
+    // Vue Tableau
+    const tableWrap = h(
+      "div",
+      { class: "card table-wrap" },
+      h(
+        "table",
+        { class: "table-compact" },
+        h(
+          "thead",
+          null,
+          h(
+            "tr",
+            null,
+            h("th", { style: "width: 200px;" }, "Joueur"),
+            h("th", { style: "width: 130px;" }, "Grade"),
+            h("th", { style: "width: 140px;" }, "Faction"),
+            h("th", { style: "width: 120px;" }, "Solde ($)"),
+            h("th", { style: "width: 110px;" }, "Statut"),
+            h("th", { style: "width: 120px;" }, "Modération"),
+            h("th", { style: "width: 140px;" }, "Dernière Activité"),
+            h("th", { style: "width: 170px; text-align: right;" }, "Actions")
+          )
+        ),
+        h(
+          "tbody",
+          null,
+          ...list.map((p) => {
+            const pName = p.name || "Steve";
+            const role = p.role || "Joueur";
+            const money = p.money ?? 1000;
+            const faction = p.faction || "Sans Faction";
+            const isOnline = Boolean(p.isOnline);
+            const isStaff = ["FONDATEUR", "ADMIN", "RESPONSABLE", "MODERATEUR", "GUIDE", "BUILDER"].includes(role.toUpperCase());
+
+            return h(
+              "tr",
+              null,
+              h(
+                "td",
+                null,
+                h(
+                  "div",
+                  { style: "display: flex; align-items: center; gap: 8px;" },
+                  h("img", {
+                    src: `https://mc-heads.net/avatar/${encodeURIComponent(pName)}/24`,
+                    alt: pName,
+                    style: "width: 22px; height: 22px; border-radius: 4px; image-rendering: pixelated;",
+                    onerror: (e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/assets/icon.png";
+                    }
+                  }),
+                  h(
+                    "button",
+                    {
+                      type: "button",
+                      class: "ghost",
+                      style: "font-weight: 600; padding: 0; color: var(--text);",
+                      onclick: () => openPlayerInspector(pName)
+                    },
+                    pName
+                  )
+                )
+              ),
+              h(
+                "td",
+                null,
+                h(
+                  "span",
+                  {
+                    class: "subnav-badge",
+                    style: `font-size: 11px; padding: 2px 7px; ${isStaff ? "background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);" : ""}`
+                  },
+                  role
+                )
+              ),
+              h("td", { class: "muted text-sm" }, faction),
+              h("td", { style: "font-family: monospace; font-weight: 600; color: var(--mint);" }, `$${money.toLocaleString("fr-FR")}`),
+              h(
+                "td",
+                null,
+                isOnline
+                  ? h("span", { class: "status-badge-active" }, "🟢 En jeu")
+                  : h("span", { class: "status-badge-expired" }, "⚪ Déconnecté")
+              ),
+              h(
+                "td",
+                null,
+                p.activeSanction
+                  ? h("span", { class: "mod-action-badge badge-ban", style: "font-size: 10px;" }, p.activeSanction)
+                  : h("span", { class: "status-badge-active" }, "🟢 En règle")
+              ),
+              h("td", { class: "muted text-sm", style: "font-size: 11px; font-family: monospace;" }, p.last_join || "-"),
+              h(
+                "td",
+                { style: "text-align: right;" },
+                h(
+                  "div",
+                  { style: "display: flex; gap: 6px; justify-content: flex-end;" },
+                  h(
+                    "button",
+                    {
+                      type: "button",
+                      class: "btn-xs",
+                      onclick: () => openPlayerInspector(pName)
+                    },
+                    "🔍 Dossier"
+                  ),
+                  h(
+                    "button",
+                    {
+                      type: "button",
+                      class: "btn-xs danger-ghost",
+                      onclick: () => {
+                        openTab("moderation");
+                        const targetInput = $("#mod-direct-target");
+                        if (targetInput) targetInput.value = pName;
+                        document.getElementById("mod-direct-form")?.scrollIntoView({ behavior: "smooth" });
+                        $("#mod-direct-reason")?.focus();
+                      }
+                    },
+                    "⚖️ Sanction"
+                  )
+                )
+              )
+            );
+          })
+        )
+      )
+    );
+    container.appendChild(tableWrap);
+  }
+};
+
+/* --- EVENT LISTENERS PLAYERS TAB ------------------------------------- */
+
+document.querySelectorAll("#players-filter-chips .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#players-filter-chips .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    playersFilter = chip.dataset.filter || "all";
+    renderPlayersTab();
+  });
+});
+
+document.querySelectorAll("#players-view-toggle .chip-btn").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#players-view-toggle .chip-btn").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    playersView = chip.dataset.view || "grid";
+    renderPlayersTab();
+  });
+});
+
+on("#players-search-input", "input", (e) => {
+  playersSearch = e.target.value;
+  renderPlayersTab();
+});
+
+on("#players-sort-select", "change", (e) => {
+  playersSort = e.target.value;
+  renderPlayersTab();
+});
+
+on("#players-tab-refresh-btn", "click", async () => {
+  toast("Actualisation de la base joueurs...", "info");
+  await renderPlayersTab();
+});
+
+/* =====================================================================
+   DÉMARRAGE
+===================================================================== */
+
+buildGrid();
+toggleEntryFields();
+toggleRecipeType();
+updateLoreCounter();
+updateEntryPreview();
+refreshStatus();
+ensureLibrary().catch(() => {});
+if (state.token) {
+  enter();
+} else {
+  showApp(false);
+  $("#password").focus();
+}
