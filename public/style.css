@@ -363,17 +363,34 @@ button.danger.ghost { background: transparent; color: var(--danger); border-colo
 .history-meta { display: flex; flex-direction: column; gap: 2px; }
 .history-meta small { color: var(--muted); }
 
-/* Dialogue de texture */
+/* TOUS les dialogues non ouverts doivent impérativement être masqués */
+dialog:not([open]) {
+  display: none !important;
+}
+
+dialog[open] {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1000;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 14px;
+}
+
+dialog::backdrop {
+  background: rgba(4, 8, 12, 0.82) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+/* Dialogue générique / textures */
 .modal-dialog {
   max-width: 520px;
   width: calc(100% - 24px);
   max-height: calc(100vh - 24px);
   overflow: auto;
-  border: 1px solid var(--accent);
   box-shadow: 0 12px 36px rgba(0, 0, 0, .6);
-  margin: auto;
 }
-.modal-dialog::backdrop { background: rgba(10, 12, 25, .75); backdrop-filter: blur(3px); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .modal-header h2 { margin: 0; }
 .modal-actions { margin-top: 16px; }
@@ -3343,11 +3360,17 @@ button.danger.ghost { background: transparent; color: var(--danger); border-colo
 /* --- INSPECTEUR JOUEUR & DOSSIER MODERATION --------------------------- */
 .player-inspector-dialog {
   max-width: 860px;
-  width: 95vw;
-  max-height: 90vh;
+  width: 92vw;
+  max-height: 85vh;
   padding: 0;
   overflow: hidden;
-  display: flex;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(82, 184, 155, 0.25);
+  background: #0d1413;
+}
+
+dialog[open].player-inspector-dialog {
+  display: flex !important;
   flex-direction: column;
 }
 
@@ -3499,7 +3522,11 @@ button.danger.ghost { background: transparent; color: var(--danger); border-colo
 .moderation-dialog {
   max-width: 520px;
   width: 90vw;
-  padding: 20px 24px;
+  padding: 24px;
+  border-radius: 14px;
+  background: #111417;
+  border: 1px solid var(--line);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(239, 68, 68, 0.25);
 }
 
 .chips-row {

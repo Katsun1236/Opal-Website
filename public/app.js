@@ -7482,6 +7482,17 @@ on("#pi-close-btn", "click", () => {
   $("#player-inspector-modal")?.close();
 });
 
+// Fermeture des modales au clic sur le fond flouté (backdrop)
+["player-inspector-modal", "moderation-action-modal", "role-create-dialog"].forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("click", (e) => {
+    const rect = el.getBoundingClientRect();
+    const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height && rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+    if (!isInDialog) el.close();
+  });
+});
+
 document.querySelectorAll(".player-inspector-tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     switchInspectorTab(btn.dataset.piTab);
