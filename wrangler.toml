@@ -1,7 +1,12 @@
 name = "opal-website"
-pages_build_output_dir = "public"
+main = "_worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
+
+# Fichiers statiques du dashboard (HTML, CSS, JS, textures, catalogues)
+[assets]
+directory = "./public"
+binding = "ASSETS"
 
 # Variables de configuration du studio Opal
 [vars]
@@ -13,4 +18,3 @@ PLUGIN_TOKEN = "K9v#mP2$xL8wQ4zR7bY1fH3jN6sT5vW"
 [[kv_namespaces]]
 binding = "OPAL_CONTENT"
 id = "9d33779e63c44dfa862dfeb48fd1aff2"
-
