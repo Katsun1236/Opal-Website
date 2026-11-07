@@ -8,7 +8,14 @@ compatibility_flags = ["nodejs_compat"]
 directory = "./public"
 binding = "ASSETS"
 
+# Variables de configuration du studio Opal
+[vars]
+ADMIN_PASSWORD = "Suricate001+"
+SESSION_SECRET = "c8f1e4a7b9d2e5f8a1c3b5d7e9f2a4c6"
+PLUGIN_TOKEN = "K9v#mP2$xL8wQ4zR7bY1fH3jN6sT5vW"
+
 # Base de données clé-valeur Cloudflare KV
 [[kv_namespaces]]
 binding = "OPAL_CONTENT"
 id = "opal_content_kv"
+
