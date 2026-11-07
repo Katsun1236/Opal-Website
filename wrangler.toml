@@ -1,9 +1,14 @@
 name = "opalheaven-dashboard"
-pages_build_output_dir = "public"
+main = "_worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Liaison KV pour la persistance des données du studio (items, configs, télémétrie, joueurs)
+# Fichiers statiques du dashboard (HTML, CSS, JS, textures, catalogues)
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Base de données clé-valeur Cloudflare KV
 [[kv_namespaces]]
 binding = "OPAL_CONTENT"
 id = "opal_content_kv"
