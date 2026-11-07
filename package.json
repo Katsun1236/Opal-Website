@@ -8,6 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
+    "build": "echo 'Build complete'",
+    "deploy": "wrangler pages deploy public",
     "dev": "npx --yes netlify-cli dev",
     "test": "node --test \"tests/*.test.mjs\"",
     "check:data": "node scripts/check-data.mjs",
