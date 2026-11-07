@@ -647,7 +647,10 @@ const routeRequest = async (req, url, context, store, env) => {
         store.get("telemetry", { type: "json" }).catch(() => null),
         store.get("server_logs", { type: "json" }).catch(() => []),
       ]);
-    } catch {}
+      serverLogs = Array.isArray(serverLogs) ? serverLogs : [];
+    } catch {
+      serverLogs = [];
+    }
     const telemConnected = Boolean(telemetry && (Date.now() - new Date(telemetry.receivedAt).getTime() < 1800000 || (serverLogs && serverLogs.length > 0)));
     return reply({
       connected: telemConnected,
@@ -668,7 +671,15 @@ const routeRequest = async (req, url, context, store, env) => {
         store.get("moderation_sanctions", { type: "json" }).catch(() => []),
         store.get("telemetry", { type: "json" }).catch(() => null),
       ]);
-    } catch {}
+      registered = Array.isArray(registered) ? registered : [];
+      serverLogs = Array.isArray(serverLogs) ? serverLogs : [];
+      sanctions = Array.isArray(sanctions) ? sanctions : [];
+    } catch {
+      registered = [];
+      serverLogs = [];
+      sanctions = [];
+      telem = null;
+    }
 
     const playersMap = new Map();
     for (const r of registered) {
