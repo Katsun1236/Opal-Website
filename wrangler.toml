@@ -17,5 +17,5 @@ PLUGIN_TOKEN = "K9v#mP2$xL8wQ4zR7bY1fH3jN6sT5vW"
 # Base de données clé-valeur Cloudflare KV
 [[kv_namespaces]]
 binding = "OPAL_CONTENT"
-id = "opal_content_kv"
+id = "9d33779e63c44dfa862dfeb48fd1aff2"
 
