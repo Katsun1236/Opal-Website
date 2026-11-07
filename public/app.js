@@ -3921,6 +3921,10 @@ const addBroadcastMessage = () => {
 const renderSyncGuideTab = () => {
   const rev = $("#sync-active-revision");
   if (rev) rev.textContent = "Rev " + (state.revision || 0);
+  const endpointEl = $("#sync-api-endpoint");
+  if (endpointEl) {
+    endpointEl.textContent = `${window.location.origin}/api/plugin/content`;
+  }
 };
 
 /* =====================================================================
